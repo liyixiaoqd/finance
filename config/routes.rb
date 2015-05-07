@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+
   #web display
   root 'registe#index'
   get 'registe/index' => 'registe#index'
@@ -31,10 +32,25 @@ Rails.application.routes.draw do
 
   #reconciliation inteface use 
   get 'pay/:payment_system/get_reconciliation' => 'online_pay#get_bill_from_payment_system'
-  #simulate inteface call , use other project
-  # get 'simulation' => 'simulation#index'
-  # post 'simulation/simulate' => 'simulation#simulate'
+
+
  
+  #web display  ---  simulate interface 
+  get 'simulation' => 'simulation#index'
+  post 'simulation/simulate_pay' => 'simulation#simulate_pay'
+  post 'simulation/simulate_pay_credit' => 'simulation#simulate_pay_credit'
+  post 'simulation/simulate_post' => 'simulation#simulate_post'
+  post 'simulation/simulate_get' => 'simulation#simulate_get'
+  post 'simulation/simulate_finance_modify' => 'simulation#simulate_finance_modify'
+  post 'simulation/simulate_registe' => 'simulation#simulate_registe'
+
+  get 'simulation/callback_return' => 'simulation#callback_return'
+  post 'simulation/callback_notify' => 'simulation#callback_notify'
+  
+  #reconciliation inteface call
+  get 'simulation/simulate_reconciliation' => 'simulation#index_reconciliation'
+  post 'simulation/simulate_reconciliation' => 'simulation#simulate_reconciliation'
+  
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

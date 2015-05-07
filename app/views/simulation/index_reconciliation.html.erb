@@ -1,0 +1,11 @@
+<h>SIMULATION RECONCILIATION INDEX PAGE</h>
+</br>
+
+<div class="simulation_reconciliation">
+	<%= form_tag("/simulation/simulate_reconciliation", method: "post") do %>
+	         <%= label_tag(:label1, "please select payment system:") %> 
+	         <%= select_tag(:payment_system,options_for_select([["alipay_oversea","alipay_oversea"],["alipay_transaction","alipay_transaction"],["paypal","paypal"]],"alipay")) %>
+	          </br>  </br>
+	          <%= submit_tag("reconciliation") %>
+	<% end %>
+</div>

@@ -1,7 +1,95 @@
-<h>SIMULATION INDEX PAGE</h>
+<h>SIMULATION ONLINE_PAY INDEX PAGE</h>
 </p>
-
-<%= form_tag("/simulation/simulate", method: "post") do %>
-  <%= label_tag(:q, "simulation inteface call") %>
-  <%= submit_tag("call") %>
-<% end %>
+<div class="simulation_submit">
+  <%= flash[:notice] %>
+  <table id="simulation_table">
+    <tr>
+      <td id="simulation_table_tr_td">
+        <%= form_tag("/simulation/simulate_pay", method: "post") do %>
+          <%= label_tag(:label1, "simulation inteface call") %> </br>
+          <%= label_tag(:label2, "please choose payway:") %> </br>
+          <%= radio_button_tag(:payway, "paypal") %>
+          <%= label_tag(:payway_paypal, "PAYPAL") %>
+          <%= radio_button_tag(:payway, "sofort") %>
+          <%= label_tag(:payway_sofort, "SOFORT") %>
+          <%= radio_button_tag(:payway, "alipay_oversea") %>
+          <%= label_tag(:payway_alipay_oversea, "ALIPAY_OVERSEA") %>
+          <%= radio_button_tag(:payway, "alipay_transaction") %>
+          <%= label_tag(:payway_alipay_transaction, "ALIPAY_TRANSACTION") %>
+          </br>  </br>
+          <%= submit_tag("call") %>
+        <% end %>
+      </td>
+      <td id="simulation_table_tr_td">
+        <%= form_tag("/simulation/simulate_pay_credit", method: "post") do %>
+          <%= label_tag(:label1, "simulation inteface call") %> </br>
+          <%= radio_button_tag(:credit, "credit") %>
+          <%= label_tag(:pay_credit, "CREDIT") %><br/>
+          <%= text_field_tag(:trade_no) %>
+          </br>  </br>
+          <%= submit_tag("credit_call") %>
+        <% end %>
+      </td>
+    </tr>
+  </table>
+</div>
+<br/>
+<div class="simulation_callback">
+  <table id="simulation_table">
+      <tr>
+        <td id="simulation_table_tr_td">
+        <%= flash[:notice] %>
+        <%= form_tag("/simulation/simulate_get", method: "post") do %>
+          <%= label_tag(:label1, "simulation callback get call") %> </br>
+          <%= label_tag(:label2, "please input url to call :") %> </br>
+          <%= text_area_tag(:call_url, 'http://127.0.0.1:3000/pay/callback/alipay_oversea_return?sign=78cb61328d8d95672099a6475ab0be05&trade_no=2015040900001000050051921095&total_fee=195.63&sign_type=MD5&out_trade_no=mypost4u_alipay_oversea_20150427_004&trade_status=TRADE_FINISHED&currency=EUR',:rows=>6,:cols=>30) %>
+          </br> 
+          <%= submit_tag("get") %>
+        <% end %>
+        </td>
+        <td id="simulation_table_tr_td">
+        <%= flash[:notice] %>
+        <%= form_tag("/simulation/simulate_post", method: "post") do %>
+          <%= label_tag(:label1, "simulation callback post call") %> </br>
+          <%= label_tag(:label2, "please input url to call :") %> </br>
+          <%= text_area_tag(:call_url, "http://127.0.0.1:3000/pay/callback/alipay_oversea_notify",:rows=>6,:cols=>30) %>
+          </br> 
+          <%= submit_tag("post") %>
+        <% end %>
+        </td>
+      </tr>
+  </table>
+</div>
+<br/>
+<div class="simulation_regist_and_score">
+  <table id="simulation_table">
+      <tr>        
+        <td id="simulation_table_tr_td">
+        <%= form_tag("/simulation/simulate_registe", method: "post") do %>
+         <%= label_tag(:label1, "simulation registe user") %> </br>
+         <%= label_tag(:label2, "please input userid:") %> 
+         <%= text_field_tag(:userid,'552b461202d0f099ec000033') %> </br> 
+         <%= label_tag(:label2, "please input init score:") %> 
+         <%= text_field_tag(:score,50) %> </br>
+         <%= label_tag(:label3,"please input init e_cash:") %> 
+         <%= text_field_tag(:e_cash,88.8) %> </br>
+          <%= submit_tag("post") %>
+        <% end %>
+        </td>
+        <td id="simulation_table_tr_td">
+        <%= form_tag("/simulation/simulate_finance_modify", method: "post") do %>
+         <%= label_tag(:label1, "simulation modify user score") %> </br>
+         <%= label_tag(:label2, "please input userid:") %> 
+         <%= text_field_tag(:userid,'552b461202d0f099ec000033') %> </br> 
+         <%= label_tag(:label2, "please input score:") %> 
+         <%= text_field_tag(:score,50) %> </br>
+         <%= label_tag(:label3, "please select symbol:") %> 
+         <%= select_tag(:symbol,options_for_select([["+","Add"],["-","Sub"]],"Add")) %> 
+         <%= label_tag(:label3, "please select watertype:") %> 
+         <%= select_tag(:watertype,options_for_select([["score","score"],["e_cash","e_cash"]],"e_cash")) %> </br>
+          <%= submit_tag("post") %>
+        <% end %>
+        </td>
+      </tr>
+  </table>
+</div>

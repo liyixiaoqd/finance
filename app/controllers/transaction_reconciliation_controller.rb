@@ -23,15 +23,23 @@ class TransactionReconciliationController < ApplicationController
 				next if v.blank? 
 				next unless CONDITION_PARAMS.include?(k)
 				
-				if(index==1)
-					sql="#{sql} where #{k}=:#{k}"
+				if( k=="start_time")
+					t_sql="timestamp>=:#{k}"
+				elsif (k=="end_time")
+					t_sql="timestamp<=:#{k}"
 				else
-					sql="#{sql} and #{k}=:#{k}"
+					t_sql="#{k}=:#{k}"
+				end
+
+				if(index==1)
+					sql="#{sql} where #{t_sql}"
+				else
+					sql="#{sql} and #{t_sql}"
 				end
 
 				index=index+1
 			end
 
-			sql="#{sql} order by payway,paytype asc,transaction_date desc"
+			sql="#{sql} order by payway,paytype asc,timestamp desc"
 		end
 end

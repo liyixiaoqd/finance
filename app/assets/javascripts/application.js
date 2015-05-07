@@ -14,3 +14,18 @@
 //= require jquery_ujs
 //= require turbolinks
 //= require_tree .
+
+$(document).ready(function(){
+  $(".button_clear_time").click(function(){
+	form_obj=this.parentNode
+	input_objs=form_obj.getElementsByTagName("input")
+
+	for (var i=0;i<input_objs.length;i++){
+		if (input_objs[i].name.match(/time$/)) {
+			input_objs[i].value=""
+		}
+	}
+
+	foreach 
+  });
+});

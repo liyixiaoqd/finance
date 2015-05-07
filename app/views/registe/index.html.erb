@@ -13,5 +13,10 @@
  
 <% end %>
 
+<%= link_to 'simulate_online_pay',simulation_path %>
+<%= link_to 'simulate_reconciliation',simulation_simulate_reconciliation_path %>
+
+<div id="div_display_none">
 <%= link_to 'simulate_online_pay','http://127.0.0.1:3001/',:method=>'get' %>
 <%= link_to 'simulate_reconciliation','http://127.0.0.1:3001/simulation/simulate_reconciliation',:method=>'get' %>
+</div>

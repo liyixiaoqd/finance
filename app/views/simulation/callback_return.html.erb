@@ -1,0 +1,11 @@
+<h>SIMULATION CALLBACK RETURN PAGE</h>
+
+<%= form_tag simulation_simulate_pay_credit_path,method:"post" do %>
+	<% @params.each do |key,value| %>
+<!-- 		<%="#{key} => #{value}"%> </br> -->
+		<%= label_tag("label_#{key}", "#{key}") %><br/>
+		<%= text_field_tag("#{key}" ,"#{value}") %> </br>
+	<% end %>
+	</br>
+	<%= submit_tag("credit_call") %>
+<% end %>
