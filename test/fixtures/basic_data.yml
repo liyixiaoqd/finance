@@ -1,0 +1,19 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  basic_type: MyString
+  desc: MyString
+  basic_sub_type: MyString
+  sub_desc: MyString
+  payway: MyString
+  paytype: MyString
+  value: MyString
+
+two:
+  basic_type: MyString
+  desc: MyString
+  basic_sub_type: MyString
+  sub_desc: MyString
+  payway: MyString
+  paytype: MyString
+  value: MyString

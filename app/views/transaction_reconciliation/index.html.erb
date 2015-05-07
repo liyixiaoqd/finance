@@ -1,0 +1,48 @@
+<% @page_title="TRANSACTION RECONCILIATION MANAGE" %>
+
+<div id="reconciliation_details_condition">
+<%= form_tag transaction_reconciliation_index_by_condition_path,method:"get" do %>
+	<fieldset>
+		<legend>Please Enter Seach Condition</legend>
+		 <%= label_tag(:l1, "payway:") %> <%= text_field_tag(:payway) %>
+		 <%= label_tag(:l2, "paytype:") %> <%= text_field_tag(:paytype) %>
+		 <%= label_tag(:l3, "flag:") %> <%= text_field_tag(:reconciliation_flag) %>
+		 </br>
+		 <%= label_tag(:l4, "start_time:") %> <%= datetime_field_tag(:start_time,value="#{Time.now.at_beginning_of_day-1.day}") %>
+		 <%= label_tag(:l5, "end_time:") %> <%= datetime_field_tag(:end_time,value="#{Time.now.at_beginning_of_day}") %>
+		 <%= label_tag(:l6, "trade_no:") %> <%= text_field_tag(:trade_no) %>
+		</br>
+		 <%= submit_tag("Search") %>
+	</fieldset>
+<% end %>
+</div>
+
+<div id="reconciliation_details_content">
+<table>
+<% @reconciliation_details.each do |reconciliation_detail| %>
+<tr>
+	<td>  <%= reconciliation_detail.payway + " " + reconciliation_detail.paytype%>  </td>
+	<td>  <%= reconciliation_detail.transactionid %>  </td>
+	<td>  <%= reconciliation_detail.reconciliation_flag %>  </td>
+	<td>  <%= reconciliation_detail.amt %>  </td>
+	<td>  <%= reconciliation_detail.transaction_status %>  </td>
+<!-- 	<td>  
+		<% unless reconciliation_detail.reconciliation_describe.blank? %>  
+			<%= reconciliation_detail.reconciliation_describe %>
+		<% else %>
+			NONE
+	           	<% end %>  
+	</td> -->
+	<td> 
+		<% unless reconciliation_detail.online_pay_id.blank? %> 
+			<%= link_to reconciliation_detail.online_pay.trade_no,show_single_online_pay_path(reconciliation_detail.online_pay_id) %>
+		<% else %>
+			UNMATCH
+		<% end %>
+	</td>
+	<td>  <%= reconciliation_detail.timestamp %>  </td>
+</tr>
+<% end %>
+</table>
+<%= paginate @reconciliation_details %>
+</div>

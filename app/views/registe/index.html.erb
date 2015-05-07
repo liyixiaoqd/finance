@@ -1,0 +1,17 @@
+<% @page_title="USER MANAGE" %>
+
+<% @users.each do |user| %>
+<p>
+  <%= user.userid %>
+  <%= user.username %>
+  <%= user.e_cash %>
+  <%= user.score %>
+  <%= link_to 'finance_water_detail',show_user_score_path(user) %>
+  <%= link_to 'online_pay_detail',show_user_online_pay_path(user) %>
+  <hr>
+</p>
+ 
+<% end %>
+
+<%= link_to 'simulate_online_pay','http://127.0.0.1:3001/',:method=>'get' %>
+<%= link_to 'simulate_reconciliation','http://127.0.0.1:3001/simulation/simulate_reconciliation',:method=>'get' %>

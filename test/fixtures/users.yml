@@ -1,0 +1,23 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  system: MyString
+  channel: MyString
+  userid: MyString
+  username: MyString
+  email: MyString
+  account: 9.99
+  score: 9.99
+  operator: MyString
+  datetime: 2015-04-23 10:18:29
+
+two:
+  system: MyString
+  channel: MyString
+  userid: MyString
+  username: MyString
+  email: MyString
+  account: 9.99
+  score: 9.99
+  operator: MyString
+  datetime: 2015-04-23 10:18:29

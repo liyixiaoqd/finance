@@ -1,0 +1,18 @@
+username:<%= @user.username %> </br>
+e_cash:<%= @user.e_cash %> score:<%= @user.score %>
+<hr>
+<% @finance_waters.each do |finance_water| %>
+<p>
+  <% if finance_water.symbol =="Add" %>
+  <%= "#{finance_water.old_amount} + #{finance_water.amount} = #{finance_water.new_amount}"%>
+  <% else %>
+  <%= "#{finance_water.old_amount} - #{finance_water.amount} = #{finance_water.new_amount}"%>
+  <% end %>
+  <%= finance_water.operator %>
+  <%= finance_water.operdate %>
+  <%= finance_water.watertype %>
+  </p>
+</p>
+<% end %>
+
+ <%= link_to 'back',root_path %>

@@ -1,0 +1,15 @@
+<% @page_title="ONLINE_PAY DETAIL" %>
+<hr>
+<table border="1">
+<tr>
+  <td><%= @online_pay.order_no %></td>
+  <td><%= @online_pay.amount %></td>
+  <td><%= @online_pay.status %></td>
+  <td><%= @online_pay.callback_status %></td>
+  <td><%= @online_pay.payway.camelize + @online_pay.paytype.camelize %></td>
+  <td><%= @online_pay.trade_no %></td>
+  <td><%= @online_pay.reason %></td>
+  </tr>
+</table>
+
+<%=link_to 'back',:back%>

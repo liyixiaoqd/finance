@@ -1,0 +1,39 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  system: MyString
+  channel: MyString
+  userid: MyString
+  payway: MyString
+  paytype: MyString
+  amount: 9.99
+  currency: MyString
+  order_no: MyString
+  success_url: MyString
+  notification_url: MyString
+  notification_email: MyString
+  abort_url: MyString
+  timeout_url: MyString
+  ip: MyString
+  description: MyString
+  quantity: 9.99
+  logistics_name: MyString
+
+two:
+  system: MyString
+  channel: MyString
+  userid: MyString
+  payway: MyString
+  paytype: MyString
+  amount: 9.99
+  currency: MyString
+  order_no: MyString
+  success_url: MyString
+  notification_url: MyString
+  notification_email: MyString
+  abort_url: MyString
+  timeout_url: MyString
+  ip: MyString
+  description: MyString
+  quantity: 9.99
+  logistics_name: MyString

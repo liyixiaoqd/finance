@@ -1,0 +1,35 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  paytype: MyString
+  payway: MyString
+  timestamp: 2015-05-04 09:06:25
+  timezone: MyString
+  type: 
+  email: MyString
+  name: MyString
+  transactionid: MyString
+  status: MyString
+  amt: 9.99
+  currencycode: MyString
+  feeamt: 9.99
+  netamt: 9.99
+  reconciliation_flag: MyString
+  online_pay_id: 1
+
+two:
+  paytype: MyString
+  payway: MyString
+  timestamp: 2015-05-04 09:06:25
+  timezone: MyString
+  type: 
+  email: MyString
+  name: MyString
+  transactionid: MyString
+  status: MyString
+  amt: 9.99
+  currencycode: MyString
+  feeamt: 9.99
+  netamt: 9.99
+  reconciliation_flag: MyString
+  online_pay_id: 1

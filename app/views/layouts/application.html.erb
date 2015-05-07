@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Finance</title>
+  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
+  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+  <%= csrf_meta_tags %>
+</head>
+<body>
+<div id="banner">
+	<%=@page_title || 'title' %>
+</div>
+
+<div id="area">
+	<div id="side">
+		<%=link_to t('user page'),registe_index_path%>
+		</br>
+		<%=link_to t('finance check page'),transaction_reconciliation_index_path%>
+		</br>
+		<%=link_to t('upload_file page'),upload_file_index_path%>
+	</div>
+
+	<div id="main">
+		<%= yield %>
+	</div>
+</div>
+
+</body>
+</html>

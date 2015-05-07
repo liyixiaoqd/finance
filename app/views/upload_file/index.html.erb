@@ -1,0 +1,16 @@
+<% @page_title="UPLOAD FILE" %>
+
+<div id="upload">
+<%= form_tag upload_file_upload_path,multipart:true do %>
+	<fieldset>
+		<legend>Please Choose File To Upload</legend>
+			<%= label_tag(:l1, "File Type:") %>
+			<%= select_tag "file_type", options_for_select([ "sofort_transaction" ], "sofort_transaction") %>
+			</br></br>
+			<%= label_tag(:l2, "Choose File:") %>
+			<%= file_field_tag :file %>
+			</br></br>
+			<%= submit_tag("Upload") %>
+	</fieldset>
+<% end %>
+</div>
