@@ -117,7 +117,7 @@ class OnlinePayController < ApplicationController
 		page_size=params['page_size']
 
 		case payment_system
-		when "alipay_transaction" then  reconciliation=ReconciliationAlipayTransaction.new("account.page.query",1,start_time,end_time,page_size,1000)
+		when "alipay_transaction" then  reconciliation=ReconciliationAlipayTransaction.new("account.page.query",page_size,start_time,end_time,1000)
 		when "alipay_oversea" then  reconciliation=ReconciliationAlipayOversea.new("forex_compare_file",start_time,end_time)
 			# if payment_system_sub=="transaction"
 			# 	reconciliation=ReconciliationAlipayTransaction.new("account.page.query","","",10)
