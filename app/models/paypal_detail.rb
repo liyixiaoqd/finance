@@ -71,7 +71,7 @@ class PaypalDetail
 
 	def valid_credit_require(online_pay,request)
 		message="success"
-		unless(online_pay.ip==request.remote_ip)
+		unless(online_pay.remote_ip==request.remote_ip)
 			message="ip not match! #{online_pay.ip} <=> #{request.remote_ip}"
 		end
 
