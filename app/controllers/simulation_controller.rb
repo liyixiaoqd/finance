@@ -93,13 +93,14 @@ class SimulationController < ApplicationController
 		amount=params['amount']
 		userid="552b461202d0f099ec000033"
 		callpath="/pay/#{userid}/submit_creditcard"
-
+		ip=request.remote_ip
+		
 		uri = URI.parse("#{CALL_HOST}#{callpath}")
 		logger.info("path:#{callpath}")
 		http = Net::HTTP.new(uri.host, uri.port)
 
 		request = Net::HTTP::Post.new(uri.request_uri) 
-		request.set_form_data(credit_params(trade_no,amount,request.remote_ip))
+		request.set_form_data(credit_params(trade_no,amount,ip))
 		logger.info("call!!")
 		response=http.request(request)
 		res_result=JSON.parse(response.body)
