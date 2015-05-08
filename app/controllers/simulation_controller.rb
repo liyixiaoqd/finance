@@ -82,10 +82,11 @@ class SimulationController < ApplicationController
 
 		request = Net::HTTP::Post.new(uri.request_uri) 
 		request.set_form_data(simulate_params)
-		logger.info("call!!")
+		logger.info("SIMULATION CALL !!")
 		response=http.request(request)
 		res_result=JSON.parse(response.body)
-		logger.info("body:#{response.body}\nresult:#{res_result}")
+		logger.info("SIMULATION CALL END !!")
+		#logger.info("body:#{response.body}\nresult:#{res_result}")
 		unless (res_result['redirect_url'].blank?)
 			redirect_to CGI.unescape(res_result['redirect_url'])
 		else
