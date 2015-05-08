@@ -1,6 +1,8 @@
 require 'csv'
 
 class UploadFileController < ApplicationController
+	before_action :authenticate_admin!
+
 	SOFORT_TRANSACTION_FILE_SPLIT=";"
 
 	def index

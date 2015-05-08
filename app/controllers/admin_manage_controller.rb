@@ -1,5 +1,4 @@
 class AdminManageController < ApplicationController
-	skip_before_filter :authenticate_admin! , :only => [:sign_in]
 
 	def sign_index
 	end

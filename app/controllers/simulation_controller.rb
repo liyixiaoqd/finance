@@ -1,5 +1,8 @@
 class SimulationController < ApplicationController
 	protect_from_forgery :except => [:simulate_post]
+
+	before_action :authenticate_admin!,:only=>[:index,:index_reconciliation]
+
 	CALL_HOST=Settings.simulation.call_host
 
 	@@simulation_num=0

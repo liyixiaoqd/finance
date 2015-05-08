@@ -1,4 +1,5 @@
 class TransactionReconciliationController < ApplicationController
+	before_action :authenticate_admin!
 
 	CONDITION_PARAMS=%w{payway paytype reconciliation_flag start_time end_time trade_no}
 	def index

@@ -1,6 +1,8 @@
 class FinanceWaterController < ApplicationController
 	protect_from_forgery :except => :modify
 
+	before_action :authenticate_admin!,:only=>:show
+
 	include Paramsable
 	
 	def show

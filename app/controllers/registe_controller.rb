@@ -2,6 +2,9 @@ class RegisteController < ApplicationController
 	protect_from_forgery :except => :create
 
 	include Paramsable
+
+	before_action :authenticate_admin!,:only=>:index
+
 	def index
 		@users=User.all
 	end
