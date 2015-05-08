@@ -2,6 +2,12 @@ Rails.application.routes.draw do
 
   #web display
   root 'registe#index'
+
+  get 'admin_manage/sign_index' => 'admin_manage#sign_index'
+  get 'admin_manage/sign_in' => 'admin_manage#sign_in'
+  post 'admin_manage/sign_in' => 'admin_manage#sign_in'
+  post 'admin_manage/sign_out' => 'admin_manage#sign_out'
+
   get 'registe/index' => 'registe#index'
   get 'finance_water/:userid/show' => 'finance_water#show', as: :show_user_score
   get 'pay/:userid/show' => 'online_pay#show', as: :show_user_online_pay

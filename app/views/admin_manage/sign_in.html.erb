@@ -1,0 +1,9 @@
+<% @page_title="ADMIN LOGIN" %>
+
+<div id="admin_login">
+	<%= form_for :admin,url: admin_manage_sign_in_path,method: :post do |f| %>
+		login_name: <%=f.text_field :admin_name %> </br></br>
+		login_passwd: <%=f.text_field :admin_passwd %> </br></br>
+		<%= f.submit %>
+	<% end %>
+</div>

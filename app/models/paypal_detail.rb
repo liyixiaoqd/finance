@@ -1,6 +1,6 @@
 class PaypalDetail
 	include PayDetailable
-	 attr_accessor :ip,:country,:amount,:description,:currency,:order_no
+	attr_accessor :ip,:country,:amount,:description,:currency,:order_no
 
 	 SPEC_PARAMS_COUNTRY=%w(de nl gb)
 	#PAY_PAYPAL_PARAMS=%w{amount currency success_url abort_url order_no description ip country}

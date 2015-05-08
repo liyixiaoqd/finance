@@ -18,6 +18,11 @@
 		<%=link_to t('finance check page'),transaction_reconciliation_index_path%>
 		</br>
 		<%=link_to t('upload_file page'),upload_file_index_path%>
+
+		<% if session[:admin].present? %>
+		</br></br>
+			<%=link_to t('sign out'),admin_manage_sign_out_path,method: :post%>
+		<% end %>
 	</div>
 
 	<div id="main">
