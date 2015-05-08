@@ -51,6 +51,7 @@ class SimulationController < ApplicationController
 
 	def simulate_pay
 		payway=params['payway']
+		amount=params['amount']
 		logger.info("payway:#{payway}")
 
 		userid="552b461202d0f099ec000033"
@@ -63,10 +64,10 @@ class SimulationController < ApplicationController
 		http = Net::HTTP.new(uri.host, uri.port)
 
 		case payway
-		when 'paypal' then simulate_params=init_paypal_submit_params(simulate_order_no) 
-		when 'sofort' then simulate_params=init_sofort_submit_params(simulate_order_no) 
-		when 'alipay_oversea' then simulate_params=init_alipay_oversea_submit_params(simulate_order_no) 
-		when 'alipay_transaction' then simulate_params=init_alipay_transaction_submit_params(simulate_order_no)
+		when 'paypal' then simulate_params=init_paypal_submit_params(simulate_order_no,amount) 
+		when 'sofort' then simulate_params=init_sofort_submit_params(simulate_order_no,amount) 
+		when 'alipay_oversea' then simulate_params=init_alipay_oversea_submit_params(simulate_order_no,amount) 
+		when 'alipay_transaction' then simulate_params=init_alipay_transaction_submit_params(simulate_order_no,amount)
 		else
 			simulate_params={}
 		end
@@ -89,6 +90,7 @@ class SimulationController < ApplicationController
 
 	def simulate_pay_credit
 		trade_no=params['trade_no']
+		amount=params['amount']
 		userid="552b461202d0f099ec000033"
 		callpath="/pay/#{userid}/submit_creditcard"
 
@@ -97,7 +99,7 @@ class SimulationController < ApplicationController
 		http = Net::HTTP.new(uri.host, uri.port)
 
 		request = Net::HTTP::Post.new(uri.request_uri) 
-		request.set_form_data(credit_params(trade_no))
+		request.set_form_data(credit_params(trade_no,amount))
 		logger.info("call!!")
 		response=http.request(request)
 		res_result=JSON.parse(response.body)
@@ -182,12 +184,12 @@ class SimulationController < ApplicationController
 			}
 		end
 
-		def credit_params(trade_no)
+		def credit_params(trade_no,amount)
 			{
 				'payway'=>'paypal',
 				'paytype'=>'',
 				'trade_no'=>trade_no,
-				'amount'=>10.0,
+				'amount'=>amount,
 				'currency'=>'EUR',
 				'ip'=>'10.2.2.2',
 				'brand' => 'visia', 
@@ -268,12 +270,12 @@ class SimulationController < ApplicationController
 			}
 		end
 
-		def init_paypal_submit_params(order_no)
+		def init_paypal_submit_params(order_no,amount)
 			paypal_submit_params={
 				'system'=>'mypost4u',
 				'payway'=>'paypal',
 				'paytype'=>'',
-				'amount'=>50,
+				'amount'=>amount,
 				'currency'=>'EUR',
 				'order_no'=>"#{order_no}",
 				'description'=>'send iphone',
@@ -287,12 +289,12 @@ class SimulationController < ApplicationController
 			init_online_pay_params.merge!(paypal_submit_params)
 		end
 
-		def init_sofort_submit_params(order_no)
+		def init_sofort_submit_params(order_no,amount)
 			sofort_submit_params={
 				'system'=>'mypost4u',
 				'payway'=>'sofort',
 				'paytype'=>'',
-				'amount'=>50,
+				'amount'=>amount,
 				'currency'=>'EUR',
 				'order_no'=>"#{order_no}",
 				'success_url'=>'http://127.0.0.1:3001/simulation/callback_return',
@@ -305,12 +307,12 @@ class SimulationController < ApplicationController
 			init_online_pay_params.merge!(sofort_submit_params)
 		end
 
-		def init_alipay_oversea_submit_params(order_no)
+		def init_alipay_oversea_submit_params(order_no,amount)
 			alipay_oversea_submit_params={
 				'system'=>'mypost4u',
 				'payway'=>'alipay',
 				'paytype'=>'oversea',
-				'amount'=>50,
+				'amount'=>amount,
 				'currency'=>'EUR',
 				'order_no'=>"#{order_no}",
 				'description'=>'send iphone',
@@ -321,12 +323,12 @@ class SimulationController < ApplicationController
 			init_online_pay_params.merge!(alipay_oversea_submit_params)
 		end
 
-		def init_alipay_transaction_submit_params(order_no)
+		def init_alipay_transaction_submit_params(order_no,amount)
 			alipay_transaction_submit_params={
 				'system'=>'mypost4u',
 				'payway'=>'alipay',
 				'paytype'=>'transaction',
-				'amount'=>144.0,
+				'amount'=>amount,
 				'order_no'=>"#{order_no}",
 				'logistics_name'=>'logistics_name',
 				'description'=>'订单号TIME000000011的寄送包裹费用',
