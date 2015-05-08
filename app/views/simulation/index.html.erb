@@ -15,7 +15,9 @@
           <%= radio_button_tag(:payway, "alipay_oversea") %>
           <%= label_tag(:payway_alipay_oversea, "ALIPAY_OVERSEA") %>
           <%= radio_button_tag(:payway, "alipay_transaction") %>
-          <%= label_tag(:payway_alipay_transaction, "ALIPAY_TRANSACTION") %>
+          <%= label_tag(:payway_alipay_transaction, "ALIPAY_TRANSACTION") %> </br>
+          <%= label_tag(:label3, "amount") %>
+          <%= text_field_tag(:amount, 0.01) %>
           </br>  </br>
           <%= submit_tag("call") %>
         <% end %>
@@ -25,7 +27,8 @@
           <%= label_tag(:label1, "simulation inteface call") %> </br>
           <%= radio_button_tag(:credit, "credit") %>
           <%= label_tag(:pay_credit, "CREDIT") %><br/>
-          <%= text_field_tag(:trade_no) %>
+          trade_no:<%= text_field_tag(:trade_no) %> <br/>
+          amount:<%= text_field_tag(:amount,0.01) %> <br/>
           </br>  </br>
           <%= submit_tag("credit_call") %>
         <% end %>
