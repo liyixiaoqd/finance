@@ -13,16 +13,30 @@
 
 <div id="area">
 	<div id="side">
-		<%=link_to t('user page'),registe_index_path%>
-		</br>
-		<%=link_to t('finance check page'),transaction_reconciliation_index_path%>
-		</br>
-		<%=link_to t('upload_file page'),upload_file_index_path%>
+		<div id="side_search">
+			<%=link_to t('user page'),registe_index_path%>
+			</br>
+			<%=link_to t('finance check page'),transaction_reconciliation_index_path%>
+			</br>
+			<%=link_to t('upload_file page'),upload_file_index_path%>
+		</div>
+
+		<div id="side_simulation">
+			<%= link_to 'simulate_online_pay',simulation_path %>
+			<%= link_to 'simulate_reconciliation',simulation_simulate_reconciliation_path %>
+
+			<div id="side_simulation_display_none">
+				<%= link_to 'simulate_online_pay','http://127.0.0.1:3001/',:method=>'get' %>
+				<%= link_to 'simulate_reconciliation','http://127.0.0.1:3001/simulation/simulate_reconciliation',:method=>'get' %>
+			</div>
+		</div>
 
 		<% if session[:admin].present? %>
-		</br></br>
-			<%=link_to t('sign out'),admin_manage_sign_out_path,method: :post%>
+			<div id="side_admin">
+				<%=link_to t('sign out'),admin_manage_sign_out_path,method: :post%>
+			</div>
 		<% end %>
+
 	</div>
 
 	<div id="main">

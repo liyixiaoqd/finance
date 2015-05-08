@@ -15,7 +15,13 @@ class SimulationController < ApplicationController
 
 	def simulate_reconciliation
 		payment_system=params['payment_system']
-		callpath="#{CALL_HOST}/pay/#{payment_system}/get_reconciliation"
+		start_time=params['start_time']
+		end_time=params['end_time']
+		page_size=params['page_size']
+
+		
+
+		callpath="#{CALL_HOST}/pay/#{payment_system}/get_reconciliation?start_time=#{start_time}&end_time=#{end_time}&page_size=#{page_size}"
 
 		response=method_url_call("get",callpath,"false",{}) 
 

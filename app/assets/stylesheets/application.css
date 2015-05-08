@@ -29,9 +29,22 @@
 /*	background: #191;	
 	height:500px;		*/
 	padding-top: 1em;
+	font-size: 14px;
+}
+#side_admin{
+	margin-top: 5em;
+	font-size: 12px;
+}
+#side_simulation{
+	margin-top: 5em;
 }
 
 #main{
 	margin-top:1em;
 	margin-left:10em;
+}
+
+
+#side_simulation_display_none{
+	display: none;
 }

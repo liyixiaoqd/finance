@@ -12,7 +12,6 @@ class ReconciliationPaypal
 	def initialize(service,startdate="",enddate="")
 		@service=service
 		post_day=BasicData.get_value("00A","001","paypal","").to_i
-		post_day=0
 		if(startdate.blank?)
 			@startdate=Time.now.at_beginning_of_day-post_day.day
 		else

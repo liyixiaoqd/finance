@@ -112,15 +112,19 @@ class OnlinePayController < ApplicationController
 
 	def get_bill_from_payment_system
 		payment_system=params['payment_system']
+		start_time=params['start_time']
+		end_time=params['end_time']
+		page_size=params['page_size']
+
 		case payment_system
-		when "alipay_transaction" then  reconciliation=ReconciliationAlipayTransaction.new("account.page.query")
-		when "alipay_oversea" then  reconciliation=ReconciliationAlipayOversea.new("forex_compare_file")
+		when "alipay_transaction" then  reconciliation=ReconciliationAlipayTransaction.new("account.page.query",1,start_time,end_time,page_size,1000)
+		when "alipay_oversea" then  reconciliation=ReconciliationAlipayOversea.new("forex_compare_file",start_time,end_time)
 			# if payment_system_sub=="transaction"
 			# 	reconciliation=ReconciliationAlipayTransaction.new("account.page.query","","",10)
 			# else
 			# 	nil
 			# end
-		when "paypal" then reconciliation=ReconciliationPaypal.new("TransactionSearch")
+		when "paypal" then reconciliation=ReconciliationPaypal.new("TransactionSearch",start_time,end_time)
 		else
 			render :text=>"wrong payment_system #{payment_system}" and return
 		end
@@ -137,7 +141,7 @@ class OnlinePayController < ApplicationController
 			if(ol_p.blank?)
 				nil
 			else
-				if ol_p.status=="submit" || ol_p.status=="failure_submit"
+				if ol_p.status=="failure_submit"
 					ol_p
 				else
 					raise "#{params['order_no']}.status:#{ol_p.status} can not be repeat call!!!"
