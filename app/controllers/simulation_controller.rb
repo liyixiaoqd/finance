@@ -64,7 +64,7 @@ class SimulationController < ApplicationController
 		http = Net::HTTP.new(uri.host, uri.port)
 
 		case payway
-		when 'paypal' then simulate_params=init_paypal_submit_params(simulate_order_no,amount) 
+		when 'paypal' then simulate_params=init_paypal_submit_params(simulate_order_no,amount,request.remote_ip) 
 		when 'sofort' then simulate_params=init_sofort_submit_params(simulate_order_no,amount) 
 		when 'alipay_oversea' then simulate_params=init_alipay_oversea_submit_params(simulate_order_no,amount) 
 		when 'alipay_transaction' then simulate_params=init_alipay_transaction_submit_params(simulate_order_no,amount)
@@ -99,7 +99,7 @@ class SimulationController < ApplicationController
 		http = Net::HTTP.new(uri.host, uri.port)
 
 		request = Net::HTTP::Post.new(uri.request_uri) 
-		request.set_form_data(credit_params(trade_no,amount))
+		request.set_form_data(credit_params(trade_no,amount,request.remote_ip))
 		logger.info("call!!")
 		response=http.request(request)
 		res_result=JSON.parse(response.body)
@@ -184,14 +184,14 @@ class SimulationController < ApplicationController
 			}
 		end
 
-		def credit_params(trade_no,amount)
+		def credit_params(trade_no,amount,ip)
 			{
 				'payway'=>'paypal',
 				'paytype'=>'',
 				'trade_no'=>trade_no,
 				'amount'=>amount,
 				'currency'=>'EUR',
-				'ip'=>'10.2.2.2',
+				'ip'=>ip,
 				'brand' => 'visia', 
 				'number' => '1111111111',
 				'verification_value' => '315',
@@ -270,18 +270,18 @@ class SimulationController < ApplicationController
 			}
 		end
 
-		def init_paypal_submit_params(order_no,amount)
+		def init_paypal_submit_params(order_no,amount,ip)
 			paypal_submit_params={
 				'system'=>'mypost4u',
 				'payway'=>'paypal',
 				'paytype'=>'',
 				'amount'=>amount,
 				'currency'=>'EUR',
-				'order_no'=>"#{order_no}",
+				'order_no'=>order_no,
 				'description'=>'send iphone',
-				'ip'=>'127.0.0.1',
-				'success_url'=>'http://127.0.0.1:3001/simulation/callback_return',
-				'abort_url'=>'http://127.0.0.1:3001/simulation/callback_return',
+				'ip'=>ip,
+				'success_url'=>"#{CALL_HOST}/simulation/callback_return",
+				'abort_url'=>"#{CALL_HOST}/simulation/callback_return",
 				'country'=>'de',
 				'channel'=>'web'
 			}
@@ -296,11 +296,11 @@ class SimulationController < ApplicationController
 				'paytype'=>'',
 				'amount'=>amount,
 				'currency'=>'EUR',
-				'order_no'=>"#{order_no}",
-				'success_url'=>'http://127.0.0.1:3001/simulation/callback_return',
-				'abort_url'=>'http://127.0.0.1:3001/simulation/callback_return',
-				'notification_url'=>'http://127.0.0.1:3001/simulation/callback_notify',
-				'timeout_url'=>'http://127.0.0.1:3001/simulation/callback_return',
+				'order_no'=>order_no,
+				'success_url'=> "#{CALL_HOST}/simulation/callback_return",
+				'abort_url'=> "#{CALL_HOST}/simulation/callback_return",
+				'notification_url'=>"#{CALL_HOST}/simulation/callback_notify",
+				'timeout_url'=> "#{CALL_HOST}/simulation/callback_return",
 				'country'=>'de',
 				'channel'=>'web'
 			}		
@@ -314,10 +314,10 @@ class SimulationController < ApplicationController
 				'paytype'=>'oversea',
 				'amount'=>amount,
 				'currency'=>'EUR',
-				'order_no'=>"#{order_no}",
+				'order_no'=>order_no,
 				'description'=>'send iphone',
-				'success_url'=>'http://127.0.0.1:3001/simulation/callback_return',
-				'notification_url'=>'http://127.0.0.1:3001/simulation/callback_notify',
+				'success_url'=>"#{CALL_HOST}/simulation/callback_return",
+				'notification_url'=>"#{CALL_HOST}/simulation/callback_notify",
 				'channel'=>'web'
 			}		
 			init_online_pay_params.merge!(alipay_oversea_submit_params)
@@ -329,11 +329,11 @@ class SimulationController < ApplicationController
 				'payway'=>'alipay',
 				'paytype'=>'transaction',
 				'amount'=>amount,
-				'order_no'=>"#{order_no}",
+				'order_no'=>order_no,
 				'logistics_name'=>'logistics_name',
 				'description'=>'订单号TIME000000011的寄送包裹费用',
-				'success_url'=>'http://127.0.0.1:3001/simulation/callback_return',
-				'notification_url'=>'http://127.0.0.1:3001/simulation/callback_notify',
+				'success_url'=>"#{CALL_HOST}/simulation/callback_return",
+				'notification_url'=>"#{CALL_HOST}/simulation/callback_notify",
 				'quantity'=>1,
 				'channel'=>'web'
 			}		
