@@ -23,7 +23,7 @@ class OnlinePayController < ApplicationController
 		}
 
 		online_pay=new_online_pay_params(params,request)
-		if(online_pay.status=='failure')
+		if(online_pay.status=='failure_submit')
 			logger.warn("no user:#{online_pay.userid} pay record save!")
 			render json:{},status:400 and return
 		end
