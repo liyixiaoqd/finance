@@ -21,7 +21,7 @@ class SimulationController < ApplicationController
 
 		case payment_system
 		when "alipay_transaction" then format="%Y-%m-%d %H:%M:%S"
-		when "alipay_oversea" then format="%Y-%m-%d"
+		when "alipay_oversea" then format="%Y%m%d"
 		when "paypal" then format="%Y-%m-%dU%H:%M:%SZ"
 		else
 			format="%Y-%m-%d %H:%M:%S"

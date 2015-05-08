@@ -38,7 +38,7 @@ class ReconciliationAlipayOversea
 		Rails.logger.info("#{reconciliation_url}")
 		response=method_url_response("get",reconciliation_url,true,{})
 
-		if(response.body[0]=="<")
+		if(response.body[0]=="<" || response.body[0,20]=="File download failed")
 			Rails.logger.warn("failure:"+response.body)
 		else
 			@alipay_oversea_detail=response.body.split("\r\n")
@@ -53,7 +53,9 @@ class ReconciliationAlipayOversea
 
 	#insert record!
 	def valid_reconciliation
-		"response Analytical failure" if @alipay_oversea_detail.blank?
+		if @alipay_oversea_detail.blank?
+			return "response Analytical failure"
+		end
 
 		check_filename=WARN_FILE_PATH+"/alipay_oversea_finance_reconciliation_warn_"+@reconciliation_date+".log"
 		Rails.logger.info("check_filename:#{check_filename}")
