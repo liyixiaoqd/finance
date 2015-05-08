@@ -1,6 +1,6 @@
 class SimulationController < ApplicationController
 	protect_from_forgery :except => [:simulate_post]
-	CALL_HOST="http://127.0.0.1:3000"
+	CALL_HOST=Settings.simulation.call_host
 
 	@@simulation_num=0
 
