@@ -103,6 +103,7 @@ class OnlinePayCallbackController < ApplicationController
 			#valid reques is right
 			if(pay_detail.notify_verify?(notify_params,Settings.alipay_transaction.pid,Settings.alipay_transaction.secret) || TEST_MODE)	
 				ret_hash=init_notify_ret_hash(online_pay)
+				rollback_callback_status=online_pay.callback_status
 				online_pay.callback_status=params[:trade_status]
 				online_pay.set_status_by_callback!()
 				online_pay.reconciliation_id=params[:trade_no]
