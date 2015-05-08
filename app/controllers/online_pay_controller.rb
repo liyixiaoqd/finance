@@ -112,8 +112,8 @@ class OnlinePayController < ApplicationController
 
 	def get_bill_from_payment_system
 		payment_system=params['payment_system']
-		start_time=params['start_time']
-		end_time=params['end_time']
+		start_time=CGI.unescape(params['start_time'])
+		end_time=CGI.unescape(params['end_time'])
 		page_size=params['page_size']
 
 		case payment_system

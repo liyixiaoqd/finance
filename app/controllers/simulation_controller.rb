@@ -19,9 +19,18 @@ class SimulationController < ApplicationController
 		end_time=params['end_time']
 		page_size=params['page_size']
 
-		
+		case payment_system
+		when "alipay_transaction" then format="%Y-%m-%d %H:%M:%S"
+		when "alipay_oversea" then format="%Y-%m-%d"
+		when "paypal" then format="%Y-%m-%dU%H:%M:%SZ"
+		else
+			format="%Y-%m-%d %H:%M:%S"
+		end
 
-		callpath="#{CALL_HOST}/pay/#{payment_system}/get_reconciliation?start_time=#{start_time}&end_time=#{end_time}&page_size=#{page_size}"
+		start_time=CGI.escape(start_time.to_time.strftime(format))
+		end_time=CGI.escape(end_time.to_time.strftime(format))
+		
+		callpath="#{CALL_HOST}/pay/#{payment_system}/get_reconciliation?start_time=#{CGI.escape(start_time)}&end_time=#{CGI.escape(end_time)}&page_size=#{page_size}"
 
 		response=method_url_call("get",callpath,"false",{}) 
 

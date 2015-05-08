@@ -6,8 +6,8 @@
 	         <%= label_tag(:label1, "please select payment system:") %> 
 	         <%= select_tag(:payment_system,options_for_select([["alipay_oversea","alipay_oversea"],["alipay_transaction","alipay_transaction"],["paypal","paypal"]],"alipay")) %>
 	         </br>
-	         START_TIME:<%= text_field_tag(:start_time,"#{Time.now.at_beginning_of_day.strftime('%Y-%m-%d')}") %>
-	         END_TIME:<%= text_field_tag(:end_time,"#{(Time.now.at_beginning_of_day+1.day).strftime('%Y-%m-%d')}") %>
+	         START_TIME:<%= text_field_tag(:start_time,"#{Time.now.at_beginning_of_day}") %>
+	         END_TIME:<%= text_field_tag(:end_time,"#{Time.now.at_beginning_of_day+1.day}") %>
 	         </br>
 	         PAGE_SIZE: <%= text_field_tag(:page_size,1) %>
 	          </br>  </br>

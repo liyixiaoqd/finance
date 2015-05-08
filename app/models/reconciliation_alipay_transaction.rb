@@ -20,7 +20,7 @@ class ReconciliationAlipayTransaction
 
 	def initialize(service,page_no=1,gmt_start_time="",gmt_end_time="",page_size=1000)
 		@service=service
-		@page_no=page_no
+		@page_no=page_no.to_i
 		@page_size=page_size
 
 		post_day=BasicData.get_value("00A","001","alipay","transaction").to_i
@@ -73,7 +73,9 @@ class ReconciliationAlipayTransaction
 	end
 
 	def valid_reconciliation
-		"response Analytical failure" if @alipay_transaction_detail.blank?
+		if @alipay_transaction_detail.blank?
+			return "response Analytical failure" 
+		end
 
 		check_filename=WARN_FILE_PATH+"/alipay_transaction_finance_reconciliation_warn_"+@reconciliation_date+".log"
 		Rails.logger.info("check_filename:#{check_filename}")
@@ -160,6 +162,7 @@ class ReconciliationAlipayTransaction
 			# Rails.logger.info(alipay_transaction_detail)
 			# "#{self.service}</br>#{reconciliation_url}</br></br>#{response.body}"
 		else
+			@alipay_transaction_detail=""
 			Rails.logger.warn("failure:"+doc.xpath("//alipay/error").first.text)
 			false
 		end

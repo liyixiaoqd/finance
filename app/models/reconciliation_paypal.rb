@@ -72,7 +72,9 @@ class ReconciliationPaypal
 
 	def valid_reconciliation(response)
 		response_to_hash_paypal!(response)
-		"response Analytical failure" if @paypal_reconciliation_hash.blank?
+		if @paypal_reconciliation_hash.blank?
+			return "response Analytical failure"
+		end
 
 		
 		check_filename=WARN_FILE_PATH+"/paypal_finance_reconciliation_warn_"+@reconciliation_date+".log"
