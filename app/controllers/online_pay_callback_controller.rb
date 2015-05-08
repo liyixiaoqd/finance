@@ -1,6 +1,6 @@
 class OnlinePayCallbackController < ApplicationController
 	include PayDetailable
-	TEST_MODE=true
+	TEST_MODE=false
 
 	protect_from_forgery :except => [:alipay_oversea_notify,:alipay_transaction_notify]
 	#Synchronous callback  --get 
@@ -312,7 +312,7 @@ class OnlinePayCallbackController < ApplicationController
 				'status'=>'',
 				'status_reason'=>'',
 				'amount'=>online_pay.amount,
-				'test_mode'=>false,
+				'test_mode'=>TEST_MODE,
 				'buyer_email'=>'',
 				'buyer_id'=>''			
 			}
