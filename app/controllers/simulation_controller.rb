@@ -52,7 +52,12 @@ class SimulationController < ApplicationController
 	def simulate_pay
 		payway=params['payway']
 		amount=params['amount']
-		new_serial=params['serial'].to_i
+		if params['serial'].blank?
+			new_serial=0
+		else
+			new_serial=params['serial'].to_i
+		end
+
 		logger.info("payway:#{payway}")
 
 		userid="552b461202d0f099ec000033"
@@ -289,7 +294,7 @@ class SimulationController < ApplicationController
 				'amount'=>amount,
 				'currency'=>'EUR',
 				'order_no'=>order_no,
-				'description'=>'send iphone',
+				'description'=>"TESTMODE:#{order_no}",
 				'ip'=>ip,
 				'success_url'=>"#{CALL_HOST}/simulation/callback_return",
 				'abort_url'=>"#{CALL_HOST}/simulation/callback_return",
@@ -326,7 +331,7 @@ class SimulationController < ApplicationController
 				'amount'=>amount,
 				'currency'=>'EUR',
 				'order_no'=>order_no,
-				'description'=>'send iphone',
+				'description'=>"TESTMODE:#{order_no}",
 				'success_url'=>"#{CALL_HOST}/simulation/callback_return",
 				'notification_url'=>"#{CALL_HOST}/simulation/callback_notify",
 				'channel'=>'web'

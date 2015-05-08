@@ -1,5 +1,5 @@
 class OnlinePay < ActiveRecord::Base
-	ONLINE_PAY_STATUS_ENUM=%w{submit failure_submit  submit_credit   success_notify  cancel_notify  failure_notify success_credit  failure_credit}
+	ONLINE_PAY_STATUS_ENUM=%w{submit failure_submit  submit_credit intermediate_notify success_notify cancel_notify failure_notify success_credit failure_credit}
 
 	belongs_to :user
 	has_one :reconciliation_detail

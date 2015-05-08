@@ -22,14 +22,14 @@ class OnlinePayController < ApplicationController
 			'is_credit'=>''
 		}
 
-		online_pay=new_online_pay_params(params,request)
-		if(online_pay.status=='failure_submit')
-			logger.warn("no user:#{online_pay.userid} pay record save!")
-			render json:{},status:400 and return
-		end
-		
-		ActiveRecord::Base.transaction do
-			begin
+		ActiveRecord::Base.transaction do	
+			begin	
+				online_pay=new_online_pay_params(params,request)
+				if(online_pay.status=='failure_submit')
+					logger.warn("no user:#{online_pay.userid} pay record save!")
+					render json:{},status:400 and return
+				end
+
 				pay_detail=OnlinePay.get_instance_pay_detail(online_pay)
 
 				flag,online_pay.redirect_url,online_pay.trade_no,online_pay.is_credit,message=pay_detail.submit()
@@ -53,8 +53,10 @@ class OnlinePayController < ApplicationController
 			rescue => e
 				#failure also save pay record!!
 				logger.info("create online_pay failure! : #{e.message}")
-				online_pay.set_status!("failure_submit",e.message)
-				online_pay.save
+				unless (online_pay.blank?)
+					online_pay.set_status!("failure_submit",e.message)
+					online_pay.save
+				end
 				render json:{},status:400 and return
 			end
 		end
@@ -98,7 +100,9 @@ class OnlinePayController < ApplicationController
 				#failure also save pay record!!	
 				logger.info("submit_creditcard online_pay failure! : #{e.message}")
 				#online_pay.set_status!("failure_credit",e.message)
-				online_pay.update_attributes(:status=>"failure_credit",:reason=>e.message)
+				unless (online_pay.blank?)
+					online_pay.update_attributes(:status=>"failure_credit",:reason=>e.message)
+				end
 				render json:{},status:400 and return
 			end
 		end
@@ -128,13 +132,31 @@ class OnlinePayController < ApplicationController
 	end
 
 	private 
-		def new_online_pay_params(params,request)
-			user=User.find_by_system_and_userid(params['system'],params['userid'])
-			if(user.blank?)
-				online_pay=OnlinePay.new()
-				online_pay.set_status!("failure_submit","user not exists")
+		def exists_online_pay(params)
+			ol_p=OnlinePay.find_by_payway_and_paytype_and_order_no(params['payway'],params['paytype'],params['order_no'])
+			if(ol_p.blank?)
+				nil
 			else
-				online_pay=user.online_pay.build()
+				if ol_p.status=="submit" || ol_p.status=="failure_submit"
+					ol_p
+				else
+					raise "#{params['order_no']}.status:#{ol_p.status} can not be repeat call!!!"
+				end
+			end
+		end
+
+		def new_online_pay_params(params,request)
+			online_pay=exists_online_pay(params)
+			if online_pay.blank?
+				user=User.find_by_system_and_userid(params['system'],params['userid'])
+				if(user.blank?)
+					online_pay=OnlinePay.new()
+					online_pay.set_status!("failure_submit","user not exists")
+				else
+					online_pay=user.online_pay.build()
+					online_pay.set_status!("submit","")
+				end
+			else
 				online_pay.set_status!("submit","")
 			end
 
