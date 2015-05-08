@@ -18,6 +18,7 @@
           <%= label_tag(:payway_alipay_transaction, "ALIPAY_TRANSACTION") %> </br>
           <%= label_tag(:label3, "amount") %>
           <%= text_field_tag(:amount, 0.01) %>
+          <%= text_field_tag(:serial, "#{SimulationController.get_simulation_num}") %>
           </br>  </br>
           <%= submit_tag("call") %>
         <% end %>

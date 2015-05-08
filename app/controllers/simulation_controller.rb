@@ -52,12 +52,13 @@ class SimulationController < ApplicationController
 	def simulate_pay
 		payway=params['payway']
 		amount=params['amount']
+		new_serial=params['serial'].to_i
 		logger.info("payway:#{payway}")
 
 		userid="552b461202d0f099ec000033"
 		callpath="/pay/#{userid}/submit"
 		
-		simulate_order_no=create_pay_order_no(payway)
+		simulate_order_no=create_pay_order_no(payway,new_serial)
 
 		uri = URI.parse("#{CALL_HOST}#{callpath}")
 		logger.info("path:#{callpath}")
@@ -148,6 +149,10 @@ class SimulationController < ApplicationController
 		# render :text=>"#{response.code}:#{response.body}"
 	end
 
+	def self.get_simulation_num
+		@@simulation_num
+	end
+
 	private
 		def method_url_call(method,url_path,https,params={})
 			uri = URI.parse(url_path)
@@ -232,8 +237,13 @@ class SimulationController < ApplicationController
 			}
 		end
 
-		def create_pay_order_no(payway)
-			@@simulation_num=@@simulation_num+1
+		def create_pay_order_no(payway,new_serial)
+			if (@@simulation_num==new_serial)
+				@@simulation_num=@@simulation_num+1
+			else
+				@@simulation_num=new_serial
+			end
+
 			callnum=sprintf("%03d",@@simulation_num)
 			calldate=current_time_ymdHMS("%Y%m%d")
 
