@@ -9,7 +9,11 @@ Rails.application.routes.draw do
   post 'admin_manage/sign_out' => 'admin_manage#sign_out'
 
   get 'registe/index' => 'registe#index'
-  get 'finance_water/:userid/show' => 'finance_water#show', as: :show_user_score
+  get 'registe/index_by_condition' => 'registe#index_by_condition'
+
+  get 'finance_water/:userid/show' => 'finance_water#show', as: :show_user_finance_water
+  get 'finance_water/:userid/new' => 'finance_water#new',as: :new_user_finance_water
+
   get 'pay/:userid/show' => 'online_pay#show', as: :show_user_online_pay
   get 'pay/:online_pay_id/show_single_detail' => 'online_pay#show_single_detail', as: :show_single_online_pay
   get 'transaction_reconciliation/index' => 'transaction_reconciliation#index'

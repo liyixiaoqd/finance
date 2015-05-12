@@ -7,6 +7,7 @@ class OnlinePay < ActiveRecord::Base
 	validates :amount, numericality:{:greater_than_or_equal_to=>0.00}
 	validates :status, inclusion: { in: ONLINE_PAY_STATUS_ENUM,message: "%{value} is not a valid online_pay.status" }
 
+	paginates_per 14
 
 	ALIPAY_OVERSEA_CALLBACK_STATUS={
 		'TRADE_CLOSED' => -1,

@@ -11,11 +11,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150508081505) do
+ActiveRecord::Schema.define(version: 20150511023308) do
+
+  create_table "access_authorities", force: true do |t|
+    t.string   "controller",   limit: 50
+    t.string   "action",       limit: 30
+    t.boolean  "is_sign_in"
+    t.boolean  "is_interface"
+    t.integer  "access_level", limit: 2
+    t.string   "describe"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "admin_manages", force: true do |t|
     t.string   "admin_name",      limit: 10, null: false
-    t.string   "admin_passwd",    limit: 10, null: false
+    t.string   "admin_passwd",    limit: 50, null: false
     t.boolean  "is_active"
     t.string   "authority",       limit: 50, null: false
     t.string   "status",          limit: 10, null: false

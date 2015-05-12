@@ -1,0 +1,18 @@
+<%= render partial:"user",locals: {user: @user} %>
+
+<%= form_tag("/finance_water/#{@user.userid}/modify", method: "post") do %>
+  <%= label_tag(:label1, "流水类型:") %> 
+  <%= select_tag(:watertype,options_for_select([["积分","score"],["电子现金","e_cash"]])) %> </br>
+  <%= label_tag(:label2, "操作:") %> 
+  <%= select_tag(:symbol,options_for_select([["+","Add"],["-","Sub"]],"Add")) %> 
+  <%= label_tag(:label3, "金额:") %> 
+  <%= text_field_tag(:amount,0.00) %> </br>
+  <%= label_tag(:label4, "新增原因:") %> 
+  <%= text_area_tag(:reason,"#{session[:admin]} 手动调整" ,size: "40*5") %> </br>
+  <%= hidden_field_tag :system,@user.system %>
+  <%= hidden_field_tag :channel,"web" %>
+  <%= hidden_field_tag :operator,session[:admin] %>
+  <%= hidden_field_tag :datetime,Time.now%>
+  <%= submit_tag("提交") %>
+ <%= link_to '返回',:back %>
+<% end %>

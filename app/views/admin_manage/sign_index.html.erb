@@ -1,2 +1,6 @@
-<% @page_title="ADMIN LOGIN" %>
-<%=session['admin']%> login success
+<% @page_title="登入界面" %>
+
+<% if flash[:notice].present? %>
+	<%= flash[:notice] %> </br>
+<% end %>
+<%=session['admin']%> 登入成功

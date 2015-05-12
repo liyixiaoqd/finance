@@ -3,11 +3,11 @@ class OnlinePayController < ApplicationController
 
 	include Paramsable
 
-	before_action :authenticate_admin!,:only=>[:show,:show_single_detail]
+	# before_action :authenticate_admin!,:only=>[:show,:show_single_detail]
 
 	def show
 		@user=User.find(params['userid'])
-		@online_pays=@user.online_pay.order(created_at: :desc)
+		@online_pays=@user.online_pay.order(created_at: :desc).page(params[:page])
 	end
 
 	def show_single_detail

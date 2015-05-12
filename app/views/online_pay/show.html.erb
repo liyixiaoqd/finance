@@ -1,16 +1,11 @@
-username:<%= @user.username %> </br>
-e_cash:<%= @user.e_cash %> score:<%= @user.score %>
-<hr>
-<table border="1">
-<% @online_pays.each do |online_pay| %>
-<tr>
-  <td><%= online_pay.order_no %></td>
-  <td><%= online_pay.amount %></td>
-  <td><%= online_pay.status %></td>
-  <td><%= online_pay.callback_status %></td>
-  <td><%= online_pay.payway.camelize + online_pay.paytype.camelize %></td>
-  <td><%= online_pay.trade_no %></td>
-  <td><%= online_pay.reason %></td>
-  </tr>
-<% end %>
-</table>
+<% @page_title="支付明细" %>
+
+<%= render partial:"finance_water/user",locals: {user: @user} %>
+ <%= link_to '返回',:back %>
+<div id="online_pay_details_content">
+	<table id="online_pay_details_table">
+		<%= render partial: "online_pay_detail_title" %>
+		<%= render partial: "online_pay_detail_content",collection: @online_pays,as: :online_pay %>
+	</table>
+	<%= paginate @online_pays %>
+</div>

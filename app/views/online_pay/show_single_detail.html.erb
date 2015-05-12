@@ -1,15 +1,10 @@
-<% @page_title="ONLINE_PAY DETAIL" %>
+<% @page_title="支付明细" %>
 <hr>
-<table border="1">
-<tr>
-  <td><%= @online_pay.order_no %></td>
-  <td><%= @online_pay.amount %></td>
-  <td><%= @online_pay.status %></td>
-  <td><%= @online_pay.callback_status %></td>
-  <td><%= @online_pay.payway.camelize + @online_pay.paytype.camelize %></td>
-  <td><%= @online_pay.trade_no %></td>
-  <td><%= @online_pay.reason %></td>
-  </tr>
-</table>
 
-<%=link_to 'back',:back%>
+<%=link_to '返回',:back%>
+<div id="online_pay_details_content">
+	<table id="online_pay_single_content">
+		<%= render partial: "online_pay_detail_title" %>
+		<%= render partial: "online_pay_detail_content",locals: {online_pay: @online_pay} %>
+	</table>
+</div>

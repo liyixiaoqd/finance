@@ -7,6 +7,9 @@ class User < ActiveRecord::Base
 	before_create :create_userid_unique_valid
 	#after_create :create_init_score     can't rollback !!
 
+	default_scope { order('system asc,operdate desc') }
+	paginates_per 14
+
 	def create_init_finance
 		begin
 			if self.score>0 then 

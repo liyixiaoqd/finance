@@ -12,33 +12,31 @@
 </div>
 
 <div id="area">
-	<div id="side">
-		<div id="side_search">
-			<%=link_to t('user page'),registe_index_path%>
-			</br>
-			<%=link_to t('finance check page'),transaction_reconciliation_index_path%>
-			</br>
-			<%=link_to t('upload_file page'),upload_file_index_path%>
-		</div>
-
-		<div id="side_simulation">
-			<%= link_to 'simulate_online_pay',simulation_path %>
-			<%= link_to 'simulate_reconciliation',simulation_simulate_reconciliation_path %>
-
-			<div id="side_simulation_display_none">
-				<%= link_to 'simulate_online_pay','http://127.0.0.1:3001/',:method=>'get' %>
-				<%= link_to 'simulate_reconciliation','http://127.0.0.1:3001/simulation/simulate_reconciliation',:method=>'get' %>
-			</div>
-		</div>
-
+	<div id="side">			
 		<% if session[:admin].present? %>
+			<% if session[:admin_level]>=0 %>
+				<div id="side_search">
+					<%=link_to t('用户'),registe_index_path%>
+					</br>
+					<%=link_to t('财务对账'),transaction_reconciliation_index_path%>
+					</br>
+					<%=link_to t('文件上传'),upload_file_index_path%>
+				</div>
+			<% end %>
+
+			<% if session[:admin_level]>=5 %>
+				<div id="side_simulation">
+					<%= link_to '模拟支付',simulation_path %>
+					<%= link_to '模拟对账',simulation_simulate_reconciliation_path %>
+				</div>
+			<% end %>
+
 			<div id="side_admin">
-				<%=link_to t('sign out'),admin_manage_sign_out_path,method: :post%>
+				<%=link_to t('登出'),admin_manage_sign_out_path,method: :post%>
 			</div>
 		<% end %>
-
 	</div>
-
+	
 	<div id="main">
 		<%= yield %>
 	</div>

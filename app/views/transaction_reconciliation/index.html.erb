@@ -1,50 +1,56 @@
-<% @page_title="TRANSACTION RECONCILIATION MANAGE" %>
+<% @page_title="财务对账明细" %>
 
 <div id="reconciliation_details_condition">
 <%= form_tag transaction_reconciliation_index_by_condition_path,method:"get" do %>
 	<fieldset>
-		<legend>Please Enter Seach Condition</legend>
-		 <%= label_tag(:l1, "payway:") %> <%= text_field_tag(:payway) %>
-		 <%= label_tag(:l2, "paytype:") %> <%= text_field_tag(:paytype) %>
-		 <%= label_tag(:l3, "flag:") %> <%= text_field_tag(:reconciliation_flag) %>
+		<legend>请输入查询条件</legend>
+		 <%= label_tag(:l1, "支付类型:") %> 
+		 <%= select_tag(:payway,options_for_select([["",""],["paypal","paypal"],["sofort","sofort"],["支付宝","alipay"]])) %> 
+		 <%= label_tag(:l2, "支付子类型:") %>
+		 <%= select_tag(:paytype,options_for_select([["",""],["国内支付","transaction"],["海外支付","oversea"]])) %> 
+		 <%= label_tag(:l3, "对账状态:") %> 
+		 <%= select_tag(:reconciliation_flag,options_for_select([["",""],["未对账","0"],["对账失败","1"],["对账成功","2"]])) %> 
 		 </br>
-		 <%= label_tag(:l4, "start_time:") %> <%= datetime_field_tag(:start_time,value="#{Time.now.at_beginning_of_day-1.day}") %>
-		 <%= label_tag(:l5, "end_time:") %> <%= datetime_field_tag(:end_time,value="#{Time.now.at_beginning_of_day}") %>
-		 <%= label_tag(:l6, "trade_no:") %> <%= text_field_tag(:trade_no) %>
+		 <%= label_tag(:l4, "交易开始时间:") %> <%= datetime_field_tag(:start_time) %>
+		 <%= label_tag(:l5, "交易结束时间:") %> <%= datetime_field_tag(:end_time) %>
 		</br>
-		 <%= submit_tag("Search") %>
+		 <%= submit_tag("查询") %>
 
-	          	<%=button_tag("Clear",type: 'button',class: "button_clear_time") %>
+	          	<%=button_tag("清除条件",type: 'button',class: "button_clear") %>
 	</fieldset>
 <% end %>
 </div>
 
 <div id="reconciliation_details_content">
-<table>
-<% @reconciliation_details.each do |reconciliation_detail| %>
-<tr>
-	<td>  <%= reconciliation_detail.payway + " " + reconciliation_detail.paytype%>  </td>
-	<td>  <%= reconciliation_detail.transactionid %>  </td>
-	<td>  <%= reconciliation_detail.reconciliation_flag %>  </td>
-	<td>  <%= reconciliation_detail.amt %>  </td>
-	<td>  <%= reconciliation_detail.transaction_status %>  </td>
-<!-- 	<td>  
-		<% unless reconciliation_detail.reconciliation_describe.blank? %>  
-			<%= reconciliation_detail.reconciliation_describe %>
-		<% else %>
-			NONE
-	           	<% end %>  
-	</td> -->
-	<td> 
-		<% unless reconciliation_detail.online_pay_id.blank? %> 
-			<%= link_to reconciliation_detail.online_pay.trade_no,show_single_online_pay_path(reconciliation_detail.online_pay_id) %>
-		<% else %>
-			UNMATCH
+	<table id="reconciliation_details_table">
+		<tr>
+			<td>支付类型</td>
+			<td> 子类型</td>
+			<td>订单号</td>
+			<td>对账状态</td>
+			<td>金额</td>
+			<td>支付系统返回状态</td>
+			<td>对账备注</td>
+			<td>交易时间</td>
+		</tr>
+		<% @reconciliation_details.each do |reconciliation_detail| %>
+		<tr>
+			<td>  <%= reconciliation_detail.payway %> </td>
+			<td>  <%= reconciliation_detail.paytype%>  </td>
+			<td>  <%= reconciliation_detail.transactionid %>  </td>
+			<td>  <%= reconciliation_flag_mapping(reconciliation_detail.reconciliation_flag) %>  </td>
+			<td>  <%= reconciliation_detail.amt %>  </td>
+			<td>  <%= reconciliation_detail.transaction_status %>  </td>
+			<td> 
+				<% unless reconciliation_detail.online_pay_id.blank? %> 
+					<%= link_to reconciliation_detail.online_pay.trade_no,show_single_online_pay_path(reconciliation_detail.online_pay_id) %>
+				<% else %>
+					UNMATCH
+				<% end %>
+			</td>
+			<td>  <%= reconciliation_detail.timestamp %>  </td>
+		</tr>
 		<% end %>
-	</td>
-	<td>  <%= reconciliation_detail.timestamp %>  </td>
-</tr>
-<% end %>
-</table>
-<%= paginate @reconciliation_details %>
+	</table>
+	<%= paginate @reconciliation_details %>
 </div>

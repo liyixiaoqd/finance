@@ -1,18 +1,30 @@
-username:<%= @user.username %> </br>
-e_cash:<%= @user.e_cash %> score:<%= @user.score %>
-<hr>
-<% @finance_waters.each do |finance_water| %>
-<p>
-  <% if finance_water.symbol =="Add" %>
-  <%= "#{finance_water.old_amount} + #{finance_water.amount} = #{finance_water.new_amount}"%>
-  <% else %>
-  <%= "#{finance_water.old_amount} - #{finance_water.amount} = #{finance_water.new_amount}"%>
-  <% end %>
-  <%= finance_water.operator %>
-  <%= finance_water.operdate %>
-  <%= finance_water.watertype %>
-  </p>
-</p>
-<% end %>
+<% @page_title="财务流水明细" %>
 
- <%= link_to 'back',root_path %>
+<%= render partial:"user",locals: {user: @user} %>
+
+ <%= link_to '新增',new_user_finance_water_path(@user) %>
+ <%= link_to '返回',:back %>
+
+<div id="finance_water_details_content">
+	<table id="finance_water_details_table">
+		<tr>
+			<td>流水类型</td>
+			<td>变化情况</td>
+			<td>来源</td>
+			<td>操作时间</td>
+		</tr>
+		<% @finance_waters.each do |finance_water| %>
+		<tr>
+			<td>	<%= watertype_mapping(finance_water.watertype) %>	</td>
+			<% if finance_water.symbol =="Add" %>
+				<td><%= "#{finance_water.old_amount} + #{finance_water.amount} = #{finance_water.new_amount}"%></td>
+			<% else %>
+				<td><%= "#{finance_water.old_amount} - #{finance_water.amount} = #{finance_water.new_amount}"%></td>
+			<% end %>
+			<td>	<%= finance_water.operator %>	</td>
+			<td>	<%= finance_water.operdate %>	</td>
+		</tr>
+		<% end %>
+	</table>
+	<%= paginate @finance_waters %>
+</div>

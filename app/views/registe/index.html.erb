@@ -1,15 +1,49 @@
-<% @page_title="USER MANAGE" %>
+<% @page_title="用户明细" %>
 
-<% @users.each do |user| %>
-<p>
-  <%= user.userid %>
-  <%= user.username %>
-  <%= user.e_cash %>
-  <%= user.score %>
-  <%= link_to 'finance_water_detail',show_user_score_path(user) %>
-  <%= link_to 'online_pay_detail',show_user_online_pay_path(user) %>
-  <hr>
-</p>
+<div id="user_details_condition">
+<%= form_tag registe_index_by_condition_path,method:"get" do %>
+	<fieldset>
+		<legend>请输入查询条件</legend>
+		 <%= label_tag(:l1, "注册系统:") %>
+		 <%= select_tag(:system,options_for_select([["",""],["快易","quaie"],["包裹","mypost4u"]])) %> 
+		 <%= label_tag(:l2, "用户名:") %> <%= text_field_tag(:username) %>
+		 <%= label_tag(:l3, "流水类型:") %>
+		 <%= select_tag(:symbol,options_for_select([["",""],["积分","e_cash"],["电子现金","score"]])) %> 
+		 </br>
+		 <%= label_tag(:l4, "流水金额起始:") %> <%= text_field_tag(:min_amount) %>
+		 <%= label_tag(:l5, "流水金额终止:") %> <%= text_field_tag(:max_amount) %>
+		</br>
+		 <%= submit_tag("查询") %>
 
+	          	<%=button_tag("清除条件",type: 'button',class: "button_clear") %>
+	</fieldset>
 <% end %>
+</div>
+
+<div id="user_details_content">
+	<table id="user_details_table">
+		<tr>
+			<td>用户ID</td>
+			<td>用户名</td>
+			<td>电子现金</td>
+			<td>积分</td>
+			<td></td>
+			<td></td>
+		</tr>
+		
+		<% @users.each do |user| %>
+			<tr>
+				<td>	<%= user.userid %>	</td>
+				<td>	<%= user.username %>	</td>
+				<td>	<%= user.e_cash %>	</td>
+				<td>	<%= user.score %>	</td>
+				<td>	<%= link_to '财务流水明细',show_user_finance_water_path(user) %>	</td>
+				<td>	<%= link_to '支付明细',show_user_online_pay_path(user) %>	</td>
+			</tr>
+		<% end %>
+		
+	</table>
+
+	<%= paginate @users %>
+</div>
 

@@ -6,8 +6,7 @@ class ReconciliationDetail < ActiveRecord::Base
 
 	default_scope { order('payway,paytype asc,timestamp desc') }
 
-	PAGE_PER=14
-	paginates_per PAGE_PER
+	paginates_per 14
 
 	RECONCILIATIONDETAIL_FLAG={
 		'INIT' => '0',

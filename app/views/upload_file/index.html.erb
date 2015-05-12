@@ -3,14 +3,14 @@
 <div id="upload">
 <%= form_tag upload_file_upload_path,multipart:true do %>
 	<fieldset>
-		<legend>Please Choose File To Upload</legend>
-			<%= label_tag(:l1, "File Type:") %>
-			<%= select_tag "file_type", options_for_select([ "sofort_transaction" ], "sofort_transaction") %>
+		<legend>请选择业务类型并上传文件</legend>
+			<%= label_tag(:l1, "上传业务类型:") %>
+			<%= select_tag "file_type", options_for_select([ ["sofort对账明细","sofort_transaction"] ], "sofort_transaction") %>
 			</br></br>
-			<%= label_tag(:l2, "Choose File:") %>
+			<%= label_tag(:l2, "选择文件:") %>
 			<%= file_field_tag :file %>
 			</br></br>
-			<%= submit_tag("Upload") %>
+			<%= submit_tag("上传") %>
 	</fieldset>
 <% end %>
 </div>

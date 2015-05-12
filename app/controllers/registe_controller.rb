@@ -3,10 +3,20 @@ class RegisteController < ApplicationController
 
 	include Paramsable
 
-	before_action :authenticate_admin!,:only=>:index
+	CONDITION_PARAMS=%w{system username min_amount max_amount}
+	# before_action :authenticate_admin!,:only=>:index
 
 	def index
-		@users=User.all
+		@users=User.all.page(params[:page])
+	end
+
+	def index_by_condition
+		sql=sql_from_condition_filter(params)
+		logger.info(sql)
+		@users=User.where(sql,params).page(params[:page])
+		#@users=Kaminari.paginate_array(@reconciliation_details).page(params[:page]).per(ReconciliationDetail::PAGE_PER)
+
+		render :index
 	end
 
 	def create
@@ -71,5 +81,43 @@ class RegisteController < ApplicationController
 			user.operdate=params["datetime"]
 		
 			user
+		end
+
+		def sql_from_condition_filter(params)
+			sql=""
+			index=1
+
+			symbol=params['symbol']
+
+			params.each do |k,v|
+				next if v.blank? 
+				next unless CONDITION_PARAMS.include?(k)
+
+				if( k=="min_amount")
+					if symbol.present? && symbol=="e_cash"
+						t_sql="e_cash>=:#{k}"
+					elsif symbol.present? && symbol=="score"
+						t_sql="score>=:#{k}"
+					end
+				elsif (k=="max_amount")
+					if symbol.present? && symbol=="e_cash"
+						t_sql="e_cash<=:#{k}"
+					elsif symbol.present? && symbol=="score"
+						t_sql="score<=:#{k}"
+					end
+				else
+					t_sql="#{k}=:#{k}"
+				end
+
+				if(index==1)
+					sql=t_sql
+				else
+					sql="#{sql} and #{t_sql}"
+				end
+
+				index=index+1
+			end
+
+			sql
 		end
 end
