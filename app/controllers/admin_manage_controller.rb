@@ -1,5 +1,10 @@
 class AdminManageController < ApplicationController
 	def sign_index
+		@data=OnlinePay.current_time_format("%Y-%m-%d",0)
+		begdata=OnlinePay.current_time_format("%Y-%m-%d",-1)
+
+		@online_pay_num,@online_pay_amount_sum=OnlinePay.get_count_sum_by_day_condition(begdata,@data,"")
+		@online_pay_succ_num,@online_pay_succ_amount_sum=OnlinePay.get_count_sum_by_day_condition(begdata,@data,"status_succ")
 	end
 
 	def sign_in

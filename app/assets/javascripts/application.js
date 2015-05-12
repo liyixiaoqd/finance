@@ -14,6 +14,7 @@
 //= require jquery_ujs
 //= require turbolinks
 //= require_tree .
+//= require jquery-ui/datepicker
 
 $(document).ready(function(){
   $(".button_clear").click(function(){

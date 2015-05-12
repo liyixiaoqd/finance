@@ -54,3 +54,6 @@ gem 'activemerchant', "~> 1.42.2"
 
 # Pagination
 gem 'kaminari', '~> 0.15.1'
+
+# jquery-ui
+gem 'jquery-ui-rails'

@@ -1,4 +1,6 @@
 class OnlinePay < ActiveRecord::Base
+	include PayDetailable
+
 	ONLINE_PAY_STATUS_ENUM=%w{submit failure_submit  submit_credit intermediate_notify success_notify cancel_notify failure_notify success_credit failure_credit}
 
 	belongs_to :user
@@ -149,6 +151,27 @@ class OnlinePay < ActiveRecord::Base
 			Rails.logger.info("the call has updated record:#{self.callback_status} >= #{new_callback_status} ")
 		end
 		has_updated
+	end
+
+	def self.get_count_sum_by_day_condition(datatime_beg="",datatime_end="",condition="")
+		if datatime_beg.blank? || datatime_end.blank?
+			datatime_beg=current_time_format("%Y-%m-%d",0)
+			datatime_end=current_time_format("%Y-%m-%d",1)
+		end
+
+		case condition
+		when "status_succ" then	sql_condition=" and status like 'success%'"
+		when "status_fail" then	sql_condition=" and status not like 'success%'"
+		else
+			sql_condition=""
+		end
+
+		op_tj=OnlinePay.select("count(*) as c,sum(amount) as s").where("created_at>=? and created_at<? #{sql_condition}",datatime_beg,datatime_end)
+		if(op_tj[0]['s'].blank?)
+			[op_tj[0]['c'],0.00]
+		else
+			[op_tj[0]['c'],op_tj[0]['s'].to_f]
+		end
 	end
 
 	#return pay_detail instance

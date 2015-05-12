@@ -16,11 +16,11 @@
 		<% if session[:admin].present? %>
 			<% if session[:admin_level]>=0 %>
 				<div id="side_search">
-					<%=link_to t('用户'),registe_index_path%>
+					<%=link_to t('用户'),registe_index_path,method: :get%>
 					</br>
-					<%=link_to t('财务对账'),transaction_reconciliation_index_path%>
+					<%=link_to t('财务对账'),transaction_reconciliation_index_path,method: :get%>
 					</br>
-					<%=link_to t('文件上传'),upload_file_index_path%>
+					<%=link_to t('文件上传'),upload_file_index_path,method: :get%>
 				</div>
 			<% end %>
 
@@ -32,6 +32,7 @@
 			<% end %>
 
 			<div id="side_admin">
+				<%=link_to t('首页'),admin_manage_sign_index_path,method: :get%>
 				<%=link_to t('登出'),admin_manage_sign_out_path,method: :post%>
 			</div>
 		<% end %>

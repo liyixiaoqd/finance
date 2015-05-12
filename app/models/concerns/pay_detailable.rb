@@ -70,6 +70,21 @@ module PayDetailable extend ActiveSupport::Concern
 		end
 	end
 	
+	# methods defined here are going to extend the class, not the instance of it
+	module ClassMethods
+		def current_time_format(format="",step=0)
+			if (format.blank?)
+				format="%Y-%m-%d %H:%M:%S"
+			end
+
+			if step!=0
+				(Time.now+step.day).strftime(format)
+			else
+				Time.now.strftime(format)
+			end
+		end
+	end
+
 	private
 		def check_payparams(valid_params,online_pay)
 			valid_params.each do |param|
