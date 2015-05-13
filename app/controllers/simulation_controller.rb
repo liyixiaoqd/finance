@@ -1,3 +1,5 @@
+require 'concerns/net_http_auth.rb'
+
 class SimulationController < ApplicationController
 	protect_from_forgery :except => [:simulate_post]
 
@@ -176,7 +178,10 @@ class SimulationController < ApplicationController
 
 	private
 		def method_url_call(method,url_path,https,params={})
-			uri = URI.parse(url_path)
+			digest_auth = Net::HTTP::DigestAuth.new
+			uri = URI.parse(url_path+".json")
+			uri.user="finance_name"
+			uri.password="finance_passwd"
 
 			http = Net::HTTP.new(uri.host, uri.port)
 			http.use_ssl =  uri.scheme == 'https' if https==true
@@ -185,12 +190,20 @@ class SimulationController < ApplicationController
 				request = Net::HTTP::Get.new(uri.request_uri) 
 			else
 				request = Net::HTTP::Post.new(uri.request_uri) 
+			end
+
+			response = http.request(request)
+			auth = digest_auth.auth_header uri, response['www-authenticate'], method.upcase
+			request.add_field 'Authorization', auth
+
+			unless(method=="get")
 				if(params.blank?)
 					request.set_form_data(method_params(method))
 				else
 					request.set_form_data(params)
 				end
 			end
+			
 			response=http.request(request)
 
 			response	

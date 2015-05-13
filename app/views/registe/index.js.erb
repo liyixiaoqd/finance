@@ -1,0 +1,3 @@
+$('.tr_relpace').remove()
+$('#user_details_table').append("<%= escape_javascript(render partial: 'index',collection: @users,as: :user) %>")
+$('.div_paginate').replaceWith("<div class='div_paginate'> <%= escape_javascript(render partial: 'layouts/paginate_replace_ajax',locals: {page_array: @users}) %> </div>")

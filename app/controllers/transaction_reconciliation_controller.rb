@@ -2,17 +2,25 @@ class TransactionReconciliationController < ApplicationController
 	# before_action :authenticate_admin!
 
 	CONDITION_PARAMS=%w{payway paytype reconciliation_flag start_time end_time}
-	def index
-		@reconciliation_details=ReconciliationDetail.includes(:online_pay).all.page(params[:page])
-	end
+	# def index
+	# 	@reconciliation_details=ReconciliationDetail.includes(:online_pay).all.page(params[:page])
 
-	def index_by_condition
+	# 	respond_to do |format|
+	# 		format.js { }
+	# 		format.html { render :index }
+	# 	end
+	# end
+
+	def index
 		sql=sql_from_condition_filter(params)
-		logger.info(sql)
-		@reconciliation_details=ReconciliationDetail.where(sql,params).page(params[:page])
+		#logger.info(sql)
+		@reconciliation_details=ReconciliationDetail.includes(:online_pay).where(sql,params).page(params[:page])
 		# @reconciliation_details=Kaminari.paginate_array(@reconciliation_details).page(params[:page]).per(ReconciliationDetail::PAGE_PER)
 
-		render :index
+		respond_to do |format|
+			format.html { render :index }
+			format.js
+		end
 	end
 
 	private 

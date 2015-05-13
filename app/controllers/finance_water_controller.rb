@@ -17,9 +17,8 @@ class FinanceWaterController < ApplicationController
 	def modify
 		respond_to do |format|	
 			unless params_valid("finance_submit",params)
-				format.json { render json:{},status:400 }
-				format.html {flash[:notice]="新增流水失败-系统验证错误";render :back}
-				return 
+				format.json { render json:{},status:400 and return }
+				format.html {flash[:notice]="新增流水失败-系统验证错误";render :back and return}
 			end
 
 			ret_hash={
@@ -30,19 +29,19 @@ class FinanceWaterController < ApplicationController
 				'e_cash'=>0.0,
 				'waterno'=>''
 			}
+
 			user=nil
 			begin
 				ActiveRecord::Base.transaction do
 					#use lock 
 					user=User.lock().find_by_system_and_userid(params['system'],params['userid'])
-					@user=user
+					logger.info(user.blank?)
 					if(user.blank?)
 						ret_hash['reasons']<<{'reason'=>"user is not exists!"}
-						format.json {render json:ret_hash.to_json}
-						format.html {flash[:notice]=ret_hash['reasons'];render :back}
-						return
+						format.json {render json:ret_hash.to_json and return }
+						format.html {flash[:notice]=ret_hash['reasons'];render :back and return }
 					end
-
+					@user=user
 					finance_water=new_finance_water_params(user,params)
 					update_params={}
 					if(finance_water.watertype=="score")
@@ -73,12 +72,13 @@ class FinanceWaterController < ApplicationController
 			end
 
 		
-			format.json { render json:ret_hash.to_json }
+			format.json { render json:ret_hash.to_json  and return }
 			format.html {
 				if ret_hash['status']=="success"
-					redirect_to show_user_finance_water_path(user) 
+					redirect_to show_user_finance_water_path(user) and return 
 				else
-					redirect_to new_user_finance_water_path(user)
+					flash[:notice]=ret_hash['reasons']
+					redirect_to new_user_finance_water_path(user) and return 
 				end
 			}
 		end

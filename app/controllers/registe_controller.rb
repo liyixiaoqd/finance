@@ -5,18 +5,47 @@ class RegisteController < ApplicationController
 
 	CONDITION_PARAMS=%w{system username min_amount max_amount}
 	# before_action :authenticate_admin!,:only=>:index
+	# before_action :web_use_interface_authenticate
 
 	def index
-		@users=User.all.page(params[:page])
-	end
-
-	def index_by_condition
 		sql=sql_from_condition_filter(params)
-		logger.info(sql)
+		#logger.info(sql)
 		@users=User.where(sql,params).page(params[:page])
 		#@users=Kaminari.paginate_array(@reconciliation_details).page(params[:page]).per(ReconciliationDetail::PAGE_PER)
 
-		render :index
+		respond_to do |format|
+			format.js { }
+			format.html { render :index }
+		end
+	end
+
+	def show
+		respond_to do |format|
+			unless params_valid("registe_show",params)
+				format.json{ render json:{},status:400 and return }
+				format.html { 
+					flash[:notice]="system valid failure!"
+					redirect_to registe_index_path and return
+				}
+			end
+
+			@user=User.find_by_system_and_userid(params['system'],params['userid'])		
+			format.json{
+				if @user.blank?
+					render json:{},status:400 and return
+				else
+					render json:@user.to_json and return
+				end
+			}
+			format.html{
+				if @user.blank?
+					flash[:notice]="#{params['userid']} not exists in #{params['system']} !"
+					redirect_to registe_index_path and return
+				else 
+					return
+				end
+			}
+		end
 	end
 
 	def create

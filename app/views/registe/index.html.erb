@@ -1,7 +1,7 @@
 <% @page_title="用户明细" %>
 
 <div id="user_details_condition">
-<%= form_tag registe_index_by_condition_path,method:"get" do %>
+<%= form_tag registe_index_path,method:"get",remote: :true do %>
 	<fieldset>
 		<legend>请输入查询条件</legend>
 		 <%= label_tag(:l1, "注册系统:") %>
@@ -20,6 +20,10 @@
 <% end %>
 </div>
 
+<% unless flash[:notice].blank? %>
+  <%=flash[:notice]%>
+<% end %>
+
 <div id="user_details_content">
 	<table id="user_details_table">
 		<tr>
@@ -30,20 +34,13 @@
 			<td></td>
 			<td></td>
 		</tr>
-		
-		<% @users.each do |user| %>
-			<tr>
-				<td>	<%= user.userid %>	</td>
-				<td>	<%= user.username %>	</td>
-				<td>	<%= user.e_cash %>	</td>
-				<td>	<%= user.score %>	</td>
-				<td>	<%= link_to '财务流水明细',show_user_finance_water_path(user) %>	</td>
-				<td>	<%= link_to '支付明细',show_user_online_pay_path(user) %>	</td>
-			</tr>
-		<% end %>
+			
+		<%= render partial: "index",collection: @users,as: :user %>
 		
 	</table>
 
-	<%= paginate @users %>
+	<div class="div_paginate">
+		<%= render partial: "layouts/paginate_replace_ajax",locals: {page_array: @users} %>
+	</div>
 </div>
 

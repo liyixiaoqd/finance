@@ -1,7 +1,7 @@
 <% @page_title="财务对账明细" %>
 
 <div id="reconciliation_details_condition">
-<%= form_tag transaction_reconciliation_index_by_condition_path,method:"get" do %>
+<%= form_tag transaction_reconciliation_index_path,method:"get",remote: :true do %>
 	<fieldset>
 		<legend>请输入查询条件</legend>
 		 <%= label_tag(:l1, "支付类型:") %> 
@@ -33,24 +33,10 @@
 			<td>对账备注</td>
 			<td>交易时间</td>
 		</tr>
-		<% @reconciliation_details.each do |reconciliation_detail| %>
-		<tr>
-			<td>  <%= reconciliation_detail.payway %> </td>
-			<td>  <%= reconciliation_detail.paytype%>  </td>
-			<td>  <%= reconciliation_detail.transactionid %>  </td>
-			<td>  <%= reconciliation_flag_mapping(reconciliation_detail.reconciliation_flag) %>  </td>
-			<td>  <%= reconciliation_detail.amt %>  </td>
-			<td>  <%= reconciliation_detail.transaction_status %>  </td>
-			<td> 
-				<% unless reconciliation_detail.online_pay_id.blank? %> 
-					<%= link_to reconciliation_detail.online_pay.trade_no,show_single_online_pay_path(reconciliation_detail.online_pay_id) %>
-				<% else %>
-					UNMATCH
-				<% end %>
-			</td>
-			<td>  <%= reconciliation_detail.timestamp %>  </td>
-		</tr>
-		<% end %>
+		
+		<%= render partial: "index",collection: @reconciliation_details,as: :reconciliation_detail %>
 	</table>
-	<%= paginate @reconciliation_details %>
+	<div class="div_paginate">
+		<%= render partial: "layouts/paginate_replace_ajax",locals: {page_array: @reconciliation_details} %>
+	</div>
 </div>

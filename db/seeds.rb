@@ -110,9 +110,9 @@ AccessAuthority.create!(:controller=>"OnlinePayController",:action=>"get_bill_fr
 AccessAuthority.create!(:controller=>"RegisteController",:action=>"index",
 			:is_sign_in=>true,:is_interface=>false,:access_level=>0,
 			:describe=>'USER注册查询显示界面')
-AccessAuthority.create!(:controller=>"RegisteController",:action=>"index_by_condition",
+AccessAuthority.create!(:controller=>"RegisteController",:action=>"show",
 			:is_sign_in=>false,:is_interface=>true,:access_level=>0,
-			:describe=>'USER注册查询显示界面(输入查询条件)')
+			:describe=>'USER详细信息查询界面')
 AccessAuthority.create!(:controller=>"RegisteController",:action=>"create",
 			:is_sign_in=>false,:is_interface=>true,:access_level=>0,
 			:describe=>'USER注册接口')
@@ -154,9 +154,6 @@ AccessAuthority.create!(:controller=>"SimulationController",:action=>"simulate_p
 AccessAuthority.create!(:controller=>"TransactionReconciliationController",:action=>"index",
 			:is_sign_in=>true,:is_interface=>false,:access_level=>0,
 			:describe=>'各财务系统对账单查询显示界面')
-AccessAuthority.create!(:controller=>"TransactionReconciliationController",:action=>"index_by_condition",
-			:is_sign_in=>true,:is_interface=>false,:access_level=>0,
-			:describe=>'各财务系统对账单查询显示界面(输入查询条件)')
 
 AccessAuthority.create!(:controller=>"UploadFileController",:action=>"index",
 			:is_sign_in=>true,:is_interface=>false,:access_level=>0,

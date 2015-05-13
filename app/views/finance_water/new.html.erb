@@ -1,5 +1,7 @@
 <%= render partial:"user",locals: {user: @user} %>
-
+<% unless flash[:notice].blank? %>
+  <%=flash[:notice]%>
+<% end %>
 <%= form_tag("/finance_water/#{@user.userid}/modify", method: "post") do %>
   <%= label_tag(:label1, "流水类型:") %> 
   <%= select_tag(:watertype,options_for_select([["积分","score"],["电子现金","e_cash"]])) %> </br>

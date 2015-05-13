@@ -1,0 +1,8 @@
+<tr class="tr_relpace">
+	<td>	<%= link_to user.userid,controller:"registe",action:"show",userid:user.userid,system:user.system %>	</td>
+	<td>	<%= user.username %>	</td>
+	<td>	<%= user.e_cash %>	</td>
+	<td>	<%= user.score %>	</td>
+	<td>	<%= link_to '财务流水明细',show_user_finance_water_path(user) %>	</td>
+	<td>	<%= link_to '支付明细',show_user_online_pay_path(user) %>	</td>
+</tr>

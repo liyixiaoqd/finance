@@ -1,0 +1,3 @@
+$('.tr_relpace').remove()
+$('#reconciliation_details_table').append("<%= escape_javascript(render partial: 'index',collection: @reconciliation_details,as: :reconciliation_detail) %>")
+$('.div_paginate').replaceWith("<div class='div_paginate'> <%= escape_javascript(render partial: 'layouts/paginate_replace_ajax',locals: {page_array: @reconciliation_details}) %> </div>")
