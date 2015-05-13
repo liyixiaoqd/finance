@@ -82,10 +82,6 @@ class SimulationController < ApplicationController
 		
 		simulate_order_no=create_pay_order_no(payway,new_serial)
 
-		uri = URI.parse("#{CALL_HOST}#{callpath}")
-		logger.info("path:#{callpath}")
-		http = Net::HTTP.new(uri.host, uri.port)
-
 		case payway
 		when 'paypal' then simulate_params=init_paypal_submit_params(simulate_order_no,amount,request.remote_ip) 
 		when 'sofort' then simulate_params=init_sofort_submit_params(simulate_order_no,amount) 
@@ -97,10 +93,11 @@ class SimulationController < ApplicationController
 
 		logger.info("simulate_params:#{simulate_params.inspect}")
 
-		request = Net::HTTP::Post.new(uri.request_uri) 
-		request.set_form_data(simulate_params)
-		logger.info("SIMULATION CALL !!")
-		response=http.request(request)
+		# request = Net::HTTP::Post.new(uri.request_uri) 
+		# request.set_form_data(simulate_params)
+		# logger.info("SIMULATION CALL !!")
+		# response=http.request(request)
+		response=method_url_call("post","#{CALL_HOST}#{callpath}",false,simulate_params)
 		res_result=JSON.parse(response.body)
 		logger.info("SIMULATION CALL END !!")
 		#logger.info("body:#{response.body}\nresult:#{res_result}")
@@ -119,14 +116,15 @@ class SimulationController < ApplicationController
 		callpath="/pay/#{userid}/submit_creditcard"
 		ip=request.remote_ip
 		
-		uri = URI.parse("#{CALL_HOST}#{callpath}")
-		logger.info("path:#{callpath}")
-		http = Net::HTTP.new(uri.host, uri.port)
+		# uri = URI.parse("#{CALL_HOST}#{callpath}")
+		# logger.info("path:#{callpath}")
+		# http = Net::HTTP.new(uri.host, uri.port)
 
-		request = Net::HTTP::Post.new(uri.request_uri) 
-		request.set_form_data(credit_params(trade_no,amount,ip))
-		logger.info("call!!")
-		response=http.request(request)
+		# request = Net::HTTP::Post.new(uri.request_uri) 
+		# request.set_form_data(credit_params(trade_no,amount,ip))
+		# logger.info("call!!")
+		# response=http.request(request)
+		response=method_url_call("post","#{CALL_HOST}#{callpath}",false,credit_params(trade_no,amount,ip))
 		res_result=JSON.parse(response.body)
 		logger.info("body:#{response.body}\nresult:#{res_result}")
 		unless (res_result['redirect_url'].blank?)
@@ -184,7 +182,6 @@ class SimulationController < ApplicationController
 			uri.password="finance_passwd"
 
 			http = Net::HTTP.new(uri.host, uri.port)
-			http.use_ssl =  uri.scheme == 'https' if https==true
 
 			if(method=="get")
 				request = Net::HTTP::Get.new(uri.request_uri) 
@@ -203,7 +200,7 @@ class SimulationController < ApplicationController
 					request.set_form_data(params)
 				end
 			end
-			
+
 			response=http.request(request)
 
 			response	
