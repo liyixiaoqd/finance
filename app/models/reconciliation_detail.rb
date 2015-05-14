@@ -96,7 +96,7 @@ class ReconciliationDetail < ActiveRecord::Base
 			set_flag!(RECONCILIATIONDETAIL_FLAG['FAIL'],"set_flag_by_status get status failure:#{reconciliation_status} and #{self.transaction_status} - #{self.online_pay_status}")
 		else
 			if reconciliation_status=="SUCC" && self.online_pay_status =~ /^success/
-				if self.online_pay.amount==self.amt
+				if self.online_pay.rate_amount==self.amt
 					set_flag!(RECONCILIATIONDETAIL_FLAG['SUCC'],"")
 				else
 					set_flag!(RECONCILIATIONDETAIL_FLAG['FAIL'],"amount not match: #{self.online_pay.amount} <=> #{self.amt}")

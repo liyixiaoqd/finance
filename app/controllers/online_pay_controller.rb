@@ -186,6 +186,7 @@ class OnlinePayController < ApplicationController
 			online_pay.set_is_credit!()
 			online_pay.remote_host=request.remote_host
 			online_pay.remote_ip=request.remote_ip
+			online_pay.rate_amount=online_pay.amount
 
 			online_pay
 		end

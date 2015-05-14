@@ -39,6 +39,7 @@ class OnlinePayCallbackController < ApplicationController
 				ret_hash=init_notify_ret_hash(online_pay)
 				rollback_callback_status=online_pay.callback_status
 				online_pay.callback_status=params[:trade_status]
+				online_pay.rate_amount=params([:total_fee])
 				online_pay.set_status_by_callback!()
 				online_pay.reconciliation_id=online_pay.trade_no
 				ret_hash['status']=online_pay.status

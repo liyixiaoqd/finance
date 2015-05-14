@@ -1,7 +1,7 @@
 class TransactionReconciliationController < ApplicationController
 	# before_action :authenticate_admin!
 
-	CONDITION_PARAMS=%w{payway paytype reconciliation_flag start_time end_time}
+	CONDITION_PARAMS=%w{payway paytype reconciliation_flag start_time end_time transactionid}
 	# def index
 	# 	@reconciliation_details=ReconciliationDetail.includes(:online_pay).all.page(params[:page])
 
