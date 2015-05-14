@@ -3,8 +3,8 @@ class ApplicationController < ActionController::Base
   # For APIs, you may want to use :null_session instead.  	
 	protect_from_forgery with: :exception
 
+	force_ssl if :ssl_required
 	before_action :authenticate_admin!
-	append_before_action force_ssl() if :ssl_required
 
 	rescue_from RuntimeError,with: :deny_access
 
@@ -82,7 +82,7 @@ class ApplicationController < ActionController::Base
 			action=params['action']
 
 			logger.info("ssl:#{controller}.#{action}")
-
-			true
+ 
+ 			true
 		end
 end
