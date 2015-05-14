@@ -81,6 +81,6 @@ class ApplicationController < ActionController::Base
 			controller=params['controller'].camelize()+"Controller"
 			action=params['action']
 
-			AccessAuthority.isDigauth(controller,action)
+			!Rails.env.development? && AccessAuthority.isDigauth(controller,action)
 		end
 end
