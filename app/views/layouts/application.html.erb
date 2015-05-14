@@ -27,7 +27,7 @@
 			<% if session[:admin_level]>=5 %>
 				<div id="side_simulation">
 					<%= link_to '模拟支付',simulation_path %>
-					<%= link_to '模拟对账',simulation_simulate_reconciliation_path %>
+					<%= link_to '模拟对账',simulation_simulate_reconciliation_path,method: :get %>
 				</div>
 			<% end %>
 
