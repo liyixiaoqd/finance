@@ -1,10 +1,10 @@
 class ApplicationController < ActionController::Base
   # Prevent CSRF attacks by raising an exception.
-  # For APIs, you may want to use :null_session instead.
-
+  # For APIs, you may want to use :null_session instead.  	
 	protect_from_forgery with: :exception
 
 	before_action :authenticate_admin!
+	append_before_action force_ssl() if :ssl_required
 
 	rescue_from RuntimeError,with: :deny_access
 
@@ -75,5 +75,14 @@ class ApplicationController < ActionController::Base
 				#@system_name = system_name
 				SYSTEMS[system_name]
 			end
+		end
+
+		def ssl_required
+			controller=params['controller'].camelize()+"Controller"
+			action=params['action']
+
+			logger.info("ssl:#{controller}.#{action}")
+
+			true
 		end
 end
