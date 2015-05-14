@@ -3,7 +3,7 @@ class ApplicationController < ActionController::Base
   # For APIs, you may want to use :null_session instead.  	
 	protect_from_forgery with: :exception
 
-	force_ssl if :ssl_required
+	force_ssl if: :ssl_required?
 	before_action :authenticate_admin!
 
 	rescue_from RuntimeError,with: :deny_access
@@ -77,12 +77,10 @@ class ApplicationController < ActionController::Base
 			end
 		end
 
-		def ssl_required
+		def ssl_required?
 			controller=params['controller'].camelize()+"Controller"
 			action=params['action']
 
-			logger.info("ssl:#{controller}.#{action}")
- 
- 			true
+			AccessAuthority.isDigauth(controller,action)
 		end
 end

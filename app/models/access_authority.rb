@@ -19,6 +19,20 @@ class AccessAuthority < ActiveRecord::Base
 		[sign,interface,level,digauth]
 	end
 
+	def self.isDigauth(controller,action)
+		value=true
+
+		record=AccessAuthority.select(:is_digest_auth).find_by_controller_and_action(controller,action)
+
+		if record.blank?
+			logger.info("#{controller}.#{action} not exists?!")
+		else
+			value=record['is_digest_auth']
+		end
+
+		value
+	end
+
 	def self.isSignIn(controller,action)
 		value=true
 		record=AccessAuthority.select(:is_sign_in).find_by_controller_and_action(controller,action)
