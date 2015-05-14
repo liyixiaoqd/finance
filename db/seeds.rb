@@ -44,77 +44,77 @@ AdminManage.create!(:admin_name=>'guest',:admin_passwd=>'af1d6c48324c1461e12cbde
 
 AccessAuthority.delete_all
 AccessAuthority.create!(:controller=>"AdminManageController",:action=>"sign_index",
-			:is_sign_in=>false,:is_interface=>false,:access_level=>0,
+			:is_sign_in=>false,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'ADMIN登入后显示界面')
 AccessAuthority.create!(:controller=>"AdminManageController",:action=>"sign_in",
-			:is_sign_in=>false,:is_interface=>false,:access_level=>0,
+			:is_sign_in=>false,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'ADMIN登入界面')
 AccessAuthority.create!(:controller=>"AdminManageController",:action=>"sign_out",
-			:is_sign_in=>false,:is_interface=>false,:access_level=>0,
+			:is_sign_in=>false,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'ADMIN登出界面')
 
 AccessAuthority.create!(:controller=>"FinanceWaterController",:action=>"new",
 			:is_sign_in=>true,:is_interface=>false,:access_level=>1,
 			:describe=>'USER财务流水手动新增界面')
 AccessAuthority.create!(:controller=>"FinanceWaterController",:action=>"show",
-			:is_sign_in=>true,:is_interface=>false,:access_level=>0,
+			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'USER财务流水查询显示界面')
 AccessAuthority.create!(:controller=>"FinanceWaterController",:action=>"modify",
-			:is_sign_in=>false,:is_interface=>true,:access_level=>0,
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>true,
 			:describe=>'USER财务流水变更借口')
 
 AccessAuthority.create!(:controller=>"OnlinePayCallbackController",:action=>"alipay_oversea_return",
-			:is_sign_in=>false,:is_interface=>true,:access_level=>0,
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>false,
 			:describe=>'alipay_oversea支付同步回调接口')
 AccessAuthority.create!(:controller=>"OnlinePayCallbackController",:action=>"alipay_oversea_notify",
-			:is_sign_in=>false,:is_interface=>true,:access_level=>0,
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>false,
 			:describe=>'alipay_oversea支付异步回调接口')
 AccessAuthority.create!(:controller=>"OnlinePayCallbackController",:action=>"alipay_transaction_return",
-			:is_sign_in=>false,:is_interface=>true,:access_level=>0,
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>false,
 			:describe=>'alipay_transaction支付同步回调接口')
 AccessAuthority.create!(:controller=>"OnlinePayCallbackController",:action=>"alipay_transaction_notify",
-			:is_sign_in=>false,:is_interface=>true,:access_level=>0,
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>false,
 			:describe=>'alipay_transaction支付异步回调接口')
 AccessAuthority.create!(:controller=>"OnlinePayCallbackController",:action=>"paypal_return",
-			:is_sign_in=>false,:is_interface=>true,:access_level=>0,
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>false,
 			:describe=>'paypal支付同步回调接口')
 AccessAuthority.create!(:controller=>"OnlinePayCallbackController",:action=>"paypal_abort",
-			:is_sign_in=>false,:is_interface=>true,:access_level=>0,
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>false,
 			:describe=>'paypal支付异常回调接口')
 AccessAuthority.create!(:controller=>"OnlinePayCallbackController",:action=>"sofort_return",
-			:is_sign_in=>false,:is_interface=>true,:access_level=>0,
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>false,
 			:describe=>'sofort支付同步回调接口')
 AccessAuthority.create!(:controller=>"OnlinePayCallbackController",:action=>"sofort_notify",
-			:is_sign_in=>false,:is_interface=>true,:access_level=>0,
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>false,
 			:describe=>'sofort支付异步回调接口')
 AccessAuthority.create!(:controller=>"OnlinePayCallbackController",:action=>"sofort_abort",
-			:is_sign_in=>false,:is_interface=>true,:access_level=>0,
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>false,
 			:describe=>'sofort支付异常回调接口')
 
 AccessAuthority.create!(:controller=>"OnlinePayController",:action=>"show",
-			:is_sign_in=>true,:is_interface=>false,:access_level=>0,
+			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'支付交易查询显示界面')
 AccessAuthority.create!(:controller=>"OnlinePayController",:action=>"show_single_detail",
-			:is_sign_in=>true,:is_interface=>false,:access_level=>0,
+			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'单笔支付交易详细查询显示界面')
 AccessAuthority.create!(:controller=>"OnlinePayController",:action=>"submit",
-			:is_sign_in=>false,:is_interface=>true,:access_level=>0,
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>true,
 			:describe=>'支付提交接口')
 AccessAuthority.create!(:controller=>"OnlinePayController",:action=>"submit_creditcard",
-			:is_sign_in=>false,:is_interface=>true,:access_level=>0,
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>true,
 			:describe=>'支付(信用卡)提交接口')
 AccessAuthority.create!(:controller=>"OnlinePayController",:action=>"get_bill_from_payment_system",
-			:is_sign_in=>false,:is_interface=>true,:access_level=>0,
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>true,
 			:describe=>'获取各支付系统财务对账单接口')
 
 AccessAuthority.create!(:controller=>"RegisteController",:action=>"index",
-			:is_sign_in=>true,:is_interface=>false,:access_level=>0,
+			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'USER注册查询显示界面')
 AccessAuthority.create!(:controller=>"RegisteController",:action=>"show",
-			:is_sign_in=>false,:is_interface=>true,:access_level=>0,
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>true,
 			:describe=>'USER详细信息查询界面')
 AccessAuthority.create!(:controller=>"RegisteController",:action=>"create",
-			:is_sign_in=>false,:is_interface=>true,:access_level=>0,
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>true,
 			:describe=>'USER注册接口')
 
 AccessAuthority.create!(:controller=>"SimulationController",:action=>"index",
@@ -139,10 +139,10 @@ AccessAuthority.create!(:controller=>"SimulationController",:action=>"simulate_p
 			:is_sign_in=>true,:is_interface=>false,:access_level=>5,
 			:describe=>'模拟交易调用 - 支付(信用卡)提交')
 AccessAuthority.create!(:controller=>"SimulationController",:action=>"callback_return",
-			:is_sign_in=>false,:is_interface=>true,:access_level=>0,
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>false,
 			:describe=>'模拟交易调用 - 支付同步回调')
 AccessAuthority.create!(:controller=>"SimulationController",:action=>"callback_notify",
-			:is_sign_in=>false,:is_interface=>true,:access_level=>0,
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>false,
 			:describe=>'模拟交易调用 - 支付异步回调')
 AccessAuthority.create!(:controller=>"SimulationController",:action=>"simulate_get",
 			:is_sign_in=>true,:is_interface=>false,:access_level=>5,
@@ -152,12 +152,12 @@ AccessAuthority.create!(:controller=>"SimulationController",:action=>"simulate_p
 			:describe=>'模拟交易调用 - post页面提交')
 
 AccessAuthority.create!(:controller=>"TransactionReconciliationController",:action=>"index",
-			:is_sign_in=>true,:is_interface=>false,:access_level=>0,
+			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'各财务系统对账单查询显示界面')
 
 AccessAuthority.create!(:controller=>"UploadFileController",:action=>"index",
-			:is_sign_in=>true,:is_interface=>false,:access_level=>0,
+			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'上传文件界面')
 AccessAuthority.create!(:controller=>"UploadFileController",:action=>"upload",
-			:is_sign_in=>true,:is_interface=>false,:access_level=>0,
+			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'上传文件处理')

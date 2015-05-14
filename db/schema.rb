@@ -11,17 +11,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150511023308) do
+ActiveRecord::Schema.define(version: 20150514012116) do
 
   create_table "access_authorities", force: true do |t|
-    t.string   "controller",   limit: 50
-    t.string   "action",       limit: 30
+    t.string   "controller",     limit: 50
+    t.string   "action",         limit: 30
     t.boolean  "is_sign_in"
     t.boolean  "is_interface"
-    t.integer  "access_level", limit: 2
+    t.integer  "access_level",   limit: 2
     t.string   "describe"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "is_digest_auth"
   end
 
   create_table "admin_manages", force: true do |t|

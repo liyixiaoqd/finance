@@ -28,13 +28,15 @@ class ApplicationController < ActionController::Base
 			controller=params['controller'].camelize()+"Controller"
 			action=params['action']
 
-			sign_flag,interface_flag,need_level=AccessAuthority.get_sign_interface_level(controller,action)
+			sign_flag,interface_flag,need_level,digauth_flag=AccessAuthority.get_sign_interface_level_digauth(controller,action)
 
 
 
 			if session[:admin].blank?
 				if interface_flag 
-					interface_authenticate()
+					if digauth_flag
+						interface_authenticate()
+					end
 				elsif sign_flag
 					logger.info("please login in!!")
 					redirect_to admin_manage_sign_in_path

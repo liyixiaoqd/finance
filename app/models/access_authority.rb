@@ -1,10 +1,11 @@
 class AccessAuthority < ActiveRecord::Base
-	def self.get_sign_interface_level(controller,action)
+	def self.get_sign_interface_level_digauth(controller,action)
 		sign=true
 		interface=false
 		level=99
+		digauth=true
 
-		record=AccessAuthority.select(:is_sign_in,:is_interface,:access_level).find_by_controller_and_action(controller,action)
+		record=AccessAuthority.select(:is_sign_in,:is_interface,:access_level,:is_digest_auth).find_by_controller_and_action(controller,action)
 
 		if record.blank?
 			logger.info("#{controller}.#{action} not exists?!")
@@ -12,9 +13,10 @@ class AccessAuthority < ActiveRecord::Base
 			sign=record['is_sign_in']
 			interface=record['is_interface']
 			level=record['access_level'].to_i
+			digauth=record['is_digest_auth']
 		end
 
-		[sign,interface,level]
+		[sign,interface,level,digauth]
 	end
 
 	def self.isSignIn(controller,action)
