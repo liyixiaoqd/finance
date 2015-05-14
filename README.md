@@ -8,4 +8,3 @@ Online Pay and Finance Check
   project version 1.0 finish
   online pay
   finance check
-  https
