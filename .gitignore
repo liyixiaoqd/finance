@@ -24,7 +24,7 @@
 
 # Ignore configuration file
 /config/environments/*.rb
-/config/settings.yml*
+/config/settings*
 /config/database.yml*
 
 # Ignore my test file

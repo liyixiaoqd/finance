@@ -183,6 +183,7 @@ class SimulationController < ApplicationController
 			uri.password="finance_passwd"
 
 			http = Net::HTTP.new(uri.host, uri.port)
+			http.use_ssl =  uri.scheme == 'https' if url_path[0,5]=="https"
 
 			if(method=="get")
 				request = Net::HTTP::Get.new(uri.request_uri) 
