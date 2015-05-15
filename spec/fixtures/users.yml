@@ -1,0 +1,10 @@
+one:
+  system: finance
+  channel: spec_fixtures
+  userid: 552b461202d0f099ec000033
+  username: spec_username
+  email: spec_username@test.com
+  e_cash: 11.1
+  score: 22.2
+  operator: spec_script
+  operdate: 2015-05-15 14:26:00

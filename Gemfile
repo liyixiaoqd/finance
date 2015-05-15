@@ -57,3 +57,8 @@ gem 'kaminari', '~> 0.15.1'
 
 # jquery-ui
 gem 'jquery-ui-rails'
+
+# test
+group :test, :development do
+	gem 'rspec-rails'
+end
