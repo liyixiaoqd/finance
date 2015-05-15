@@ -30,3 +30,4 @@
 # Ignore my test file
 /test/tmp
 /readme.txt
+/lib/tasks/test*

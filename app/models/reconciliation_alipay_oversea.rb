@@ -48,7 +48,7 @@ class ReconciliationAlipayOversea
 	#call  get_reconciliation and valid_reconciliation
 	def finance_reconciliation()
 		get_reconciliation()
-		message=valid_reconciliation()	
+		message="#{@start_date} - #{@end_date} </br> #{valid_reconciliation()}"
 	end
 
 	#insert record!

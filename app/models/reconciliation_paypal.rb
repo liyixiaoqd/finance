@@ -51,7 +51,7 @@ class ReconciliationPaypal
 
 	def finance_reconciliation()
 		hour_step=BasicData.get_value("00A","002","paypal","").to_i
-		message=""
+		message="#{@startdate} - #{@enddate} </br> "
 		for h in (0...24/hour_step)
 			tmp_start = (@startdate+ (h*hour_step).hour).strftime("%Y-%m-%dT%H:%M:%SZ")
 			tmp_end =  (@startdate+ ((h+1)*hour_step).hour).strftime("%Y-%m-%dT%H:%M:%SZ")

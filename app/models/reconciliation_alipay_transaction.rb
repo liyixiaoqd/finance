@@ -53,7 +53,7 @@ class ReconciliationAlipayTransaction
 
 	def finance_reconciliation()
 		has_next=true 	#first call interface
-		message=""
+		message="#{@gmt_start_time} - #{@gmt_end_time} </br> "
 		while  has_next 
 			has_next=get_reconciliation_detail()
 
