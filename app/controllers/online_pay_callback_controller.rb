@@ -150,9 +150,11 @@ class OnlinePayCallbackController < ApplicationController
 			render text: "#{render_text}" and return if (online_pay.blank? || online_pay.success_url.blank?)
 
 			online_pay.set_status!("submit_credit","")
-			online_pay.callback_status=online_pay.status
+			rollback_callback_status=online_pay.status
 			#check is status has updated
-			render :text=>'success' and return if online_pay.check_has_updated?(online_pay.callback_status)
+			render :text=>'success' and return if online_pay.check_has_updated?(rollback_callback_status)
+
+			online_pay.callback_status,rollback_callback_status=rollback_callback_status,online_pay.callback_status
 
 			pay_detail=OnlinePay.get_instance_pay_detail(online_pay)
 			ret_hash=init_return_ret_hash(online_pay)
@@ -179,9 +181,11 @@ class OnlinePayCallbackController < ApplicationController
 
 			# render text: "#{render_text}"		
 			online_pay.set_status!("cancel_notify","abort")
-			online_pay.callback_status=online_pay.status		
+			rollback_callback_status=online_pay.status	
 			#check is status has updated
-			render :text=>'success' and return if online_pay.check_has_updated?(online_pay.callback_status)
+			render :text=>'success' and return if online_pay.check_has_updated?(rollback_callback_status)
+			
+			online_pay.callback_status,rollback_callback_status=rollback_callback_status,online_pay.callback_status
 
 			redirect_url=redirect_url_replace("get",online_pay.abort_url,{})
 			logger.info("paypal_abort:#{redirect_url}")
@@ -226,11 +230,14 @@ class OnlinePayCallbackController < ApplicationController
 			pay_detail=OnlinePay.get_instance_pay_detail(online_pay)
 			
 			ret_hash=init_notify_ret_hash(online_pay)
-			online_pay.callback_status,online_pay.reason=pay_detail.identify_transaction(online_pay.trade_no)
-			online_pay.set_status_by_callback!()
+			rollback_callback_status,online_pay.reason=pay_detail.identify_transaction(online_pay.trade_no,online_pay.country)
 			#check is status has updated
-			logger.warn("sofort_notify:identify_transaction failure") if online_pay.callback_status.blank?
-			render :text=>'success' and return if online_pay.check_has_updated?(online_pay.callback_status)
+			logger.warn("sofort_notify:identify_transaction failure") if rollback_callback_status.blank?
+			render :text=>'success' and return if online_pay.check_has_updated?(rollback_callback_status)
+
+			online_pay.callback_status,rollback_callback_status=rollback_callback_status,online_pay.callback_status
+			online_pay.set_status_by_callback!()
+
 			online_pay.reconciliation_id=online_pay.trade_no
 
 			ret_hash['status']=online_pay.status
@@ -248,8 +255,7 @@ class OnlinePayCallbackController < ApplicationController
 
 				render_text="success"
 			rescue => e
-				online_pay.set_status!("failure_notify",e.message)
-				online_pay.custom_update_status_and_reason()
+				online_pay.update_attributes(:status=>"failure_notify",:reason=>e.message,:callback_status=>rollback_callback_status)
 				logger.info("sofort_notify failure!! : #{e.message}")
 			end
 
@@ -260,16 +266,18 @@ class OnlinePayCallbackController < ApplicationController
 	def sofort_abort
 		OnlinePay.transaction do
 			render_text="failure"
-			online_pay=OnlinePay.get_online_pay_instance("sofort","",params,false,true)
+			online_pay=OnlinePay.get_online_pay_instance("sofort","",params,"",false,true)
 			render text: "#{render_text}" and return if (online_pay.blank? || online_pay.abort_url.blank?)
 
 			# render text: "#{render_text}"		
 			online_pay.set_status!("cancel_notify","abort or timeout")
-			online_pay.callback_status=online_pay.status		
+			rollback_callback_status=online_pay.status		
 			#check is status has updated
-			render :text=>'success' and return if online_pay.check_has_updated?(online_pay.callback_status)
+			render :text=>'success' and return if online_pay.check_has_updated?(rollback_callback_status)
 
-			redirect_url=redirect_url_replace("get",online_pay.abort_url,ret_hash)
+			online_pay.callback_status,rollback_callback_status=rollback_callback_status,online_pay.callback_status
+
+			redirect_url=redirect_url_replace("get",online_pay.abort_url,{})
 			logger.info("sofort_abort:#{redirect_url}")
 			# if(method_url_response_code("get",redirect_url,false)=="200")
 			# 	render_text="success"

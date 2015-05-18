@@ -81,7 +81,7 @@ class SofortDetail
 		end
 	end
 
-	def identify_transaction(trade_no)
+	def identify_transaction(trade_no,country)
 		identify_status=""
 		identify_status_reason=""
 		xbuilder = Builder::XmlMarkup.new(:target => xstr = "<?xml version='1.0' encoding='UTF-8'?>\n", :indent =>1)
@@ -90,7 +90,7 @@ class SofortDetail
 			xbuilder.transaction trade_no
 		}
 
-		http,req = httpinit(parcel_order.send_country)
+		http,req = httpinit(country)
 		req.body = xstr
 		begin
 			res = http.request(req)

@@ -26,4 +26,11 @@ describe RegisteController do
 			end
 		end
 	end
+
+	describe "get create" do
+		it "get create status" do
+			get :create
+			expect(response.status).to eq(400)
+		end
+	end
 end

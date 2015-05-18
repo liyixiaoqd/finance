@@ -15,6 +15,7 @@ class OnlinePayController < ApplicationController
 	end
 
 	def submit
+		logger.info(params.inspect)
 		render json:{},status:400 and return unless params_valid("online_pay_submit",params)
 		ret_hash={
 			'redirect_url'=>'',
@@ -72,7 +73,7 @@ class OnlinePayController < ApplicationController
 		}
 
 		OnlinePay.transaction do  	#lock table_row
-			online_pay=OnlinePay.get_online_pay_instance(params['payway'],params['paytype'],params,["submit_credit"],true,true)
+			online_pay=OnlinePay.get_online_pay_instance(params['payway'],params['paytype'],params,["submit_credit","failure_credit"],true,true)
 			render json:{},status:400  and return if online_pay.blank?
 			
 			begin

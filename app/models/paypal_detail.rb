@@ -62,7 +62,7 @@ class PaypalDetail
 		elsif online_pay.country == "gb"
 			details=EXPRESS_GATEWAY_GB.details_for(online_pay.trade_no)
 		end
-		Rails.logger.info("#{online_pay.country}:#{details.payer_id}")
+		Rails.logger.info("get_pay_details:#{online_pay.country}:#{details.payer_id}")
 		
 		online_pay.credit_pay_id = details.payer_id
 		online_pay.credit_first_name = details.params["first_name"]
