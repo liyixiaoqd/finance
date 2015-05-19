@@ -1,6 +1,5 @@
 class OnlinePayCallbackController < ApplicationController
 	include PayDetailable
-	TEST_MODE=false
 
 	protect_from_forgery :except => [:alipay_oversea_notify,:alipay_transaction_notify]
 	#Synchronous callback  --get 
@@ -35,10 +34,9 @@ class OnlinePayCallbackController < ApplicationController
 			#delete request params
 			notify_params = params.except(*request.path_parameters.keys)
 			#valid reques is right
-			if(pay_detail.notify_verify?(notify_params,Settings.alipay_oversea.pid,Settings.alipay_oversea.secret) || TEST_MODE)	
+			if(pay_detail.notify_verify?(notify_params,Settings.alipay_oversea.pid,Settings.alipay_oversea.secret))	
 				begin
 					ret_hash=init_notify_ret_hash(online_pay)
-					logger.info("init_notify_ret_hash end!!")
 					rollback_callback_status=online_pay.callback_status
 					online_pay.callback_status=params[:trade_status]
 					online_pay.rate_amount=params[:total_fee]
@@ -74,11 +72,13 @@ class OnlinePayCallbackController < ApplicationController
 		online_pay=OnlinePay.get_online_pay_instance("alipay","transaction",params,"",false,false)
 		render :text=>"#{render_text}" and return if (online_pay.blank? || online_pay.success_url.blank?)
 
+		test_mode=params.delete(:test_mode)
 		pay_detail=OnlinePay.get_instance_pay_detail(online_pay)
 		#delete request params
 		notify_params = params.except(*request.path_parameters.keys)
 		#valid reques is right
-		if(pay_detail.notify_verify?(notify_params,Settings.alipay_transaction.pid,Settings.alipay_transaction.secret) || TEST_MODE)	
+
+		if(pay_detail.notify_verify?(notify_params,Settings.alipay_transaction.pid,Settings.alipay_transaction.secret) || test_mode==true)	
 			ret_hash=init_return_ret_hash(online_pay)
 			redirect_url=redirect_url_replace("get",online_pay.success_url,ret_hash)
 			logger.info("alipay_transaction_return:#{redirect_url}")
@@ -96,7 +96,7 @@ class OnlinePayCallbackController < ApplicationController
 			render_text="failure"
 			online_pay=OnlinePay.get_online_pay_instance("alipay","transaction",params)
 			render :text=>"#{render_text}" and return if (online_pay.blank? || online_pay.notification_url.blank?)
-
+			test_mode=params.delete(:test_mode)
 			#check is status has updated
 			render :text=>'success' and return if online_pay.check_has_updated?(params[:trade_status])
 
@@ -104,7 +104,7 @@ class OnlinePayCallbackController < ApplicationController
 			#delete request params
 			notify_params = params.except(*request.path_parameters.keys)
 			#valid reques is right
-			if(pay_detail.notify_verify?(notify_params,Settings.alipay_transaction.pid,Settings.alipay_transaction.secret) || TEST_MODE)	
+			if(pay_detail.notify_verify?(notify_params,Settings.alipay_transaction.pid,Settings.alipay_transaction.secret) || test_mode==true)	
 				begin
 					ret_hash=init_notify_ret_hash(online_pay)
 					rollback_callback_status=online_pay.callback_status
@@ -325,7 +325,7 @@ class OnlinePayCallbackController < ApplicationController
 				'status'=>'',
 				'status_reason'=>'',
 				'amount'=>online_pay.amount,
-				'test_mode'=>TEST_MODE,
+				'test_mode'=>false,
 				'buyer_email'=>'',
 				'buyer_id'=>''			
 			}

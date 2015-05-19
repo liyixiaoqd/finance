@@ -40,9 +40,12 @@ module AlipayDetailable extend ActiveSupport::Concern
 		valid_flag=false
 		if verify_sign?(params,secret)
 			params = stringify_keys(params)
-			if open("#{Settings.alipay_oversea.alipay_oversea_api_ur}?service=notify_verify&partner=#{pid}&notify_id=#{CGI.escape params['notify_id'].to_s}").read == 'true'
+			valid_url="#{Settings.alipay_oversea.alipay_oversea_api_ur}?service=notify_verify&partner=#{pid}&notify_id=#{CGI.escape params['notify_id'].to_s}"
+			if open(valid_url).read == 'true'
 				Rails.logger.info("ALIPAY NOTIFY_VERIFY SUCCESS!!")
 				valid_flag=true
+			else
+				Rails.logger.info("ALIPAY NOTIFY_VERIFY FAILURE!!: #{valid_url}")
 			end
 		end
 
