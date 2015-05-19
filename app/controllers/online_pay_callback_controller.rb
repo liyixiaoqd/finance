@@ -36,18 +36,20 @@ class OnlinePayCallbackController < ApplicationController
 			notify_params = params.except(*request.path_parameters.keys)
 			#valid reques is right
 			if(pay_detail.notify_verify?(notify_params,Settings.alipay_oversea.pid,Settings.alipay_oversea.secret) || TEST_MODE)	
-				ret_hash=init_notify_ret_hash(online_pay)
-				rollback_callback_status=online_pay.callback_status
-				online_pay.callback_status=params[:trade_status]
-				online_pay.rate_amount=params([:total_fee])
-				online_pay.set_status_by_callback!()
-				online_pay.reconciliation_id=online_pay.trade_no
-				ret_hash['status']=online_pay.status
-				ret_hash['status_reason']=online_pay.callback_status
-
-				redirect_url=redirect_url_replace("post",online_pay.notification_url)
-				logger.info("alipay_oversea_notify:#{redirect_url}")
 				begin
+					ret_hash=init_notify_ret_hash(online_pay)
+					logger.info("init_notify_ret_hash end!!")
+					rollback_callback_status=online_pay.callback_status
+					online_pay.callback_status=params[:trade_status]
+					online_pay.rate_amount=params[:total_fee]
+					online_pay.set_status_by_callback!()
+					online_pay.reconciliation_id=online_pay.trade_no
+					ret_hash['status']=online_pay.status
+					ret_hash['status_reason']=online_pay.callback_status
+
+					redirect_url=redirect_url_replace("post",online_pay.notification_url)
+					logger.info("alipay_oversea_notify:#{redirect_url}")
+				
 					online_pay.save!()
 					response_code=method_url_response_code("post",redirect_url,false,ret_hash)
 					unless response_code=="200"
@@ -103,19 +105,20 @@ class OnlinePayCallbackController < ApplicationController
 			notify_params = params.except(*request.path_parameters.keys)
 			#valid reques is right
 			if(pay_detail.notify_verify?(notify_params,Settings.alipay_transaction.pid,Settings.alipay_transaction.secret) || TEST_MODE)	
-				ret_hash=init_notify_ret_hash(online_pay)
-				rollback_callback_status=online_pay.callback_status
-				online_pay.callback_status=params[:trade_status]
-				online_pay.set_status_by_callback!()
-				online_pay.reconciliation_id=params[:trade_no]
-				ret_hash['status']=online_pay.status
-				ret_hash['status_reason']=online_pay.callback_status
-				ret_hash['buyer_email'] = params[:buyer_email]
-				ret_hash['buyer_id'] = params[:buyer_id]
-
-				redirect_url=redirect_url_replace("post",online_pay.notification_url)
-				logger.info("alipay_transaction_notify:#{redirect_url}")
 				begin
+					ret_hash=init_notify_ret_hash(online_pay)
+					rollback_callback_status=online_pay.callback_status
+					online_pay.callback_status=params[:trade_status]
+					online_pay.set_status_by_callback!()
+					online_pay.reconciliation_id=params[:trade_no]
+					ret_hash['status']=online_pay.status
+					ret_hash['status_reason']=online_pay.callback_status
+					ret_hash['buyer_email'] = params[:buyer_email]
+					ret_hash['buyer_id'] = params[:buyer_id]
+
+					redirect_url=redirect_url_replace("post",online_pay.notification_url)
+					logger.info("alipay_transaction_notify:#{redirect_url}")
+				
 					#auto send order
 					if(online_pay.callback_status=="WAIT_SELLER_SEND_GOODS")
 						message=pay_detail.auto_send_good_success(online_pay.reconciliation_id)

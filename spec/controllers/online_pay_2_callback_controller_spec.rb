@@ -95,14 +95,55 @@ describe OnlinePayCallbackController do
 			op=OnlinePay.where(payway: 'alipay',paytype: 'oversea',status: 'submit').last
 			expect(op).not_to eq nil
 
-			get :alipay_oversea_return,:out_trade_no=>op.trade_no
+			get :alipay_oversea_return,alipay_oversea_return_params()
 			op.reload
 			expect(response.status).to eq(302)
 			expect(response['Location']).to match(op['success_url'])
+		end
+
+		it "post alipay_oversea_notify" do
+			request.session[:admin]="admin"
+			
+			op=OnlinePay.where(payway: 'alipay',paytype: 'oversea',status: 'submit').last
+			expect(op).not_to eq nil
+
+			post :alipay_oversea_notify,alipay_oversea_notify_params()
+			op.reload
+			expect(response.status).to eq(200)
+			expect(response.body).to eq("success")
+			expect(op['status']).to eq("success_notify")
+			expect(op['rate_amount']).not_to eq(op['amount'])
 		end
 	end
 
 	let(:getseqId) do
 		Time.now.strftime("%Y%m%d%H%M%S")
+	end
+
+	let(:alipay_oversea_return_params) do
+		{
+			"sign"=>"8ac74f1c16cd3d8dcc25a7f10c0cc4ec", 
+			"trade_no"=>"2015051900001000980052833147", 
+			"total_fee"=>"0.01", 
+			"sign_type"=>"MD5", 
+			"out_trade_no"=>"mypost4u_alipay_oversea_20150519_002", 
+			"trade_status"=>"TRADE_FINISHED", 
+			"currency"=>"EUR"
+		}
+	end
+
+	let(:alipay_oversea_notify_params) do
+		{
+			"notify_id"=>"e0de91c150d106a5e409a477dc9d3a107g", 
+			"notify_type"=>"trade_status_sync", 
+			"sign"=>"a7a3ff52a4d87ee2017944576b4f681c", 
+			"trade_no"=>"2015051900001000980052833147", 
+			"total_fee"=>"0.01", 
+			"out_trade_no"=>"mypost4u_alipay_oversea_20150519_002", 
+			"currency"=>"EUR", 
+			"notify_time"=>"2015-05-19 09:08:33", 
+			"trade_status"=>"TRADE_FINISHED", 
+			"sign_type"=>"MD5"
+		}
 	end
 end

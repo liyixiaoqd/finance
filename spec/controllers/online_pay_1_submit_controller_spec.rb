@@ -27,6 +27,7 @@ describe OnlinePayController do
 
 	describe "alipay_oversea call:" do
 		it "post submit" do
+			alipay_oversea_trade_no="mypost4u_alipay_oversea_20150519_002"
 			request.session[:admin]="admin"
 			post :submit,init_alipay_oversea_submit_params()
 
@@ -36,6 +37,9 @@ describe OnlinePayController do
 			expect(op).not_to eq nil
 			expect(op['status']).to eq("submit")
 			expect(op['order_no']).to eq(@order_no)
+
+			op.trade_no=alipay_oversea_trade_no
+			op.save!()
 		end
 	end	
 
