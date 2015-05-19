@@ -133,27 +133,27 @@ describe OnlinePayCallbackController do
 			op=OnlinePay.where(payway: 'alipay',paytype: 'transaction',status: 'submit').last
 			expect(op).not_to eq nil
 
-			# post :alipay_transaction_notify,alipay_transaction_notify_params_1()
-			# op.reload
-			# expect(response.status).to eq(200)
-			# expect(response.body).to eq("success")
-			# expect(op['status']).to eq("intermediate_notify")
-			# expect(op['callback_status']).to eq("WAIT_BUYER_PAY")
+			post :alipay_transaction_notify,alipay_transaction_notify_params_1()
+			op.reload
+			expect(response.status).to eq(200)
+			expect(response.body).to eq("success")
+			expect(op['status']).to eq("intermediate_notify")
+			expect(op['callback_status']).to eq("WAIT_BUYER_PAY")
 
-			# post :alipay_transaction_notify,alipay_transaction_notify_params_3()
-			# op.reload
-			# expect(response.status).to eq(200)
-			# expect(response.body).to eq("failure")
-			# expect(op['status']).to eq("failure_notify")
-			# expect(op['reason']).to eq("TRADE_STATUS_NOT_AVAILD")
-			# expect(op['callback_status']).to eq("WAIT_BUYER_PAY")
+			post :alipay_transaction_notify,alipay_transaction_notify_params_3()
+			op.reload
+			expect(response.status).to eq(200)
+			expect(response.body).to eq("failure")
+			expect(op['status']).to eq("failure_notify")
+			expect(op['reason']).to eq("TRADE_STATUS_NOT_AVAILD")
+			expect(op['callback_status']).to eq("WAIT_BUYER_PAY")
 
-			# post :alipay_transaction_notify,alipay_transaction_notify_params_4()
-			# op.reload
-			# expect(response.status).to eq(200)
-			# expect(response.body).to eq("success")
-			# expect(op['status']).to eq("intermediate_notify")
-			# expect(op['callback_status']).to eq("WAIT_BUYER_CONFIRM_GOODS")
+			post :alipay_transaction_notify,alipay_transaction_notify_params_4()
+			op.reload
+			expect(response.status).to eq(200)
+			expect(response.body).to eq("success")
+			expect(op['status']).to eq("intermediate_notify")
+			expect(op['callback_status']).to eq("WAIT_BUYER_CONFIRM_GOODS")
 
 			post :alipay_transaction_notify,alipay_transaction_notify_params_5()
 			op.reload
@@ -205,7 +205,6 @@ describe OnlinePayCallbackController do
 
 	let(:alipay_transaction_return_params) do
 		{
-			"test_mode"=>true,
 			"buyer_actions"=>"REFUND,CONFIRM_GOODS", 
 			"buyer_email"=>"13764886276", 
 			"buyer_id"=>"2088702362165983", 
@@ -369,7 +368,7 @@ describe OnlinePayCallbackController do
 			 "receive_name"=>"李一啸", 
 			 "use_coupon"=>"N", 
 			 "sign_type"=>"MD5", 
-			 "sign"=>"8531d85eee84e2196d106b1768ab9049", 
+			 "sign"=>"6a2400b262d5fa90f3d6969e7b29f9bb", 
 			 "receive_address"=>"上>海 上海市 普陀区 中山北路1715号 浦发广场E座 2101"
  		}
 	end
