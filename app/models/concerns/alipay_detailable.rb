@@ -45,11 +45,7 @@ module AlipayDetailable extend ActiveSupport::Concern
 				Rails.logger.info("ALIPAY NOTIFY_VERIFY SUCCESS!!: #{valid_url}")
 				valid_flag=true
 			else
-				if Settings.simulation.online_pay_verify=="true"
-					valid_flag=true
-				end
-
-				Rails.logger.info("ALIPAY NOTIFY_VERIFY FAILURE!!: #{valid_url} , #{valid_flag}")
+				Rails.logger.info("ALIPAY NOTIFY_VERIFY FAILURE!!: #{valid_url}")
 			end
 		else
 			Rails.logger.info("ALIPAY NOTIFY_VERIFY - verify_sign FAILURE!!")

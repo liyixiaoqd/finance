@@ -68,7 +68,7 @@ class RegisteController < ApplicationController
 					user.errors.full_messages.each do |msg|
 						ret_hash['reasons']<<{'reason'=>msg}
 					end
-					raise "create use failure"
+					raise "create user failure"
 				else
 					ret_hash['status']='success'
 				end

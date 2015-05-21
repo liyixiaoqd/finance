@@ -1,0 +1,27 @@
+fw_one:
+  system: mypost4u
+  channel: spec_fixtures
+  userid: 552b461202d0f099ec000033
+  symbol: Add
+  amount: 22.2
+  operator: spec_script
+  operdate: 2015-05-15 14:26:00
+  watertype: score
+  reason: init
+  old_amount: 0.0
+  new_amount: 22.2
+  user: user_one
+
+fw_two:
+  system: mypost4u
+  channel: spec_fixtures
+  userid: 552b461202d0f099ec000033
+  symbol: Add
+  amount: 11.1
+  operator: spec_script
+  operdate: 2015-05-15 14:26:00
+  watertype: e_cash
+  reason: init
+  old_amount: 0.0
+  new_amount: 11.1
+  user: user_one

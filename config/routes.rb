@@ -10,8 +10,8 @@ Rails.application.routes.draw do
 
   get 'registe/index' => 'registe#index'
 
-  get 'finance_water/:userid/show' => 'finance_water#show', as: :show_user_finance_water
-  get 'finance_water/:userid/new' => 'finance_water#new',as: :new_user_finance_water
+  get 'finance_water/:id/show' => 'finance_water#show', as: :show_user_finance_water
+  get 'finance_water/:id/new' => 'finance_water#new',as: :new_user_finance_water
 
   get 'pay/:userid/show' => 'online_pay#show', as: :show_user_online_pay
   get 'pay/:online_pay_id/show_single_detail' => 'online_pay#show_single_detail', as: :show_single_online_pay

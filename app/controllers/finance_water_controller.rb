@@ -6,11 +6,11 @@ class FinanceWaterController < ApplicationController
 	include Paramsable
 	
 	def new
-		@user=User.find(params['userid'])
+		@user=User.find(params['id'])
 	end
 
 	def show
-		@user=User.find(params['userid'])
+		@user=User.find(params['id'])
 		@finance_waters=@user.finance_water.page(params[:page])
 	end
 

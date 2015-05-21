@@ -24,7 +24,7 @@ describe User do
 		end
 
 		it "should unique_valid" do	
-			u=User.create( users(:one).attributes )		
+			u=User.create( users(:user_one).attributes )		
 			expect(			
 				u.errors.messages[:base][0]
 			).to eq "user has exists"
