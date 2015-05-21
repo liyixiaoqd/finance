@@ -83,6 +83,20 @@ module PayDetailable extend ActiveSupport::Concern
 				Time.now.strftime(format)
 			end
 		end
+
+		def redirect_url_replace(method,redirect_url,ret_hash={})
+			new_redirect_url=""
+			if(method=="get")
+				params_url=ret_hash.map do |key,value|
+					"#{CGI.escape(key.to_s)}=#{CGI.escape(value.to_s)}"
+				end.join("&")
+				new_redirect_url=redirect_url+"?"+params_url
+			else
+				new_redirect_url=redirect_url
+			end
+
+			new_redirect_url
+		end
 	end
 
 	private

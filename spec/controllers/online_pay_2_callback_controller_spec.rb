@@ -1,6 +1,15 @@
 require 'rails_helper'
 
 describe OnlinePayCallbackController do
+	let!(:set_stub!){
+		allow_any_instance_of(OnlinePay).to receive(:method_url_response_code).and_return("200")
+		allow_any_instance_of(AlipayDetailable).to receive(:notify_verify?).and_return(true)
+		# RSpec::Mocks.with_temporary_scop do
+		# 	# allow(OnlinePay).to receive(:method_url_response_code){ "200" }
+		# 	allow_any_instance_of(OnlinePay).to receive(:method_url_response_code).and_return("200")
+		# 	allow_any_instance_of(AlipayDetailable).to receive(:notify_verify?).and_return(true)
+		# end
+	}
 
 	describe "online_pay_callback call:" do
 		it "get paypal_abort" do

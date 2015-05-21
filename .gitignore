@@ -31,3 +31,4 @@
 /test/tmp
 /readme.txt
 /lib/tasks/test*
+/spec/test

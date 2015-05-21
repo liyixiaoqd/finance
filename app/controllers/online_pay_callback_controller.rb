@@ -1,5 +1,5 @@
 class OnlinePayCallbackController < ApplicationController
-	include PayDetailable
+	# include PayDetailable
 
 	protect_from_forgery :except => [:alipay_oversea_notify,:alipay_transaction_notify]
 	#Synchronous callback  --get 
@@ -10,7 +10,7 @@ class OnlinePayCallbackController < ApplicationController
 		render :text=>"#{render_text}" and return if (online_pay.blank? || online_pay.success_url.blank?)
 
 		ret_hash=init_return_ret_hash(online_pay)
-		redirect_url=redirect_url_replace("get",online_pay.success_url,ret_hash)
+		redirect_url=OnlinePay.redirect_url_replace("get",online_pay.success_url,ret_hash)
 		logger.info("alipay_oversea_return:#{redirect_url}")
 		# if(method_url_response_code("get",redirect_url,false)=="200")
 		# 	render_text="success"
@@ -45,11 +45,11 @@ class OnlinePayCallbackController < ApplicationController
 					ret_hash['status']=online_pay.status
 					ret_hash['status_reason']=online_pay.callback_status
 
-					redirect_url=redirect_url_replace("post",online_pay.notification_url)
+					redirect_url=OnlinePay.redirect_url_replace("post",online_pay.notification_url)
 					logger.info("alipay_oversea_notify:#{redirect_url}")
 				
 					online_pay.save!()
-					response_code=method_url_response_code("post",redirect_url,false,ret_hash)
+					response_code=online_pay.method_url_response_code("post",redirect_url,false,ret_hash)
 					unless response_code=="200"
 						raise "call #{redirect_url} failure : #{response_code}"
 					end
@@ -79,7 +79,7 @@ class OnlinePayCallbackController < ApplicationController
 
 		if(pay_detail.notify_verify?(notify_params,Settings.alipay_transaction.pid,Settings.alipay_transaction.secret))	
 			ret_hash=init_return_ret_hash(online_pay)
-			redirect_url=redirect_url_replace("get",online_pay.success_url,ret_hash)
+			redirect_url=OnlinePay.redirect_url_replace("get",online_pay.success_url,ret_hash)
 			logger.info("alipay_transaction_return:#{redirect_url}")
 			# if(method_url_response_code("get",redirect_url,false)=="200")
 			# 	render_text="success"
@@ -114,7 +114,7 @@ class OnlinePayCallbackController < ApplicationController
 					ret_hash['buyer_email'] = params[:buyer_email]
 					ret_hash['buyer_id'] = params[:buyer_id]
 
-					redirect_url=redirect_url_replace("post",online_pay.notification_url)
+					redirect_url=OnlinePay.redirect_url_replace("post",online_pay.notification_url)
 					logger.info("alipay_transaction_notify:#{redirect_url}")
 				
 					#auto send order
@@ -126,7 +126,7 @@ class OnlinePayCallbackController < ApplicationController
 						end
 					end
 					online_pay.save!()
-					response_code=method_url_response_code("post",redirect_url,false,ret_hash)
+					response_code=online_pay.method_url_response_code("post",redirect_url,false,ret_hash)
 					unless response_code=="200"
 						raise "call #{redirect_url} failure : #{response_code}"
 					end
@@ -170,7 +170,7 @@ class OnlinePayCallbackController < ApplicationController
 				logger.warn("paypal_return:save failure!")
 			end
 
-			redirect_to redirect_url_replace("get",online_pay.success_url,ret_hash)
+			redirect_to OnlinePay.redirect_url_replace("get",online_pay.success_url,ret_hash)
 		end
 	end
 	
@@ -188,7 +188,7 @@ class OnlinePayCallbackController < ApplicationController
 			
 			online_pay.callback_status,rollback_callback_status=rollback_callback_status,online_pay.callback_status
 
-			redirect_url=redirect_url_replace("get",online_pay.abort_url,{})
+			redirect_url=OnlinePay.redirect_url_replace("get",online_pay.abort_url,{})
 			logger.info("paypal_abort:#{redirect_url}")
 			# if(method_url_response_code("get",redirect_url,false)=="200")
 			# 	render_text="success"
@@ -212,7 +212,7 @@ class OnlinePayCallbackController < ApplicationController
 		render text: "#{render_text}" and return if (online_pay.blank? || online_pay.success_url.blank?)
 
 		ret_hash=init_return_ret_hash(online_pay)
-		redirect_url=redirect_url_replace("get",online_pay.success_url,ret_hash)
+		redirect_url=OnlinePay.redirect_url_replace("get",online_pay.success_url,ret_hash)
 		logger.info("sofort_return:#{redirect_url}")
 		# if(method_url_response_code("get",redirect_url,false)=="200")
 		# 	render_text="success"
@@ -244,12 +244,12 @@ class OnlinePayCallbackController < ApplicationController
 			ret_hash['status']=online_pay.status
 			ret_hash['status_reason']=online_pay.callback_status
 
-			redirect_url=redirect_url_replace("post",online_pay.notification_url)
+			redirect_url=OnlinePay.redirect_url_replace("post",online_pay.notification_url)
 			logger.info("sofort_notify:#{redirect_url}")
 
 			begin
 				online_pay.save!()
-				response_code=method_url_response_code("post",redirect_url,false,ret_hash)
+				response_code=online_pay.method_url_response_code("post",redirect_url,false,ret_hash)
 				unless response_code=="200"
 					raise "call #{redirect_url} failure : #{response_code}"
 				end
@@ -278,7 +278,7 @@ class OnlinePayCallbackController < ApplicationController
 
 			online_pay.callback_status,rollback_callback_status=rollback_callback_status,online_pay.callback_status
 
-			redirect_url=redirect_url_replace("get",online_pay.abort_url,{})
+			redirect_url=OnlinePay.redirect_url_replace("get",online_pay.abort_url,{})
 			logger.info("sofort_abort:#{redirect_url}")
 			# if(method_url_response_code("get",redirect_url,false)=="200")
 			# 	render_text="success"
@@ -293,20 +293,6 @@ class OnlinePayCallbackController < ApplicationController
 	end
 
 	private 
-		def redirect_url_replace(method,redirect_url,ret_hash={})
-			new_redirect_url=""
-			if(method=="get")
-				params_url=ret_hash.map do |key,value|
-					"#{CGI.escape(key.to_s)}=#{CGI.escape(value.to_s)}"
-				end.join("&")
-				new_redirect_url=redirect_url+"?"+params_url
-			else
-				new_redirect_url=redirect_url
-			end
-
-			new_redirect_url
-		end
-
 		def init_return_ret_hash(online_pay)
 			{
 				'trade_no'=>"#{online_pay.trade_no}",
