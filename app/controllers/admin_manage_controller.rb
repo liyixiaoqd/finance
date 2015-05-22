@@ -16,7 +16,6 @@ class AdminManageController < ApplicationController
 				redirect_to admin_manage_sign_index_path and return
 			end
 		else
-
 			am=AdminManage.valid_admin(valid_admin_param_params)
 
 			unless am.blank?
@@ -31,8 +30,11 @@ class AdminManageController < ApplicationController
 	end
 
 	def sign_out
-		session['admin']=nil
-
+		if session[:admin].present?
+			session[:admin]=nil
+			session[:admin_level]=nil
+		end
+		
 		redirect_to admin_manage_sign_in_path
 	end
 

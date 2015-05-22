@@ -10,8 +10,8 @@ class ApplicationController < ActionController::Base
 
 	DENY_ACCESS_MESSAGE="无权限访问此功能,请确认用户!"
 
-	REALM = "FINANCE"
- 	SYSTEMS = {"finance_name" => Digest::MD5.hexdigest(["finance_name",REALM,"finance_passwd"].join(":"))}
+	REALM = Settings.authenticate.realm
+ 	SYSTEMS = {"finance_name" => Digest::MD5.hexdigest([Settings.authenticate.username,REALM,Settings.authenticate.passwd].join(":"))}
 
 
   	private
