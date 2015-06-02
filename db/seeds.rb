@@ -154,6 +154,9 @@ AccessAuthority.create!(:controller=>"SimulationController",:action=>"simulate_p
 AccessAuthority.create!(:controller=>"TransactionReconciliationController",:action=>"index",
 			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'各财务系统对账单查询显示界面')
+AccessAuthority.create!(:controller=>"TransactionReconciliationController",:action=>"report",
+			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
+			:describe=>'各财务系统对账汇总查询显示界面')
 
 AccessAuthority.create!(:controller=>"UploadFileController",:action=>"index",
 			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,

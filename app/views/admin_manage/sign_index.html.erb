@@ -4,10 +4,10 @@
 	<%= flash[:notice] %> </br>
 <% end %>
 <%=session['admin']%> 登入成功
-<%=@data%>
+<%=@finance_summary.end_time%>
 </br></br>
 昨日在线交易:
 </br>
-总比数:<%=@online_pay_num%>,总金额:<%=@online_pay_amount_sum%>
+总比数:<%=@finance_summary.total_num%>,总金额:<%=@finance_summary.total_amount%>
 </br>
-成功比数:<%=@online_pay_succ_num%>,成功金额:<%=@online_pay_succ_amount_sum%>
+成功比数:<%=@finance_summary.succ_num%>,成功金额:<%=@finance_summary.succ_amount%>

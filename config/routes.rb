@@ -16,6 +16,7 @@ Rails.application.routes.draw do
   get 'pay/:userid/show' => 'online_pay#show', as: :show_user_online_pay
   get 'pay/:online_pay_id/show_single_detail' => 'online_pay#show_single_detail', as: :show_single_online_pay
   get 'transaction_reconciliation/index' => 'transaction_reconciliation#index'
+  post 'transaction_reconciliation/report' => 'transaction_reconciliation#report'
   get 'upload_file/index' => 'upload_file#index'
   post 'upload_file/upload' => 'upload_file#upload'
 

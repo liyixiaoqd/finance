@@ -23,6 +23,29 @@ class TransactionReconciliationController < ApplicationController
 		end
 	end
 
+	def report
+		payway=params['payway']
+		paytype=params['paytype']
+		start_time=params['start_time']
+		end_time=params['end_time']
+
+		if start_time.blank? || end_time.blank?
+			@finance_summary=FinanceSummary.new(OnlinePay.current_time_format("%Y-%m-%d",-1),OnlinePay.current_time_format("%Y-%m-%d",0))
+		else
+			@finance_summary=FinanceSummary.new(start_time,end_time,1)
+			condition=""
+			condition="and payway='#{payway}'" unless payway.blank?
+			condition+=" and paytype='#{paytype}'" unless paytype.blank?
+			@finance_summary.setAmountAndNum!(condition)
+			logger.info(@finance_summary.output)
+		end
+
+		respond_to do |format|
+			format.html { render :report }
+			format.js
+		end
+	end
+
 	private 
 		def sql_from_condition_filter(params)
 			sql=""

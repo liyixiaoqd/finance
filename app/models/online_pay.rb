@@ -163,7 +163,7 @@ class OnlinePay < ActiveRecord::Base
 		when "status_succ" then	sql_condition=" and status like 'success%'"
 		when "status_fail" then	sql_condition=" and status not like 'success%'"
 		else
-			sql_condition=""
+			sql_condition=condition
 		end
 
 		op_tj=OnlinePay.select("count(*) as c,sum(amount) as s").where("created_at>=? and created_at<? #{sql_condition}",datatime_beg,datatime_end)
