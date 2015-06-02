@@ -1,9 +1,14 @@
+<div class="container-fluid">
 <% @page_title="登入界面" %>
-
-<div id="admin_login">
-	<%= form_for :admin,url: admin_manage_sign_in_path,method: :post do |f| %>
-		<%=label_tag :label1,"用户名:" %> <%=f.text_field :admin_name %> </br></br>
-		<%=label_tag :label2,"密码:" %> <%=f.password_field :admin_passwd_encryption %> </br></br>
-		<%= f.submit "登入",:class=>"login_button" %>
-	<% end %>
+	<div class="row-fluid">
+		<div class="well">
+			<%= form_for :admin,url: admin_manage_sign_in_path,method: :post do |f| %>
+				<%=label_tag :label1,"用户名:" %> <%=f.text_field :admin_name %> </br></br>
+				<%=label_tag :label2,"密码:" %> <%=f.password_field :admin_passwd_encryption %> </br></br>
+				 <div class="btn-toolbar">
+					 <%= submit_tag("登入",class: "btn btn-primary",id: "login_button") %>
+			          	</div>
+			<% end %>
+		</div>
+	</div>
 </div>

@@ -18,7 +18,7 @@
 
 $(document).ready(function(){
   $("#button_clear").click(function(){
-	form_obj=this.parentNode
+	form_obj=this.parentNode.parentNode
 	input_objs=form_obj.getElementsByTagName("input")
 
 	for (var i=0;i<input_objs.length;i++){
@@ -34,13 +34,13 @@ $(document).ready(function(){
 	}
   });
 
-  $(".login_button").click(function(){
+  $("#login_button").click(function(){
   	var passwd=document.getElementById("admin_admin_passwd_encryption").value
   	document.getElementById("admin_admin_passwd_encryption").value=hex_md5(passwd)
   });
 
 
-  $(".button_submit_time").click(function(event){
+  $("#button_submit_time").click(function(event){
   	if(document.getElementById("start_time").value=="" || document.getElementById("end_time").value==""){
 		alert("请输入开始与结束时间")
 		event.preventDefault()
