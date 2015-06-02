@@ -1,5 +1,16 @@
-<div id="user_desc">
-	用户名:<%= user.username %> </br>
-	电子现金:<%= user.e_cash %> 积分:<%= user.score %>
-</div>
-<hr>
+<table class="table">
+	<thead>
+		<tr>
+			<th>用户名</th>
+			<th>电子现金</th>
+			<th>积分</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td><%= @user.username %></td>
+			<td><%= @user.e_cash %></td>
+			<td><%= @user.score %></td>
+		</tr>
+	</tbody>
+</table>

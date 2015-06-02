@@ -1,20 +1,42 @@
-<%= render partial:"user",locals: {user: @user} %>
-<% unless flash[:notice].blank? %>
-  <%=flash[:notice]%>
-<% end %>
-<%= form_tag("/finance_water/#{@user.userid}/modify", method: "post") do %>
-  <%= label_tag(:label1, "流水类型:") %> 
-  <%= select_tag(:watertype,options_for_select([["积分","score"],["电子现金","e_cash"]])) %> </br>
-  <%= label_tag(:label2, "操作:") %> 
-  <%= select_tag(:symbol,options_for_select([["+","Add"],["-","Sub"]],"Add")) %> 
-  <%= label_tag(:label3, "金额:") %> 
-  <%= text_field_tag(:amount,0.00) %> </br>
-  <%= label_tag(:label4, "新增原因:") %> 
-  <%= text_area_tag(:reason,"#{session[:admin]} 手动调整" ,size: "40*5") %> </br>
-  <%= hidden_field_tag :system,@user.system %>
-  <%= hidden_field_tag :channel,"web" %>
-  <%= hidden_field_tag :operator,session[:admin] %>
-  <%= hidden_field_tag :datetime,Time.now%>
-  <%= submit_tag("提交") %>
- <%= link_to '返回',:back %>
-<% end %>
+<div class="container-fluid">
+  <% @page_title="财务流水明细" %>
+  <% content_for :breadcrumb do %>
+    <li> <%=link_to t('用户明细'),registe_index_path,method: :get%> <span class="divider">/</span></li>
+    <li> <%=link_to t('财务流水明细'),show_user_finance_water_path(@user) ,method: :get%> <span class="divider">/</span></li>
+  <% end %>
+
+  <div class="row-fluid">
+      <div class="row-fluid">
+       <%= render partial:"user",locals: {user: @user} %>
+      </div>
+
+    <% unless flash[:notice].blank? %>
+      <div class="alert alert-info">
+        <button type="button" class="close" data-dismiss="alert">×</button>
+        <%=flash[:notice]%>
+      </div>
+    <% end %>
+
+      <div class="row-fluid"> 
+        <div class="well">
+          <%= form_tag("/finance_water/#{@user.userid}/modify", method: "post") do %>
+          <%= label_tag(:label1, "流水类型:",class:"label_inline") %> 
+          <%= select_tag(:watertype,options_for_select([["积分","score"],["电子现金","e_cash"]])) %> </br>
+          <%= label_tag(:label2, "操作:",class:"label_inline") %> 
+          <%= select_tag(:symbol,options_for_select([["+","Add"],["-","Sub"]],"Add")) %> 
+          <%= label_tag(:label3, "金额:",class:"label_inline") %> 
+          <%= text_field_tag(:amount,0.00) %> </br>
+          <%= label_tag(:label4, "新增原因:",class:"label_inline") %> 
+          <%= text_area_tag(:reason,"#{session[:admin]} 手动调整" ,size: "40*5") %>
+          <%= hidden_field_tag :system,@user.system %>
+          <%= hidden_field_tag :channel,"web" %>
+          <%= hidden_field_tag :operator,session[:admin] %>
+          <%= hidden_field_tag :datetime,Time.now%>
+          <%= submit_tag("提交") %>
+          <% end %>
+        </div>
+      </div>
+
+  </div>
+
+</div>

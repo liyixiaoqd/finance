@@ -7,42 +7,74 @@
   <%= csrf_meta_tags %>
 </head>
 <body>
-<div id="banner">
-	<%=@page_title || 'title' %>
+
+<div class="navbar">
+    <div class="navbar-inner">
+            <ul class="nav pull-right">
+                
+                <li id="fat-menu" class="dropdown">
+                    <a href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">
+                        <% if session[:admin].blank? %>
+                        	尚未登入
+                        <% else %>
+                        	<%=session[:admin]%>
+                        <% end %>
+                    </a>
+                
+            </ul>
+            <a class="brand" href="index.html"><span class="second">财务管理系统</span></a>
+    </div>
 </div>
 
-<div id="area">
-	<div id="side">			
-		<% if session[:admin].present? %>
-			<% if session[:admin_level]>=0 %>
-				<div id="side_search">
-					<%=link_to t('用户'),registe_index_path,method: :get%>
-					</br>
-					<%=link_to t('财务对账'),transaction_reconciliation_index_path,method: :get%>
-					</br>
-					<%=link_to t('财务汇总'),transaction_reconciliation_report_path,method: :post%>
-					</br>
-					<%=link_to t('文件上传'),upload_file_index_path,method: :get%>
-				</div>
-			<% end %>
+<div class="sidebar-nav">
+	<% if session[:admin].present? %>
+	    <a href="#user-menu" class="nav-header" data-toggle="collapse"><i class="icon-user"></i>用户管理</a>
+	    <ul id="user-menu" class="nav nav-list collapse in">
+	    <% if session[:admin_level]>=0 %>
+	        <li> <%=link_to t('用户'),registe_index_path,method: :get%> </li>
+	    <% end %>
+	    </ul>
 
-			<% if session[:admin_level]>=5 %>
-				<div id="side_simulation">
-					<%= link_to '模拟支付',simulation_path %>
-					<%= link_to '模拟对账',simulation_simulate_reconciliation_path,method: :get %>
-				</div>
-			<% end %>
+	    <a href="#finance-menu" class="nav-header" data-toggle="collapse"><i class="icon-finance"></i>财务管理</a>
+	    <ul id="finance-menu" class="nav nav-list collapse in">
+	    <% if session[:admin_level]>=0 %>
+	        <li > <%=link_to t('财务对账'),transaction_reconciliation_index_path,method: :get%> </li>
+	        <li > <%=link_to t('财务汇总'),transaction_reconciliation_report_path,method: :post%> </li>
+	    <% end %>
+	    </ul>
 
-			<div id="side_admin">
-				<%=link_to t('首页'),admin_manage_sign_index_path,method: :get%>
-				<%=link_to t('登出'),admin_manage_sign_out_path,method: :post%>
-			</div>
-		<% end %>
+	    <a href="#file-menu" class="nav-header" data-toggle="collapse"><i class="icon-file"></i>文件上传</a>
+	    <ul id="file-menu" class="nav nav-list collapse in">
+	        <li > <%=link_to t('文件上传'),upload_file_index_path,method: :get%> </li>
+	    </ul>
+
+	    <a href="#simulate-menu" class="nav-header" data-toggle="collapse"><i class="icon-simulate"></i>模拟交易</a>
+	    <ul id="simulate-menu" class="nav nav-list collapse in">
+	    <% if session[:admin_level]>=0 %>
+	        <li > <%= link_to '模拟支付',simulation_path %> </li>
+	        <li > <%= link_to '模拟对账',simulation_simulate_reconciliation_path,method: :get %> </li>
+	    <% end %>
+	    </ul>
+
+	<% end %>
+</div>
+
+<div class="content">
+	<div class="header">
+		<div class="stats">
+			<p class="stat"><span class="number">0</span>tasks</p>
+			<p class="stat"><span class="number">0</span>waiting</p>
+		</div>
+		<h1 class="page-title"><%=@page_title || 'title' %></h1>
 	</div>
-	
-	<div id="main">
-		<%= yield %>
-	</div>
+
+	<ul class="breadcrumb">
+		<li> <%=link_to t('首页'),admin_manage_sign_index_path,method: :get%> <span class="divider">/</span></li>
+		<%= yield :breadcrumb %>
+		<li class="active"><%=@page_title || 'title' %></li>
+	</ul>
+
+	<%= yield %>
 </div>
 
 </body>

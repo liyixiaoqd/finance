@@ -17,7 +17,7 @@
 //= require jquery-ui/datepicker
 
 $(document).ready(function(){
-  $(".button_clear").click(function(){
+  $("#button_clear").click(function(){
 	form_obj=this.parentNode
 	input_objs=form_obj.getElementsByTagName("input")
 

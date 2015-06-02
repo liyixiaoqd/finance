@@ -1,16 +1,20 @@
-<% @page_title="UPLOAD FILE" %>
-
-<div id="upload">
-<%= form_tag upload_file_upload_path,multipart:true do %>
-	<fieldset>
-		<legend>请选择业务类型并上传文件</legend>
-			<%= label_tag(:l1, "上传业务类型:") %>
-			<%= select_tag "file_type", options_for_select([ ["sofort对账明细","sofort_transaction"] ], "sofort_transaction") %>
-			</br></br>
-			<%= label_tag(:l2, "选择文件:") %>
-			<%= file_field_tag :file %>
-			</br></br>
-			<%= submit_tag("上传") %>
-	</fieldset>
-<% end %>
+<div class="container-fluid">
+<% @page_title="文件上传" %>
+	<div class="row-fluid">
+		<div class="alert alert-info">
+			<button type="button" class="close" data-dismiss="alert">×</button>
+			<strong>提示:</strong> 请选择业务类型并上传文件!
+		</div>
+		<div class="well">
+			<%= form_tag upload_file_upload_path,multipart:true do %>
+				<%= label_tag(:l1, "上传业务类型:") %>
+				<%= select_tag "file_type", options_for_select([ ["sofort对账明细","sofort_transaction"] ], "sofort_transaction") %>
+				<%= label_tag(:l2, "选择文件:") %>
+				<%= file_field_tag :file %>
+				 <div class="btn-toolbar">
+					 <%= submit_tag("上传",class: "btn btn-primary") %>
+			          	</div>
+			<% end %>
+		</div>
+	</div>
 </div>

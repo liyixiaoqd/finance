@@ -1,30 +1,40 @@
-<% @page_title="财务流水明细" %>
+<div class="container-fluid">
+	<% @page_title="财务流水明细" %>
+	<% content_for :breadcrumb do %>
+		<li> <%=link_to t('用户明细'),registe_index_path,method: :get%> <span class="divider">/</span></li>
+	<% end %>
 
-<%= render partial:"user",locals: {user: @user} %>
+	<div class="row-fluid">
+		<div class="row-fluid">
+			<%= render partial:"user",locals: {user: @user} %>
+		</div>
 
- <%= link_to '新增',new_user_finance_water_path(@user) %>
- <%= link_to '返回',:back %>
+		<div class="row-fluid">
+			<div class="btn-toolbar">
+				<%= button_to "新增",new_user_finance_water_path(@user),class: "btn btn-primary",method: "get" %>
+			</div>
 
-<div id="finance_water_details_content">
-	<table id="finance_water_details_table">
-		<tr>
-			<td>流水类型</td>
-			<td>变化情况</td>
-			<td>来源</td>
-			<td>操作时间</td>
-		</tr>
-		<% @finance_waters.each do |finance_water| %>
-		<tr>
-			<td>	<%= watertype_mapping(finance_water.watertype) %>	</td>
-			<% if finance_water.symbol =="Add" %>
-				<td><%= "#{finance_water.old_amount} + #{finance_water.amount} = #{finance_water.new_amount}"%></td>
-			<% else %>
-				<td><%= "#{finance_water.old_amount} - #{finance_water.amount} = #{finance_water.new_amount}"%></td>
-			<% end %>
-			<td>	<%= finance_water.operator %>	</td>
-			<td>	<%= finance_water.operdate %>	</td>
-		</tr>
-		<% end %>
-	</table>
-	<%= paginate @finance_waters %>
+			<table class="table">
+				<tr>
+					<th>流水类型</th>
+					<th>变化情况</th>
+					<th>来源</th>
+					<th>操作时间</th>
+				</tr>
+				<% @finance_waters.each do |finance_water| %>
+				<tr>
+					<td>	<%= watertype_mapping(finance_water.watertype) %>	</td>
+					<% if finance_water.symbol =="Add" %>
+						<td><%= "#{finance_water.old_amount} + #{finance_water.amount} = #{finance_water.new_amount}"%></td>
+					<% else %>
+						<td><%= "#{finance_water.old_amount} - #{finance_water.amount} = #{finance_water.new_amount}"%></td>
+					<% end %>
+					<td>	<%= finance_water.operator %>	</td>
+					<td>	<%= finance_water.operdate %>	</td>
+				</tr>
+				<% end %>
+			</table>
+			<%= paginate @finance_waters %>
+		</div>
+	</div>
 </div>

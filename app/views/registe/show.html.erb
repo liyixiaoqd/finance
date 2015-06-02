@@ -1,13 +1,51 @@
-<% @page_title="USER详细信息" %>
-
-<%= link_to "返回",:back%>
-</br></br>
-注册系统:<%= @user.system %></br>
-渠道:<%= @user.channel %> </br>
-用户ID:<%= @user.userid %></br>
-用户名:<%= @user.username %></br>
-邮箱:<%= @user.email %></br>
-电子现金:<%= @user.e_cash %></br>
-积分:<%= @user.score %></br>
-注册日期:<%= @user.operdate %>	</br>
-最后修改时间:<%= @user.updated_at %></br>
+<div class="container-fluid">
+	<% @page_title="用户详细信息" %>
+	<% content_for :breadcrumb do %>
+		<li> <%=link_to t('用户明细'),registe_index_path,method: :get%> <span class="divider">/</span></li>
+	<% end %>
+	
+	<div class="row-fluid">
+		<div class="well">
+			<table class="table">
+				<tbody>
+					<tr>
+						<td>注册系统</td>
+						<td><%= @user.system %></td>
+					</tr>
+					<tr>
+						<td>渠道</td>
+						<td><%= @user.channel %></td>
+					</tr>
+					<tr>
+						<td>用户ID</td>
+						<td><%= @user.userid %></td>
+					</tr>
+					<tr>
+						<td>用户名</td>
+						<td><%= @user.username %></td>
+					</tr>
+					<tr>
+						<td>邮箱</td>
+						<td><%= @user.email %></td>
+					</tr>
+					<tr>
+						<td>电子现金</td>
+						<td><%= @user.e_cash %></td>
+					</tr>
+					<tr>
+						<td>积分</td>
+						<td><%= @user.score %></td>
+					</tr>
+					<tr>
+						<td>注册日期</td>
+						<td><%= @user.operdate %></td>
+					</tr>
+					<tr>
+						<td>最后修改时间</td>
+						<td><%= @user.updated_at %></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

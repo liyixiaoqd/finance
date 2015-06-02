@@ -1,46 +1,58 @@
+<div class="container-fluid">
 <% @page_title="用户明细" %>
+	<div class="row-fluid">
+		<div class="alert alert-info">
+			<button type="button" class="close" data-dismiss="alert">×</button>
+			<strong>提示:</strong> 请输入查询条件进行查询!
+		</div>
+		<div class="row-fluid">
+			<div class="well">
+				<%= form_tag registe_index_path,method:"get",remote: :true do %>
+					 <%= label_tag(:l1, "注册系统:",class:"label_inline") %>
+					 <%= select_tag(:system,options_for_select([["",""],["快易","quaie"],["包裹","mypost4u"]])) %> 
+					 <%= label_tag(:l2, "用户名:",class:"label_inline") %> <%= text_field_tag(:username) %>
+					 <%= label_tag(:l3, "流水类型:",class:"label_inline") %>
+					 <%= select_tag(:symbol,options_for_select([["",""],["积分","e_cash"],["电子现金","score"]])) %> 
+					 </br>
+					 <%= label_tag(:l4, "流水金额起始:",class:"label_inline") %> <%= text_field_tag(:min_amount) %>
+					 <%= label_tag(:l5, "流水金额终止:",class:"label_inline") %> <%= text_field_tag(:max_amount) %>
+					 <div class="btn-toolbar">
+						 <%= submit_tag("查询",class: "btn btn-primary") %>
+					          	<%=button_tag("清除条件",type: 'button',class: "btn",id: "button_clear") %>
+				          	</div>
+				<% end %>	
+			</div>	
+		</div>
+	</div>
 
-<div id="user_details_condition">
-<%= form_tag registe_index_path,method:"get",remote: :true do %>
-	<fieldset>
-		<legend>请输入查询条件</legend>
-		 <%= label_tag(:l1, "注册系统:") %>
-		 <%= select_tag(:system,options_for_select([["",""],["快易","quaie"],["包裹","mypost4u"]])) %> 
-		 <%= label_tag(:l2, "用户名:") %> <%= text_field_tag(:username) %>
-		 <%= label_tag(:l3, "流水类型:") %>
-		 <%= select_tag(:symbol,options_for_select([["",""],["积分","e_cash"],["电子现金","score"]])) %> 
-		 </br>
-		 <%= label_tag(:l4, "流水金额起始:") %> <%= text_field_tag(:min_amount) %>
-		 <%= label_tag(:l5, "流水金额终止:") %> <%= text_field_tag(:max_amount) %>
-		</br>
-		 <%= submit_tag("查询") %>
+	<div class="row-fluid">
+		<% unless flash[:notice].blank? %>
+			<div class="alert alert-info">
+				<button type="button" class="close" data-dismiss="alert">×</button>
+				<%=flash[:notice]%>
+			</div>
+		<% end %>
 
-	          	<%=button_tag("清除条件",type: 'button',class: "button_clear") %>
-	</fieldset>
-<% end %>
-</div>
+		<div class="well">
+			<table class="table" id="user_details_table">
+				<thead>
+					<tr>
+						<th>用户ID</th>
+						<th>用户名</th>
+						<th>电子现金</th>
+						<th>积分</th>
+						<th>流水明细</th>
+						<th>支付明细</th>
+					</tr>
+				</thead>
+				<tbody>
+					<%= render partial: "index",collection: @users,as: :user %>
+				</tbody>
+			</table>
 
-<% unless flash[:notice].blank? %>
-  <%=flash[:notice]%>
-<% end %>
-
-<div id="user_details_content">
-	<table id="user_details_table">
-		<tr>
-			<td>用户ID</td>
-			<td>用户名</td>
-			<td>电子现金</td>
-			<td>积分</td>
-			<td></td>
-			<td></td>
-		</tr>
-			
-		<%= render partial: "index",collection: @users,as: :user %>
-		
-	</table>
-
-	<div class="div_paginate">
-		<%= render partial: "layouts/paginate_replace_ajax",locals: {page_array: @users} %>
+			<div class="div_paginate">
+				<%= render partial: "layouts/paginate_replace_ajax",locals: {page_array: @users} %>
+			</div>
+		</div>
 	</div>
 </div>
-

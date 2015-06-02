@@ -2,7 +2,7 @@
 	<td><%= online_pay.order_no %></td>
 	<td><%= online_pay.amount %></td>
 	<td><%= status_mapping(online_pay.status) %></td>
-	<td><%= online_pay.callback_status %></td>
+<!-- 	<td><%= online_pay.callback_status %></td> -->
 	<td><%= payway_paytype_mapping(online_pay.payway.camelize + online_pay.paytype.camelize) %></td>
 	<td><%= online_pay.trade_no %></td>
 	<td class="td_50"><%= online_pay.reason %></td>

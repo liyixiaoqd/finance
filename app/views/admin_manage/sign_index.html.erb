@@ -1,13 +1,40 @@
+<div class="container-fluid">
 <% @page_title="登入界面" %>
+	<div class="row-fluid">
+		<div class="alert alert-info">
+			<button type="button" class="close" data-dismiss="alert">×</button>
+			<%=session['admin']%> 登入成功 : <%=@finance_summary.end_time%>
+		</div>
 
-<% if flash[:notice].present? %>
-	<%= flash[:notice] %> </br>
-<% end %>
-<%=session['admin']%> 登入成功
-<%=@finance_summary.end_time%>
-</br></br>
-昨日在线交易:
-</br>
-总比数:<%=@finance_summary.total_num%>,总金额:<%=@finance_summary.total_amount%>
-</br>
-成功比数:<%=@finance_summary.succ_num%>,成功金额:<%=@finance_summary.succ_amount%>
+		<% unless flash[:notice].blank? %>
+			<div class="alert alert-info">
+				<button type="button" class="close" data-dismiss="alert">×</button>
+				<%=flash[:notice]%>
+			</div>
+		<% end %>
+
+		<div class="block">
+			<a href="#sign-stats" class="block-heading" data-toggle="collapse">昨日在线交易统计</a>
+			<div id="sign-stats" class="block-body collapse in">
+
+			<table class="table">
+				<thead>
+					<tr>
+						<th>总比数</th>
+						<th>成功比数</th>
+						<th>总金额</th>
+						<th>成功金额</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><%=@finance_summary.total_num%></td>
+						<td><%=@finance_summary.succ_num%></td>
+						<td><%=@finance_summary.total_amount%></td>
+						<td><%=@finance_summary.succ_amount%></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

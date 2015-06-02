@@ -14,38 +14,7 @@
  *= require_self
  *= require jquery-ui/datepicker
  */
-
- #banner{
-	background: #9c9;
-	color: #282;
-	text-align: center;
-	padding-top: 10px;
-	padding-bottom: 10px;
-	border-bottom: 2px solid;
-}
-
-#side{
-	float:left;
-	width: 10em;
-/*	background: #191;	
-	height:500px;		*/
-	padding-top: 1em;
-	font-size: 14px;
-}
-#side_admin{
-	margin-top: 5em;
-	font-size: 12px;
-}
-#side_simulation{
-	margin-top: 5em;
-}
-
-#main{
-	margin-top:1em;
-	margin-left:10em;
-}
-
-
-#side_simulation_display_none{
-	display: none;
+label.label_inline {
+  display: inline;
+  margin-bottom: 5px;
 }

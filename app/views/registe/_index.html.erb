@@ -3,6 +3,6 @@
 	<td>	<%= user.username %>	</td>
 	<td>	<%= user.e_cash %>	</td>
 	<td>	<%= user.score %>	</td>
-	<td>	<%= link_to '财务流水明细',show_user_finance_water_path(user) %>	</td>
-	<td>	<%= link_to '支付明细',show_user_online_pay_path(user) %>	</td>
+	<td>	<%= link_to '财务流水明细',show_user_finance_water_path(user),method: :get %>	</td>
+	<td>	<%= link_to '支付明细',show_user_online_pay_path(user),method: :get %>	</td>
 </tr>
