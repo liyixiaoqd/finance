@@ -44,7 +44,7 @@ AdminManage.create!(:admin_name=>'guest',:admin_passwd=>'af1d6c48324c1461e12cbde
 
 AccessAuthority.delete_all
 AccessAuthority.create!(:controller=>"AdminManageController",:action=>"sign_index",
-			:is_sign_in=>false,:is_interface=>false,:is_digest_auth=>true,
+			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'ADMIN登入后显示界面')
 AccessAuthority.create!(:controller=>"AdminManageController",:action=>"sign_in",
 			:is_sign_in=>false,:is_interface=>false,:is_digest_auth=>true,
