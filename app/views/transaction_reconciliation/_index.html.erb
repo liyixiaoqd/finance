@@ -7,9 +7,13 @@
 	<td>  <%= reconciliation_detail.transaction_status %>  </td>
 	<td> 
 		<% unless reconciliation_detail.online_pay_id.blank? %> 
-			<%= link_to reconciliation_detail.online_pay.trade_no,show_single_online_pay_path(reconciliation_detail.online_pay_id) %>
+			<% unless reconciliation_detail.online_pay.blank? %>
+				<%= link_to reconciliation_detail.online_pay.trade_no,show_single_online_pay_path(reconciliation_detail.online_pay_id) %>
+			<% else %>
+				无对应在线支付记录数据,ID:<%= reconciliation_detail.online_pay_id %>
+			<% end %>
 			</br>
-		<% end %>
+		<% end %> 
 		<%= reconciliation_detail.reconciliation_describe %>
 	</td>
 	<td>  <%= reconciliation_detail.timestamp %>  </td>

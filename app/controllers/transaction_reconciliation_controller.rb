@@ -16,7 +16,6 @@ class TransactionReconciliationController < ApplicationController
 		#logger.info(sql)
 		@reconciliation_details=ReconciliationDetail.includes(:online_pay).where(sql,params).page(params[:page])
 		# @reconciliation_details=Kaminari.paginate_array(@reconciliation_details).page(params[:page]).per(ReconciliationDetail::PAGE_PER)
-
 		respond_to do |format|
 			format.html { render :index }
 			format.js

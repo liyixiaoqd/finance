@@ -57,7 +57,7 @@ class ReconciliationDetail < ActiveRecord::Base
 		set_params_by_transactionid!()
 
 		if self.online_pay_id.blank?
-			set_flag!(RECONCILIATIONDETAIL_FLAG['FAIL'],"get online_pay_failure:#{self.transactionid}")
+			set_flag!(RECONCILIATIONDETAIL_FLAG['FAIL'],"获取对应在线支付记录失败:#{self.transactionid}")
 		else
 			set_flag_by_status_and_amount!()
 		end
