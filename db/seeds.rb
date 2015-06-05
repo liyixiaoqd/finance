@@ -61,7 +61,10 @@ AccessAuthority.create!(:controller=>"FinanceWaterController",:action=>"show",
 			:describe=>'USER财务流水查询显示界面')
 AccessAuthority.create!(:controller=>"FinanceWaterController",:action=>"modify",
 			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>true,
-			:describe=>'USER财务流水变更借口')
+			:describe=>'USER财务流水变更接口')
+AccessAuthority.create!(:controller=>"FinanceWaterController",:action=>"modify_web",
+			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
+			:describe=>'USER财务流水变更界面调用')
 
 AccessAuthority.create!(:controller=>"OnlinePayCallbackController",:action=>"alipay_oversea_return",
 			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>false,

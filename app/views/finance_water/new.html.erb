@@ -19,7 +19,7 @@
 
       <div class="row-fluid"> 
         <div class="well">
-          <%= form_tag("/finance_water/#{@user.userid}/modify", method: "post") do %>
+          <%= form_tag("/finance_water/#{@user.userid}/modify_web", method: "post") do %>
           <%= label_tag(:label1, "流水类型:",class:"label_inline") %> 
           <%= select_tag(:watertype,options_for_select([["积分","score"],["电子现金","e_cash"]])) %> </br>
           <%= label_tag(:label2, "操作:",class:"label_inline") %> 

@@ -3,6 +3,7 @@ require "support/render_views"
 
 describe RegisteController do
 	fixtures :users
+	fixtures :finance_waters
 
 	let!(:set_session) do
 		request.session[:admin]="admin"
@@ -93,7 +94,9 @@ describe RegisteController do
 			'username'=>'testname',
 			'email'=>'testname@126.com',
 			'accountInitAmount'=>11.1,
+			'accountInitReason'=>'init e_cash',
 			'scoreInitAmount'=>22.2,
+			'scoreInitReason'=>'init score',
 			'operator'=>'system',
 			'datetime'=>Time.now.strftime("%Y-%m-%d %H:%M:%S")
 		}

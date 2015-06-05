@@ -10,14 +10,14 @@ class User < ActiveRecord::Base
 	default_scope { order('system asc,operdate desc') }
 	paginates_per 14
 
-	def create_init_finance
+	def create_init_finance(score_reason,e_cash_reason)
 		begin
 			if self.score>0 then 
-				create_init_watertype("score")
+				create_init_watertype("score",score_reason)
 			end
 
 			if self.e_cash>0 then		
-				create_init_watertype("e_cash")
+				create_init_watertype("e_cash",e_cash_reason)
 			end
 		rescue => e
 			logger.info("finance_water insert failure!! #{e.message}")
@@ -34,7 +34,7 @@ class User < ActiveRecord::Base
 			end
 		end
 
-		def create_init_watertype(watertype)
+		def create_init_watertype(watertype,reason="init")
 			finance_water_params={
 				'system'=>self.system,
 				'channel'=>self.channel,
@@ -42,7 +42,7 @@ class User < ActiveRecord::Base
 				'symbol'=>'Add',
 				'old_amount'=>0.0,
 				'operator'=>'system',
-				'reason'=>'init_score',
+				'reason'=>reason,
 				'operdate'=>self.operdate,
 				'watertype'=>watertype
 			}

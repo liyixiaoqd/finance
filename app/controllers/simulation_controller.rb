@@ -204,7 +204,7 @@ class SimulationController < ApplicationController
 			end
 
 			response=http.request(request)
-
+			logger.info("sim response:#{response.code}")
 			response	
 		end
 	
@@ -242,17 +242,26 @@ class SimulationController < ApplicationController
 		end
 
 		def score_params(userid,score,sybmol,watertype)
+			oper=[{
+				'symbol'=>"Add",
+				'amount'=>"100",
+				'reason'=>'score add 100',
+				'watertype'=>"score"
+				},
+				{
+					'symbol'=>"Add",
+					'amount'=>"22",
+					'reason'=>'score add 22',
+					'watertype'=>"score"
+				}].to_json
+
 			{
 				'system'=>'mypost4u',
 				'channel'=>'web',
 				'userid'=>userid,
 				'operator'=>'system',
 				'datetime'=>current_time_ymdHMS(),
-				'type'=>'score',
-				'symbol'=>sybmol,
-				'amount'=>score,
-				'reason'=>'test',
-				'watertype'=>watertype
+				'oper'=>oper
 			}
 		end
 
@@ -264,7 +273,9 @@ class SimulationController < ApplicationController
 				'username'=>'testname',
 				'email'=>'testname@126.com',
 				'accountInitAmount'=>e_cash,
+				'accountInitReason'=>'init e_cash',
 				'scoreInitAmount'=>score,
+				'scoreInitReason'=>'init score',
 				'operator'=>'system',
 				'datetime'=>current_time_ymdHMS()
 			}

@@ -24,6 +24,7 @@ Rails.application.routes.draw do
   post 'registe' => 'registe#create'
   get 'registe/:userid/show' => 'registe#show'
   post 'finance_water/:userid/modify' => 'finance_water#modify'
+  post 'finance_water/:userid/modify_web' => 'finance_water#modify_web'
   post 'pay/:userid/submit' => 'online_pay#submit'
   post 'pay/:userid/submit_creditcard' => 'online_pay#submit_creditcard'
 

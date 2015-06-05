@@ -63,7 +63,8 @@ class RegisteController < ApplicationController
 		begin
 			ActiveRecord::Base.transaction do
 				user=new_user_params(params)
-				user.save && user.create_init_finance
+				user.save && user.create_init_finance(params["scoreInitReason"],params["accountInitReason"])
+				
 				if user.errors.any?
 					user.errors.full_messages.each do |msg|
 						ret_hash['reasons']<<{'reason'=>msg}
