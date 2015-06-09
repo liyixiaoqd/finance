@@ -12,23 +12,24 @@
 		<div class="row-fluid">
 			<div class="btn-toolbar">
 				<%= button_to "新增",new_user_finance_water_path(@user),class: "btn btn-primary",method: "get" %>
+				<%= button_to "导出",export_user_finance_water_path(@user),class: "btn",method: "get" %>
 			</div>
 
 			<table class="table">
 				<tr>
 					<th>流水类型</th>
-					<th>变化情况</th>
+					<th>起始</th>
+					<th>变化</th>
+					<th>终止</th>
 					<th>来源</th>
 					<th>操作时间</th>
 				</tr>
 				<% @finance_waters.each do |finance_water| %>
 				<tr>
 					<td>	<%= watertype_mapping(finance_water.watertype) %>	</td>
-					<% if finance_water.symbol =="Add" %>
-						<td><%= "#{finance_water.old_amount} + #{finance_water.amount} = #{finance_water.new_amount}"%></td>
-					<% else %>
-						<td><%= "#{finance_water.old_amount} - #{finance_water.amount} = #{finance_water.new_amount}"%></td>
-					<% end %>
+					<td>	<%= finance_water.old_amount %>	</td>
+					<td>	<%= "#{symbol_mapping(finance_water.symbol)} #{finance_water.amount}"%>	</td>
+					<td>	<%= finance_water.new_amount %>	</td>
 					<td>	<%= finance_water.operator %>	</td>
 					<td>	<%= finance_water.operdate %>	</td>
 				</tr>

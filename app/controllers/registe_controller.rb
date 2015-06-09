@@ -3,7 +3,7 @@ class RegisteController < ApplicationController
 
 	include Paramsable
 
-	CONDITION_PARAMS=%w{system username min_amount max_amount}
+	CONDITION_PARAMS=%w{system username min_amount max_amount email}
 	# before_action :authenticate_admin!,:only=>:index
 	# before_action :web_use_interface_authenticate
 

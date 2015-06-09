@@ -1,0 +1,3 @@
+$('.tr_relpace').remove()
+$('#online_pay_details_table').append("<%= escape_javascript(render partial: 'online_pay_and_user_detail_content',collection: @online_pay,as: :online_pay) %>")
+$('.div_paginate').replaceWith("<div class='div_paginate'> <%= escape_javascript(render partial: 'layouts/paginate_replace_ajax',locals: {page_array: @online_pay}) %> </div>")

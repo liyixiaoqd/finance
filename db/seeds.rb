@@ -59,6 +59,9 @@ AccessAuthority.create!(:controller=>"FinanceWaterController",:action=>"new",
 AccessAuthority.create!(:controller=>"FinanceWaterController",:action=>"show",
 			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'USER财务流水查询显示界面')
+AccessAuthority.create!(:controller=>"FinanceWaterController",:action=>"export",
+			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
+			:describe=>'USER财务流水导出')
 AccessAuthority.create!(:controller=>"FinanceWaterController",:action=>"modify",
 			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>true,
 			:describe=>'USER财务流水变更接口')
@@ -100,6 +103,12 @@ AccessAuthority.create!(:controller=>"OnlinePayController",:action=>"show",
 AccessAuthority.create!(:controller=>"OnlinePayController",:action=>"show_single_detail",
 			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'单笔支付交易详细查询显示界面')
+AccessAuthority.create!(:controller=>"OnlinePayController",:action=>"index",
+			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
+			:describe=>'交易信息查询显示界面')
+AccessAuthority.create!(:controller=>"OnlinePayController",:action=>"export",
+			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
+			:describe=>'交易信息导出')
 AccessAuthority.create!(:controller=>"OnlinePayController",:action=>"submit",
 			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>true,
 			:describe=>'支付提交接口')
@@ -109,7 +118,6 @@ AccessAuthority.create!(:controller=>"OnlinePayController",:action=>"submit_cred
 AccessAuthority.create!(:controller=>"OnlinePayController",:action=>"get_bill_from_payment_system",
 			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>true,
 			:describe=>'获取各支付系统财务对账单接口')
-
 AccessAuthority.create!(:controller=>"RegisteController",:action=>"index",
 			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'USER注册查询显示界面')

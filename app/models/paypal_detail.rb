@@ -110,8 +110,8 @@ class PaypalDetail
 	private 
 		def spec_payparams_valid(online_pay)
 			errmsg=''
-			if(online_pay['currency']!="EUR")
-				errmsg="paypal.currency must be 'EUR'"
+			if(online_pay['currency']!="EUR" && online_pay['currency']!="GBP")
+				errmsg="paypal.currency must be 'EUR' or 'GBP'"
 				Rails.logger.info(errmsg)
 			elsif( !SPEC_PARAMS_COUNTRY.include?(online_pay['country']) )
 				errmsg="paypal.country must in #{SPEC_PARAMS_COUNTRY}"

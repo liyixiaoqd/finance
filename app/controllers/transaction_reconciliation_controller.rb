@@ -1,7 +1,7 @@
 class TransactionReconciliationController < ApplicationController
 	# before_action :authenticate_admin!
 
-	CONDITION_PARAMS=%w{payway paytype reconciliation_flag start_time end_time transactionid}
+	CONDITION_PARAMS=%w{payway paytype reconciliation_flag start_time end_time transactionid online_pay_id}
 	# def index
 	# 	@reconciliation_details=ReconciliationDetail.includes(:online_pay).all.page(params[:page])
 
@@ -12,9 +12,17 @@ class TransactionReconciliationController < ApplicationController
 	# end
 
 	def index
-		sql=sql_from_condition_filter(params)
 		#logger.info(sql)
+		unless (params['order_no'].blank?)
+			op=OnlinePay.find_by_order_no(params['order_no'])
+			unless op.blank?
+				params['online_pay_id']=op.id
+			end
+		end
+		
+		sql=sql_from_condition_filter(params)
 		@reconciliation_details=ReconciliationDetail.includes(:online_pay).where(sql,params).page(params[:page])
+		
 		# @reconciliation_details=Kaminari.paginate_array(@reconciliation_details).page(params[:page]).per(ReconciliationDetail::PAGE_PER)
 		respond_to do |format|
 			format.html { render :index }

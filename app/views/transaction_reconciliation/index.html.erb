@@ -15,11 +15,13 @@
 				 <%= label_tag(:l3, "对账状态:",class:"label_inline") %> 
 				 <%= select_tag(:reconciliation_flag,options_for_select([["",""],["未对账","0"],["对账失败","1"],["对账成功","2"]])) %> 
 				 </br>
-				 <%= label_tag(:l4, "交易开始时间:",class:"label_inline") %> <%= datetime_field_tag(:start_time) %>
-				 <%= label_tag(:l5, "交易结束时间:",class:"label_inline") %> <%= datetime_field_tag(:end_time) %>
-				 <%= label_tag(:l6, "订单号:",class:"label_inline") %> <%= datetime_field_tag(:transactionid) %>
+				 <%= label_tag(:l3, "交易号:",class:"label_inline") %> <%= text_field_tag(:transactionid) %>
+				 <%= label_tag(:l4, "订单号/补款号:",class:"label_inline") %> <%= text_field_tag(:order_no) %>
+				 </br>
+				 <%= label_tag(:l5, "交易开始时间:",class:"label_inline") %> <%= datetime_field_tag(:start_time) %>
+				 <%= label_tag(:l6, "交易结束时间:",class:"label_inline") %> <%= datetime_field_tag(:end_time) %>
 				 <div class="btn-toolbar">
-					 <%= submit_tag("查询",class: "btn btn-primary") %>
+					<%= submit_tag("查询",class: "btn btn-primary") %>
 				          	<%=button_tag("清除条件",type: 'button',class: "btn",id: "button_clear") %>
 			          	</div>
 			        <% end %>
@@ -40,12 +42,14 @@
 				<thead>
 					<tr>
 						<th>支付类型</th>
-						<th> 子类型</th>
-						<th>订单号</th>
+						<th>子类型</th>
+						<th>交易号</th>
+						<th>订单号/补款号</th>
 						<th>对账状态</th>
 						<th>金额</th>
-						<th>支付系统返回状态</th>
-						<th>对账备注</th>
+						<th>货币</th>
+<!-- 						<th>支付系统返回状态</th>
+						<th>对账备注</th> -->
 						<th>交易时间</th>
 					</tr>
 				</thead>

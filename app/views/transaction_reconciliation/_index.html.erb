@@ -2,9 +2,15 @@
 	<td>  <%= reconciliation_detail.payway %> </td>
 	<td>  <%= reconciliation_detail.paytype%>  </td>
 	<td>  <%= reconciliation_detail.transactionid %>  </td>
+	<td> 
+		<% unless reconciliation_detail.online_pay.blank? %> 
+			 <%= reconciliation_detail.reconciliation_detail.online_pay.order_no %>  
+		<% end %> 
+	</td>
 	<td>  <%= reconciliation_flag_mapping(reconciliation_detail.reconciliation_flag) %>  </td>
 	<td>  <%= reconciliation_detail.amt %>  </td>
-	<td>  <%= reconciliation_detail.transaction_status %>  </td>
+	<td>  <%= reconciliation_detail.currencycode %>  </td>
+<!-- 	<td>  <%= reconciliation_detail.transaction_status %>  </td>
 	<td> 
 		<% unless reconciliation_detail.online_pay_id.blank? %> 
 			<% unless reconciliation_detail.online_pay.blank? %>
@@ -15,6 +21,6 @@
 			</br>
 		<% end %> 
 		<%= reconciliation_detail.reconciliation_describe %>
-	</td>
+	</td> -->
 	<td>  <%= reconciliation_detail.timestamp %>  </td>
 </tr>

@@ -1,4 +1,8 @@
+require 'csv'
+
 class FinanceWaterController < ApplicationController
+	include FinanceWaterHelper
+
 	protect_from_forgery :except => :modify
 
 	# before_action :authenticate_admin!,:only=>:show
@@ -12,6 +16,23 @@ class FinanceWaterController < ApplicationController
 	def show
 		@user=User.find(params['id'])
 		@finance_waters=@user.finance_water.page(params[:page])
+	end
+
+	def export
+		user=User.includes(:finance_water).find(params['id'])
+
+		csv_string = CSV.generate do |csv|
+			csv << ["用户名", user.username,'',"注册E-Mail",user.email]
+			csv << ["电子现金", user.e_cash,'',"积分",user.score] 	
+			csv << []
+			csv << ["流水类型", "起始","变化", "终止", "来源","操作时间"]
+			user.finance_water.each do |fw|
+				csv << [watertype_mapping(fw.watertype),fw.old_amount,"#{symbol_mapping(fw.symbol)} #{fw.amount}",
+				              fw.new_amount,fw.operator,fw.operdate]
+			end
+		end
+		
+		send_data csv_string,:type => 'text/csv ',:disposition => "filename=财务流水明细_#{user.username}.csv"
 	end
 
 	def modify			

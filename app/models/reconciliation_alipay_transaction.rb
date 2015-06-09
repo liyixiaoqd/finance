@@ -186,7 +186,12 @@ class ReconciliationAlipayTransaction
 				when "trans_code_msg" then hash_alipay["transaction_type"]=child.text+" - "+hash_alipay["transaction_type"]
 				when "trade_no" then hash_alipay["transactionid"]=child.text
 				when "total_fee" then hash_alipay["amt"]=child.text.to_f
-				when "currency" then hash_alipay["currencycode"]=child.text.to_f
+				when "currency" then 
+					if (child.text=="156")
+						hash_alipay["currencycode"]="RMB"
+					else
+						hash_alipay["currencycode"]=child.text
+					end
 				when "service_fee" then hash_alipay["feeamt"]=child.text.to_f
 				else
 					Rails.logger.warn("Analytical failure - child : #{child}")

@@ -1,10 +1,23 @@
+require 'csv'
+
 class OnlinePayController < ApplicationController
 	protect_from_forgery :except => :submit
 
-	include Paramsable
-
+	include Paramsable,OnlinePayHelper
+	
+	CONDITION_PARAMS=%w{payway paytype reconciliation_flag start_time end_time reconciliation_id order_no}
 	# before_action :authenticate_admin!,:only=>[:show,:show_single_detail]
-
+	def index
+		sql=sql_from_condition_filter(params)
+		#logger.info(sql)
+		@online_pay=OnlinePay.includes(:user).where(sql,params).page(params[:page])
+		# @reconciliation_details=Kaminari.paginate_array(@reconciliation_details).page(params[:page]).per(ReconciliationDetail::PAGE_PER)
+		respond_to do |format|
+			format.html { render :index }
+			format.js
+		end
+	end
+	
 	def show
 		@user=User.find(params['userid'])
 		@online_pays=@user.online_pay.order(created_at: :desc).page(params[:page])
@@ -12,6 +25,24 @@ class OnlinePayController < ApplicationController
 
 	def show_single_detail
 		@online_pay=OnlinePay.find(params['online_pay_id'])
+	end
+
+	def export
+		user=User.includes(:online_pay).find(params['userid'])
+
+		csv_string = CSV.generate do |csv|
+			csv << ["用户名", user.username,'',"注册E-Mail",user.email]
+			csv << ["电子现金", user.e_cash,'',"积分",user.score] 	
+			csv << []
+			csv << ["交易号", "金额","货币", "状态", "支付类型与子类型","订单号/补款号","备注"]
+			user.online_pay.each do |op|
+				csv << [op.reconciliation_id,op.amount,op.currency,status_mapping(op.status),
+				              payway_paytype_mapping(op.payway.camelize + op.paytype.camelize),
+				              op.order_no,op.reason]
+			end
+		end
+		
+		send_data csv_string,:type => 'text/csv ',:disposition => "filename=财务流水明细_#{user.username}.csv"
 	end
 
 	def submit
@@ -171,7 +202,10 @@ class OnlinePayController < ApplicationController
 			online_pay.payway=params.delete('payway')
 			online_pay.paytype=params.delete('paytype')
 			online_pay.amount=params.delete('amount')
+
 			online_pay.currency=params.delete('currency')
+			online_pay.currency="RMB" if online_pay.currency.blank?
+
 			online_pay.order_no=params.delete('order_no')
 			online_pay.success_url=params.delete('success_url')
 			online_pay.notification_url=params.delete('notification_url')
@@ -200,5 +234,33 @@ class OnlinePayController < ApplicationController
 			online_pay.credit_year=params['year']
 			online_pay.credit_first_name=params['first_name']
 			online_pay.credit_last_name=params['last_name']
+		end
+
+		def sql_from_condition_filter(params)
+			sql=""
+			index=1
+
+			params.each do |k,v|
+				next if v.blank? 
+				next unless CONDITION_PARAMS.include?(k)
+				
+				if( k=="start_time")
+					t_sql="timestamp>=:#{k}"
+				elsif (k=="end_time")
+					t_sql="timestamp<=:#{k}"
+				else
+					t_sql="#{k}=:#{k}"
+				end
+
+				if(index==1)
+					sql=t_sql
+				else
+					sql="#{sql} and #{t_sql}"
+				end
+
+				index=index+1
+			end
+
+			sql
 		end
 end

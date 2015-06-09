@@ -10,11 +10,17 @@
 		</div>
 
 		<div class="row-fluid">
+			<div class="btn-toolbar">
+				<%= button_to "导出",export_user_online_pay_path(@user),class: "btn",method: "get" %>
+			</div>
+
 			<table class="table">
 				<%= render partial: "online_pay_detail_title" %>
 				<%= render partial: "online_pay_detail_content",collection: @online_pays,as: :online_pay %>
 			</table>
-			<%= paginate @online_pays %>
+			<div class="div_paginate">
+				<%= render partial: "layouts/paginate_replace_ajax",locals: {page_array: @online_pays} %>
+			</div>
 		</div>
 	</div>
 </div>

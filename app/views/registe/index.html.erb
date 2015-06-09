@@ -11,11 +11,12 @@
 					 <%= label_tag(:l1, "注册系统:",class:"label_inline") %>
 					 <%= select_tag(:system,options_for_select([["",""],["快易","quaie"],["包裹","mypost4u"]])) %> 
 					 <%= label_tag(:l2, "用户名:",class:"label_inline") %> <%= text_field_tag(:username) %>
-					 <%= label_tag(:l3, "流水类型:",class:"label_inline") %>
-					 <%= select_tag(:symbol,options_for_select([["",""],["积分","e_cash"],["电子现金","score"]])) %> 
+					 <%= label_tag(:l3, "注册E-Mail:",class:"label_inline") %> <%= text_field_tag(:email) %>
 					 </br>
-					 <%= label_tag(:l4, "流水金额起始:",class:"label_inline") %> <%= text_field_tag(:min_amount) %>
-					 <%= label_tag(:l5, "流水金额终止:",class:"label_inline") %> <%= text_field_tag(:max_amount) %>
+					 <%= label_tag(:l4, "流水类型:",class:"label_inline") %>
+					 <%= select_tag(:symbol,options_for_select([["",""],["积分","e_cash"],["电子现金","score"]])) %> 
+					 <%= label_tag(:l5, "流水金额起始:",class:"label_inline") %> <%= text_field_tag(:min_amount) %>
+					 <%= label_tag(:l6, "流水金额终止:",class:"label_inline") %> <%= text_field_tag(:max_amount) %>
 					 <div class="btn-toolbar">
 						 <%= submit_tag("查询",class: "btn btn-primary") %>
 					          	<%=button_tag("清除条件",type: 'button',class: "btn",id: "button_clear") %>
