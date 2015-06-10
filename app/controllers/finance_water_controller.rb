@@ -83,6 +83,29 @@ class FinanceWaterController < ApplicationController
 						end
 						raise "create finance_water failure"
 					end
+
+					online_pay=new_online_pay_each(user,finance_each,params)
+					unless online_pay.blank?
+						online_pay.save
+
+						if online_pay.errors.any?
+							online_pay.errors.full_messages.each do |msg|
+								ret_hash['reasons']<<{'reason'=>msg}
+							end
+							raise "create finance_water - online_pay failure"
+						end
+						logger.info("online_pay record save success!!!! #{online_pay.id}")
+						reconciliation_detail=new_reconciliation_detail_each(online_pay,params)
+						reconciliation_detail.save
+
+						if reconciliation_detail.errors.any?
+							reconciliation_detail.errors.full_messages.each do |msg|
+								ret_hash['reasons']<<{'reason'=>msg}
+							end
+							raise "create finance_water - reconciliation_detail failure"
+						end
+					end
+
 					ret_hash['waterno']<<finance_water.id
 				end
 
@@ -100,6 +123,7 @@ class FinanceWaterController < ApplicationController
 			end
 		rescue => e
 			logger.info("create finance_water failure! : #{e.message}")
+			ret_hash['waterno']=[]
 			ret_hash['reasons']<<{'reason'=>e.message} if ret_hash['reasons'].blank?
 			logger.info("FINANCE.MODIFY RET HASH:#{ret_hash}")
 		end
@@ -169,6 +193,57 @@ class FinanceWaterController < ApplicationController
 	end
 
 	private
+		def new_online_pay_each(user,finance_each,params)
+			if finance_each['is_pay']=="Y"
+				if finance_each['order_no'].blank?
+					raise "支付交易订单号不可为空"
+				end
+				if finance_each['symbol']!="Sub"
+					raise "支付交易操作符只能为减"
+				end
+
+				online_pay=user.online_pay.build()
+				online_pay.system=params['system']
+				online_pay.channel=params['channel']
+				online_pay.userid=user.userid
+				online_pay.payway=finance_each["watertype"]
+				online_pay.paytype=""
+				online_pay.amount=finance_each["amount"]
+				online_pay.order_no=finance_each["order_no"]
+
+				if finance_each["watertype"]=="score"
+					online_pay.payway="score"
+					online_pay.status="success_score"
+				elsif finance_each["watertype"]=="e_cash"
+					online_pay.payway="e_cash"
+					online_pay.status="success_e_cash"
+				end
+				online_pay.reason=finance_each["reason"]
+				online_pay.trade_no=online_pay.order_no
+				online_pay.reconciliation_id=online_pay.order_no
+				online_pay
+			else
+				nil
+			end
+		end
+
+		def new_reconciliation_detail_each(online_pay,params)
+			reconciliation_detail=online_pay.build_reconciliation_detail
+			reconciliation_detail.payway=online_pay.payway
+			reconciliation_detail.paytype=online_pay.paytype
+			reconciliation_detail.batch_id=OnlinePay.current_time_format("%Y%m%d")+"_001"
+			reconciliation_detail.transaction_date=OnlinePay.current_time_format("%Y-%m-%d")
+			reconciliation_detail.timestamp=params["datetime"]
+			reconciliation_detail.transactionid=online_pay.reconciliation_id
+			reconciliation_detail.transaction_status='SUCC'
+			reconciliation_detail.reconciliation_flag='2'
+			reconciliation_detail.amt=online_pay.amount
+			reconciliation_detail.netamt=0.0
+			reconciliation_detail.feeamt=0.0
+
+			reconciliation_detail
+		end
+
 		def new_finance_water_each(user,finance_each,params)
 			finance_water=user.finance_water.build()
 			finance_water.system=params["system"]

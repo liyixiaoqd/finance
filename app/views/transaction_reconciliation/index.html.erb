@@ -1,5 +1,5 @@
 <div class="container-fluid">
-<% @page_title="财务明细对账" %>
+<% @page_title="财务对账" %>
 	<div class="row-fluid">
 		<div class="alert alert-info">
 			<button type="button" class="close" data-dismiss="alert">×</button>
@@ -7,9 +7,9 @@
 		</div>
 		<div class="row-fluid">
 			<div class="well">
-			        <%= form_tag transaction_reconciliation_index_path,method:"get",remote: :true do %>
+			        <%= form_tag transaction_reconciliation_index_path,method:"get",remote: :true,id: "index_and_export_form" do %>
 				 <%= label_tag(:l1, "支付类型:",class:"label_inline") %> 
-				 <%= select_tag(:payway,options_for_select([["",""],["paypal","paypal"],["sofort","sofort"],["支付宝","alipay"]])) %> 
+				 <%= select_tag(:payway,options_for_select([["",""],["paypal","paypal"],["sofort","sofort"],["支付宝","alipay"],["积分","score"],["电子现金","e_cash"]])) %> 
 				 <%= label_tag(:l2, "支付子类型:",class:"label_inline") %>
 				 <%= select_tag(:paytype,options_for_select([["",""],["国内支付","transaction"],["海外支付","oversea"]])) %> 
 				 <%= label_tag(:l3, "对账状态:",class:"label_inline") %> 
@@ -22,7 +22,8 @@
 				 <%= label_tag(:l6, "交易结束时间:",class:"label_inline") %> <%= datetime_field_tag(:end_time) %>
 				 <div class="btn-toolbar">
 					<%= submit_tag("查询",class: "btn btn-primary") %>
-				          	<%=button_tag("清除条件",type: 'button',class: "btn",id: "button_clear") %>
+					<%= link_to "导出",transaction_reconciliation_export_path,class: "btn",method: "get",id: "link_to_export"%>
+				          	<%= button_tag("清除条件",type: 'button',class: "btn",id: "button_clear") %>
 			          	</div>
 			        <% end %>
 			</div>
@@ -50,7 +51,7 @@
 						<th>货币</th>
 <!-- 						<th>支付系统返回状态</th>
 						<th>对账备注</th> -->
-						<th>交易时间</th>
+						<th>交易时间 </th>
 					</tr>
 				</thead>
 				<%= render partial: "index",collection: @reconciliation_details,as: :reconciliation_detail %>

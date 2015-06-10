@@ -106,9 +106,12 @@ AccessAuthority.create!(:controller=>"OnlinePayController",:action=>"show_single
 AccessAuthority.create!(:controller=>"OnlinePayController",:action=>"index",
 			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'交易信息查询显示界面')
-AccessAuthority.create!(:controller=>"OnlinePayController",:action=>"export",
+AccessAuthority.create!(:controller=>"OnlinePayController",:action=>"export_index",
 			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'交易信息导出')
+AccessAuthority.create!(:controller=>"OnlinePayController",:action=>"export",
+			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
+			:describe=>'USER交易信息导出')
 AccessAuthority.create!(:controller=>"OnlinePayController",:action=>"submit",
 			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>true,
 			:describe=>'支付提交接口')
@@ -168,6 +171,9 @@ AccessAuthority.create!(:controller=>"TransactionReconciliationController",:acti
 AccessAuthority.create!(:controller=>"TransactionReconciliationController",:action=>"report",
 			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'各财务系统对账汇总查询显示界面')
+AccessAuthority.create!(:controller=>"TransactionReconciliationController",:action=>"export",
+			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
+			:describe=>'各财务系统对账单导出')
 
 AccessAuthority.create!(:controller=>"UploadFileController",:action=>"index",
 			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,

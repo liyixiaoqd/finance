@@ -17,6 +17,29 @@ class OnlinePayController < ApplicationController
 			format.js
 		end
 	end
+
+	def export_index
+		sql=sql_from_condition_filter(params)
+		if sql.blank?
+			redirect_to index_online_pay_path and return
+		end
+
+		online_pay=OnlinePay.includes(:user).where(sql,params)
+
+		csv_string = CSV.generate do |csv|
+			csv << ["导出工号", session[:admin],"导出时间", OnlinePay.current_time_format("%Y-%m-%d %H:%M:%S")]
+			csv << []
+			csv << ["用户名", "交易号", "金额","货币", "状态", "支付类型与子类型","订单号/补款号","备注"]
+			online_pay.each do |op|
+				csv << [op.user.username,op.reconciliation_id,op.amount,op.get_convert_currency(),
+				              status_mapping(op.status),
+				              payway_paytype_mapping(op.payway.camelize + op.paytype.camelize),
+				              op.order_no,op.reason]
+			end
+		end
+
+		send_data csv_string,:type => 'text/csv ',:disposition => "filename=交易明细_#{OnlinePay.current_time_format("%Y%m%d%H%M%S")}.csv"
+	end
 	
 	def show
 		@user=User.find(params['userid'])
@@ -36,13 +59,14 @@ class OnlinePayController < ApplicationController
 			csv << []
 			csv << ["交易号", "金额","货币", "状态", "支付类型与子类型","订单号/补款号","备注"]
 			user.online_pay.each do |op|
-				csv << [op.reconciliation_id,op.amount,op.currency,status_mapping(op.status),
+				csv << [op.reconciliation_id,op.amount,op.get_convert_currency(),
+				              status_mapping(op.status),
 				              payway_paytype_mapping(op.payway.camelize + op.paytype.camelize),
 				              op.order_no,op.reason]
 			end
 		end
 		
-		send_data csv_string,:type => 'text/csv ',:disposition => "filename=财务流水明细_#{user.username}.csv"
+		send_data csv_string,:type => 'text/csv ',:disposition => "filename=支付明细_#{user.username}.csv"
 	end
 
 	def submit
@@ -204,7 +228,6 @@ class OnlinePayController < ApplicationController
 			online_pay.amount=params.delete('amount')
 
 			online_pay.currency=params.delete('currency')
-			online_pay.currency="RMB" if online_pay.currency.blank?
 
 			online_pay.order_no=params.delete('order_no')
 			online_pay.success_url=params.delete('success_url')
@@ -218,10 +241,13 @@ class OnlinePayController < ApplicationController
 			online_pay.quantity=params.delete('quantity')
 			online_pay.logistics_name=params.delete('logistics_name')
 			online_pay.other_params=params.inspect
-			online_pay.set_is_credit!()
+
 			online_pay.remote_host=request.remote_host
 			online_pay.remote_ip=request.remote_ip
 			online_pay.rate_amount=online_pay.amount
+
+			online_pay.set_is_credit!()
+			online_pay.set_currency!()
 
 			online_pay
 		end

@@ -47,6 +47,48 @@ $(document).ready(function(){
   	}
   });
 
+  $("#link_to_export").click(function(event){
+  	input_objs=document.getElementById("index_and_export_form").children
+  	var condition="?"
+  	var control_index=0
+  	var control_len=0
+	for (var i=0;i<input_objs.length;i++){
+		if(input_objs[i].type=="text"){
+			control_len++
+			if (input_objs[i].value!=""){
+				if (condition=="?")
+					condition+=input_objs[i].name+"="+input_objs[i].value
+				else
+					condition+="&"+input_objs[i].name+"="+input_objs[i].value
+			}
+			else{
+				control_index++
+			}
+		}
+		else if(input_objs[i].type=="select-one" && input_objs[i].selectedIndex!=0){
+			control_len++
+			if (input_objs[i].selectedIndex!=0){
+				if (condition=="?")
+					condition+=input_objs[i].name+"="+input_objs[i].value
+				else
+					condition+="&"+input_objs[i].name+"="+input_objs[i].value
+			}
+			else{
+				control_index++
+			}
+		}
+	}	
+	if (control_index==control_len) {
+		alert("请输入至少一项条件后进行导出操作")
+		return false
+	}
+	else{
+		this.href=this.href.replace(/\?.*/,"")
+		this.href+=condition
+	}
+  });
+
+
 $.datepicker.regional['zh-CN'] = {  
 	closeText: '关闭',  
 	prevText: '<上月',  

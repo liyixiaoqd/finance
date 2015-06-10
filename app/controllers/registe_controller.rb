@@ -57,7 +57,8 @@ class RegisteController < ApplicationController
 			'channel'=>params['channel'],
 			'userid'=>params['userid'],
 			'status'=>'failure',
-			'reasons'=>[]
+			'reasons'=>[],
+			'water_no'=>[]
 		}
 		
 		begin
@@ -71,6 +72,9 @@ class RegisteController < ApplicationController
 					end
 					raise "create user failure"
 				else
+					user.finance_water.each do |f|
+						ret_hash['water_no']<<f.id.to_s
+					end
 					ret_hash['status']='success'
 				end
 			end
@@ -83,21 +87,6 @@ class RegisteController < ApplicationController
 	end
 	
 	private
-		def get_test_user
-			user=User.new()
-			user.system="mypost4u"
-			user.channel="web"
-			user.userid="552b461202d0f099ec000002"
-			user.username="testname"
-			user.email="testname@126.com"
-			user.e_cash=5.0
-			user.score=11.0
-			user.operator="system"
-			user.operdate="2015-04-22 09:00:00"		
-		
-			user
-		end
-
 		def new_user_params(params)
 			user=User.new()
 			user.system=params["system"]

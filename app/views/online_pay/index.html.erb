@@ -9,9 +9,9 @@
 
 		<div class="row-fluid">
 			<div class="well">
-				<%= form_tag index_online_pay_path,method:"post",remote: :true do %>
+				<%= form_tag index_online_pay_path,method:"get",remote: :true,id: "index_and_export_form" do %>
 					 <%= label_tag(:l1, "支付类型:",class:"label_inline") %> 
-					 <%= select_tag(:payway,options_for_select([["",""],["paypal","paypal"],["sofort","sofort"],["支付宝","alipay"]])) %> 
+					 <%= select_tag(:payway,options_for_select([["",""],["paypal","paypal"],["sofort","sofort"],["支付宝","alipay"],["积分","score"],["电子现金","e_cash"]])) %> 
 					 <%= label_tag(:l2, "支付子类型:",class:"label_inline") %>
 					 <%= select_tag(:paytype,options_for_select([["",""],["国内支付","transaction"],["海外支付","oversea"]])) %> 
 					 </br>
@@ -22,6 +22,7 @@
 					 <%= label_tag(:l6, "交易结束时间:",class:"label_inline") %> <%= datetime_field_tag(:end_time) %>
 					 <div class="btn-toolbar">
 						 <%= submit_tag("查询",class: "btn btn-primary") %>
+						 <%= link_to "导出",export_index_online_pay_path,class: "btn",method: "get",id: "link_to_export"%>
 					          	<%=button_tag("清除条件",type: 'button',class: "btn",id: "button_clear") %>
 				          	</div>
 				<% end %>	

@@ -44,9 +44,9 @@
 	    <a href="#finance-menu" class="nav-header" data-toggle="collapse"><i class="icon-th-list"></i>财务管理</a>
 	    <ul id="finance-menu" class="nav nav-list collapse in">
 	    <% if session[:admin_level]>=0 %>
-	        <li > <%=link_to t('交易查询'),index_online_pay_path,method: :post%> </li>
+	        <li > <%=link_to t('交易查询'),index_online_pay_path,method: :get%> </li>
 	        <li > <%=link_to t('财务对账'),transaction_reconciliation_index_path,method: :get%> </li>
-	        <li > <%=link_to t('财务汇总'),transaction_reconciliation_report_path,method: :post%> </li>
+	        <li > <%=link_to t('财务汇总'),transaction_reconciliation_report_path,method: :get%> </li>
 	    <% end %>
 	    </ul>
 

@@ -2,7 +2,7 @@
 	<td><%=link_to  online_pay.user.username,registe_index_path(system: online_pay.user.system,username: online_pay.user.username),method: :get%></td>
 	<td><%= online_pay.reconciliation_id %></td>
 	<td><%= online_pay.amount %></td>
-	<td><%= online_pay.currency %></td>
+	<td><%= online_pay.get_convert_currency %></td>
 	<td><%= status_mapping(online_pay.status) %></td>
 <!-- 	<td><%= online_pay.callback_status %></td> -->
 	<td><%= payway_paytype_mapping(online_pay.payway.camelize + online_pay.paytype.camelize) %></td>

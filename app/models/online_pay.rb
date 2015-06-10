@@ -1,7 +1,7 @@
 class OnlinePay < ActiveRecord::Base
 	include PayDetailable
 
-	ONLINE_PAY_STATUS_ENUM=%w{submit failure_submit  submit_credit intermediate_notify success_notify cancel_notify failure_notify success_credit failure_credit}
+	ONLINE_PAY_STATUS_ENUM=%w{submit failure_submit submit_credit intermediate_notify success_notify cancel_notify failure_notify success_credit failure_credit success_score success_e_cash}
 
 	belongs_to :user
 	has_one :reconciliation_detail
@@ -44,6 +44,22 @@ class OnlinePay < ActiveRecord::Base
 			self.is_credit=true
 		else
 			self.is_credit=false
+		end
+	end
+
+	def set_currency!()
+		if(self.currency.blank?)
+			self.currency="RMB"
+		end
+	end
+
+	def get_convert_currency()
+		if self.currency.blank?
+			"RMB"
+		elsif(self.payway=="alipay")
+			"RMB"
+		else
+			self.currency
 		end
 	end
 

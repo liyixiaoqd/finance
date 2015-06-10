@@ -1,5 +1,6 @@
 class TransactionReconciliationController < ApplicationController
 	# before_action :authenticate_admin!
+	include TransactionReconciliationHelper
 
 	CONDITION_PARAMS=%w{payway paytype reconciliation_flag start_time end_time transactionid online_pay_id}
 	# def index
@@ -17,6 +18,8 @@ class TransactionReconciliationController < ApplicationController
 			op=OnlinePay.find_by_order_no(params['order_no'])
 			unless op.blank?
 				params['online_pay_id']=op.id
+			else
+				params['online_pay_id']='no_record'
 			end
 		end
 		
@@ -28,6 +31,45 @@ class TransactionReconciliationController < ApplicationController
 			format.html { render :index }
 			format.js
 		end
+	end
+
+	def export
+		unless (params['order_no'].blank?)
+			op=OnlinePay.find_by_order_no(params['order_no'])
+			unless op.blank?
+				params['online_pay_id']=op.id
+			else
+				params['online_pay_id']='no_record'
+			end
+		end
+		
+		sql=sql_from_condition_filter(params)
+
+		if sql.blank?
+			redirect_to transaction_reconciliation_index_path and return
+		end
+
+		reconciliation_details=ReconciliationDetail.includes(:online_pay).where(sql,params)
+
+		csv_string = CSV.generate do |csv|
+			csv << ["导出工号", session[:admin],"导出时间", OnlinePay.current_time_format("%Y-%m-%d %H:%M:%S")]
+			csv << []
+			csv << ["支付类型", "子类型","交易号", "订单号/补款号", "对账状态","金额","货币","交易时间"]
+			reconciliation_details.each do |rd|
+				if rd.online_pay.blank?
+					order_no=""
+				else
+					order_no=rd.online_pay.order_no
+				end
+
+				csv << [rd.payway,rd.paytype,rd.transactionid,
+				              order_no,
+				              reconciliation_flag_mapping(rd.reconciliation_flag),
+				              rd.amt,rd.currencycode,rd.timestamp]
+			end
+		end
+
+		send_data csv_string,:type => 'text/csv ',:disposition => "filename=财务对账明细_#{OnlinePay.current_time_format("%Y%m%d%H%M%S")}.csv"
 	end
 
 	def report

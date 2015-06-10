@@ -243,16 +243,20 @@ class SimulationController < ApplicationController
 
 		def score_params(userid,score,sybmol,watertype)
 			oper=[{
-				'symbol'=>"Add",
-				'amount'=>"100",
-				'reason'=>'score add 100',
-				'watertype'=>"score"
+					'symbol'=>"Add",
+					'amount'=>"100",
+					'reason'=>'score add 100',
+					'watertype'=>"score",
+					'is_pay'=>'N',
+					'order_no'=>''
 				},
 				{
-					'symbol'=>"Add",
+					'symbol'=>"Sub",
 					'amount'=>"22",
-					'reason'=>'score add 22',
-					'watertype'=>"score"
+					'reason'=>'score sub 22',
+					'watertype'=>"score",
+					'is_pay'=>'Y',
+					'order_no'=>'SCORE_PAY_ORDER_001'
 				}].to_json
 
 			{

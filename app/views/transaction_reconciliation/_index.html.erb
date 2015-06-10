@@ -4,7 +4,7 @@
 	<td>  <%= reconciliation_detail.transactionid %>  </td>
 	<td> 
 		<% unless reconciliation_detail.online_pay.blank? %> 
-			 <%= reconciliation_detail.reconciliation_detail.online_pay.order_no %>  
+			 <%= reconciliation_detail.online_pay.order_no %>  
 		<% end %> 
 	</td>
 	<td>  <%= reconciliation_flag_mapping(reconciliation_detail.reconciliation_flag) %>  </td>

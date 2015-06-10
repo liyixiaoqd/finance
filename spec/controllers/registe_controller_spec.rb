@@ -103,12 +103,18 @@ describe RegisteController do
 	end
 
 	def ret_params_succ(userid)
+		water_no=[]
+		User.find_by_userid(userid).finance_water.each do |f|
+			water_no<<f.id.to_s
+		end
+
 		{
 			'system'=>'mypost4u',
 			'channel'=>'web',
 			'userid'=>userid,
 			'status'=>'success',
-			'reasons'=>[]
+			'reasons'=>[],
+			'water_no'=>water_no
 		}
 	end
 
@@ -118,7 +124,8 @@ describe RegisteController do
 			'channel'=>'web',
 			'userid'=>userid,
 			'status'=>'failure',
-			'reasons'=>[]
+			'reasons'=>[],
+			'water_no'=>[]
 		}
 
 		ret_hash['reasons']<<{'reason'=>"user has exists"}

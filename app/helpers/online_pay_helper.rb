@@ -9,13 +9,17 @@ module OnlinePayHelper
 		'failure_notify'=>'支付失败-异步回写失败',
 		'success_credit'=>'支付成功-请求(信用卡)成功',
 		'failure_credit'=>'支付失败-请求(信用卡)失败',
+		'success_score'=>'支付成功-积分支付',
+		'success_e_cash'=>'支付成功-电子现金支付',
 	}
 
 	PAYWAY_PAYTYPE_MAPPING={
 		'AlipayOversea'=>'支付宝-海外',
 		'AlipayTransaction'=>'支付宝-国内',
 		'Paypal'=>'paypal',
-		'Sofort'=>'sofort'
+		'Sofort'=>'sofort',
+		'Score'=>'积分',
+		'ECash'=>'电子现金'
 	}
 
 	def status_mapping(status)
