@@ -62,3 +62,6 @@ gem 'jquery-ui-rails'
 group :test, :development do
 	gem 'rspec-rails'
 end
+
+# xlsx
+gem 'roo'

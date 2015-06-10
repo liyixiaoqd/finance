@@ -1,3 +1,5 @@
+require 'roo'
+
 class ReconciliationSofort
 	include AlipayDetailable
 	include PayDetailable
@@ -32,7 +34,7 @@ class ReconciliationSofort
 				end
 
 				rd=ReconciliationDetail.init( array_to_hash_sofort(sofort_detail,reconciliation_date,batch_id) )
-				rd.valid_and_save!()		
+				rd.valid_and_save!()
 			
 				valid_complete_num=valid_complete_num+1
 				if(rd.reconciliation_flag==ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['FAIL'])
@@ -49,6 +51,52 @@ class ReconciliationSofort
 		check_file.close
 
 		"#{reconciliation_date} - #{reconciliation_date} <br> batch_id [ #{@batch_id} ] : </br> {all_num:#{valid_all_num} = complete_num:#{valid_complete_num} + rescue_num:#{valid_rescue_num}</br> complete_num:#{valid_complete_num} = succ_num:#{valid_succ_num} + fail_num:#{valid_fail_num} }</br>"
+	end
+
+	def valid_reconciliation_by_de(filename)
+		errmsg=""
+		xlsx=Roo::Spreadsheet.open(filename,extension: :xlsx)
+		i=0
+		valid_all_num=0
+		valid_complete_num=0
+		valid_succ_num=0
+		valid_fail_num=0
+		valid_rescue_num=0
+
+		xlsx.sheet(0).each do |row|
+			i =i+1
+			next if i<5
+			begin
+				valid_all_num=valid_all_num+1
+
+				rd=ReconciliationDetail.init( DE_BOC_Bank_to_hash_sofort(row,i) )
+				rd.valid_and_save!()
+
+				
+				valid_complete_num=valid_complete_num+1
+				if(rd.reconciliation_flag==ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['FAIL'])
+					valid_fail_num=valid_fail_num+1
+				elsif(rd.reconciliation_flag==ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC'])
+					valid_succ_num=valid_succ_num+1
+				end
+			rescue => e
+				Rails.logger.info("sofort对账异常:"+e.message)
+				if valid_rescue_num==0
+					errmsg=e.message
+				elsif valid_rescue_num<5
+					errmsg+=";"+e.message
+				elsif valid_rescue_num==5
+					errmsg+="..."
+				end
+
+				valid_rescue_num=valid_rescue_num+1
+			end
+		end
+
+		outmsg="文件总比数:#{valid_all_num},导入成功比数:#{valid_complete_num},异常比数:#{valid_rescue_num} ; 
+			   对账成功比数:#{valid_succ_num},对账失败比数:#{valid_fail_num}"
+		
+		[outmsg,errmsg]
 	end
 
 	private 
@@ -70,5 +118,34 @@ class ReconciliationSofort
 				'batch_id'=>reconciliation_date+"_"+sprintf("%03d",batch_id),
 				'reconciliation_flag'=>ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['INIT']
 			}
+		end
+
+		def DE_BOC_Bank_to_hash_sofort(row,i)
+			sofort_detail={
+				'transaction_status'=>'SUCC',
+				'payway'=>'sofort',
+				'feeamt'=>0.0,
+				'paytype'=>'',
+				'transaction_date'=>OnlinePay.current_time_format("%Y-%m-%d"),
+				'batch_id'=>"upload_file",
+				'reconciliation_flag'=>ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['INIT']
+			}
+			j=0
+			row.each do |col|
+				j=j+1
+				next unless j==3 || j==5 || j==6 || j==8 || j==10
+				col.gsub!(/\t/,"") if col.class=="String"
+				sofort_detail["amt"],sofort_detail['netamt']=col,col if j==3
+				sofort_detail["currencycode"]=col if j==5
+				sofort_detail['timestamp']=col if j==6
+				sofort_detail['name']=col if j==8
+				sofort_detail['transactionid']=col if j==10
+			end
+
+			if sofort_detail['transactionid'].blank?
+				raise "第#{i}行:对账标识(订单号)为空!"
+			end
+
+			sofort_detail
 		end
 end

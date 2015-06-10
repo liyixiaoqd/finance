@@ -26,7 +26,7 @@ class ReconciliationDetail < ActiveRecord::Base
 		'ALIPAY_OVERSEA_L' => 'SUCC',
 		'ALIPAY_OVERSEA_W' => 'PEND',
 		'ALIPAY_OVERSEA_F' => 'FAIL',
-		'SOFORT_untraceable' => 'SUCC'
+		'SOFORT_SUCC' => 'SUCC'
 	}
 
 	def self.init(init_params)
