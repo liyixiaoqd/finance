@@ -174,6 +174,16 @@ AccessAuthority.create!(:controller=>"TransactionReconciliationController",:acti
 AccessAuthority.create!(:controller=>"TransactionReconciliationController",:action=>"export",
 			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'各财务系统对账单导出')
+AccessAuthority.create!(:controller=>"TransactionReconciliationController",:action=>"modify",
+			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
+			:describe=>'单笔对账状态修改')
+AccessAuthority.create!(:controller=>"TransactionReconciliationController",:action=>"confirm_search",
+			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
+			:describe=>'财务确认查询界面')
+AccessAuthority.create!(:controller=>"TransactionReconciliationController",:action=>"confirm",
+			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
+			:describe=>'财务确认')
+
 
 AccessAuthority.create!(:controller=>"UploadFileController",:action=>"index",
 			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,

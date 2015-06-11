@@ -2,7 +2,7 @@ class TransactionReconciliationController < ApplicationController
 	# before_action :authenticate_admin!
 	include TransactionReconciliationHelper
 
-	CONDITION_PARAMS=%w{payway paytype reconciliation_flag start_time end_time transactionid online_pay_id}
+	CONDITION_PARAMS=%w{payway paytype reconciliation_flag start_time end_time transactionid online_pay_id confirm_flag}
 	# def index
 	# 	@reconciliation_details=ReconciliationDetail.includes(:online_pay).all.page(params[:page])
 
@@ -93,6 +93,83 @@ class TransactionReconciliationController < ApplicationController
 			format.html { render :report }
 			format.js
 		end
+	end
+
+	def modify
+		begin 
+			ReconciliationDetail.transaction do
+				reconciliation_detail=ReconciliationDetail.lock.find(params[:transactionid])
+				if reconciliation_detail.reconciliation_flag!=params[:flag]
+					flash[:notice]="#{params[:transactionid]}对账状态已发生变更,与提交时不同,请重新确认"
+					redirect_to transaction_reconciliation_index_path(payway: reconciliation_detail.payway,paytype: reconciliation_detail.paytype,transactionid: reconciliation_detail.transactionid) and return
+				end
+				if (reconciliation_detail.reconciliation_flag==ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC'])
+					reconciliation_detail.reconciliation_flag=ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['FAIL']
+				else
+					reconciliation_detail.reconciliation_flag=ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC']
+				end
+				reconciliation_detail.reconciliation_describe="#{OnlinePay.current_time_format("%Y-%m-%d %H:%M:%S")} #{session[:admin]} 手工修改状态:#{reconciliation_detail.reconciliation_flag}"
+				reconciliation_detail.update_attributes({})
+				
+				redirect_to transaction_reconciliation_index_path(payway: reconciliation_detail.payway,paytype: reconciliation_detail.paytype,transactionid: reconciliation_detail.transactionid) and return
+			end
+		rescue => e 
+			flash[:notice]="更新状态出错:#{e.message}"
+			redirect_to transaction_reconciliation_index_path() and return
+		end
+		
+	end
+
+	def confirm_search
+		@confirm_num,@confirm_amount,@max_updated_at=ReconciliationDetail.get_confirm_summary(ReconciliationDetail::CONFIRM_FLAG['INIT'])
+	end
+
+	def confirm
+		begin
+			if params['confirm_num'].blank? || params['confirm_num']==0
+				flash[:notice]="无可确认数据! 提交未确认比数: #{params['confirm_num']}"
+				redirect_to transaction_reconciliation_confirm_search_path and return
+			end
+		
+			if params['end_time'].blank? 
+				flash[:notice]="请输入确认发票日期"
+				redirect_to transaction_reconciliation_confirm_search_path and return
+			end
+
+			all_amount=0.0
+			ReconciliationDetail.transaction do
+				reconciliation_details=ReconciliationDetail.lock.where("reconciliation_flag=? and confirm_flag=? and updated_at<=?",ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC'],ReconciliationDetail::CONFIRM_FLAG['INIT'],params['max_updated_at'])
+
+				if reconciliation_details.size != params['confirm_num'].to_i
+					raise "数据已变更,请重新确认! 比数 #{params['confirm_num']} => #{reconciliation_details.size}"
+				end
+
+				reconciliation_details.each do |rd|
+					all_amount+=rd.amt
+				end
+
+				if all_amount != params['confirm_amount'].to_f
+					raise "数据已变更,请重新确认! 金额 #{params['confirm_amount']} => #{all_amount}"
+				end
+
+				reconciliation_details.each do |rd|
+					rd.confirm_flag=ReconciliationDetail::CONFIRM_FLAG['SUCC']
+					rd.confirm_date=params['end_time']
+					if rd.reconciliation_describe.blank?
+						rd.reconciliation_describe="#{OnlinePay.current_time_format("%Y-%m-%d %H:%M:%S")} #{session[:admin]} 发票确认"
+					else
+						rd.reconciliation_describe+=";#{OnlinePay.current_time_format("%Y-%m-%d %H:%M:%S")} #{session[:admin]} 发票确认"
+					end
+					rd.update_attributes({})
+				end
+			end
+
+			flash[:notice]="确认发票成功!!"
+		rescue => e
+			flash[:notice]=e.message
+		end
+
+		redirect_to transaction_reconciliation_confirm_search_path
 	end
 
 	private 

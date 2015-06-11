@@ -23,4 +23,11 @@
 		<%= reconciliation_detail.reconciliation_describe %>
 	</td> -->
 	<td>  <%= reconciliation_detail.timestamp %>  </td>
+	<td>  
+		<% if  reconciliation_detail.reconciliation_flag==ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC'] %> 
+			<%= link_to "手工撤销",modify_transaction_reconciliation_path(transactionid: reconciliation_detail.id,flag: reconciliation_detail.reconciliation_flag),method: "post",data: { confirm: "请确认是否手工撤销对账成功记录?\n#{reconciliation_detail.transactionid}: #{reconciliation_detail.currencycode} #{reconciliation_detail.amt} " } %>
+		<% else %>
+			<%= link_to "手工对账",modify_transaction_reconciliation_path(transactionid: reconciliation_detail.id,flag: reconciliation_detail.reconciliation_flag),method: "post",data: { confirm: "请确认是否手工对账成功?\n#{reconciliation_detail.transactionid}: #{reconciliation_detail.currencycode} #{reconciliation_detail.amt} " }%>
+		<% end %>
+	</td>
 </tr>

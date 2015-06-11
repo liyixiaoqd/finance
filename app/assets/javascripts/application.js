@@ -23,7 +23,7 @@ $(document).ready(function(){
 
 	for (var i=0;i<input_objs.length;i++){
 		// if (input_objs[i].name.match(/time$/)) {
-			if(input_objs[i].type!="submit")
+			if(input_objs[i].type=="text")
 				input_objs[i].value=""
 		// }
 	}
@@ -33,6 +33,11 @@ $(document).ready(function(){
 		input_objs[i].selectedIndex=0
 	}
   });
+
+  $("#button_refresh").click(function(){
+	location.reload();
+  });
+
 
   $("#login_button").click(function(){
   	var passwd=document.getElementById("admin_admin_passwd_encryption").value

@@ -17,6 +17,8 @@
 				 </br>
 				 <%= label_tag(:l3, "交易号:",class:"label_inline") %> <%= text_field_tag(:transactionid) %>
 				 <%= label_tag(:l4, "订单号/补款号:",class:"label_inline") %> <%= text_field_tag(:order_no) %>
+				 <%= label_tag(:l7, "发票状态:",class:"label_inline") %> 
+				 <%= select_tag(:confirm_flag,options_for_select([["",""],["未确认","0"],["已确认","2"]])) %> 
 				 </br>
 				 <%= label_tag(:l5, "交易开始时间:",class:"label_inline") %> <%= datetime_field_tag(:start_time) %>
 				 <%= label_tag(:l6, "交易结束时间:",class:"label_inline") %> <%= datetime_field_tag(:end_time) %>
@@ -52,6 +54,7 @@
 <!-- 						<th>支付系统返回状态</th>
 						<th>对账备注</th> -->
 						<th>交易时间 </th>
+						<th>操作 </th>
 					</tr>
 				</thead>
 				<%= render partial: "index",collection: @reconciliation_details,as: :reconciliation_detail %>

@@ -1,1 +1,3 @@
-<%= paginate page_array,:remote=>true %>
+<% unless page_array.blank? %>
+	<%= paginate page_array,:remote=>true %>
+<% end %>

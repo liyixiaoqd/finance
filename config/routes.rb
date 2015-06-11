@@ -22,6 +22,9 @@ Rails.application.routes.draw do
   get 'transaction_reconciliation/index' => 'transaction_reconciliation#index'
   get 'transaction_reconciliation/report' => 'transaction_reconciliation#report'
   get 'transaction_reconciliation/export' => 'transaction_reconciliation#export'
+  get 'transaction_reconciliation/confirm_search' => 'transaction_reconciliation#confirm_search'
+  post 'transaction_reconciliation/confirm' => 'transaction_reconciliation#confirm'
+  post 'transaction_reconciliation/:transactionid/modify/:flag' => 'transaction_reconciliation#modify',as: :modify_transaction_reconciliation
   get 'upload_file/index' => 'upload_file#index'
   post 'upload_file/upload' => 'upload_file#upload'
 

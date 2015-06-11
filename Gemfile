@@ -65,3 +65,4 @@ end
 
 # xlsx
 gem 'roo'
+gem 'roo-xls'
