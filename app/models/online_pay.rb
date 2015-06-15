@@ -53,6 +53,18 @@ class OnlinePay < ActiveRecord::Base
 		end
 	end
 
+	def set_country!()
+		if (self.country.blank?)
+			if (self.payway=="alipay")
+				self.country="cn"
+			end
+		end
+
+		if(self.country.blank?)
+			set_status!("failure_submit","country wrong!")
+		end
+	end
+
 	def get_convert_currency()
 		if self.currency.blank?
 			"RMB"
@@ -186,7 +198,7 @@ class OnlinePay < ActiveRecord::Base
 		if(op_tj[0]['s'].blank?)
 			[op_tj[0]['c'],0.00]
 		else
-			[op_tj[0]['c'],op_tj[0]['s'].to_f]
+			[op_tj[0]['c'],op_tj[0]['s'].to_f.round(2)]
 		end
 	end
 

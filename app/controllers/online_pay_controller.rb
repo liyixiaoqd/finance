@@ -5,9 +5,31 @@ class OnlinePayController < ApplicationController
 
 	include Paramsable,OnlinePayHelper
 	
-	CONDITION_PARAMS=%w{payway paytype reconciliation_flag start_time end_time reconciliation_id order_no}
+	CONDITION_PARAMS=%w{payway paytype reconciliation_flag start_time end_time reconciliation_id order_no user_id country}
 	# before_action :authenticate_admin!,:only=>[:show,:show_single_detail]
 	def index
+		if (params['username'].present? || params['email'].present? )
+			users=nil
+			if params['username'].present? && params['email'].present?
+				users=User.where("username=? and email=?",params['username'],params['email']) 
+			elsif params['username'].present?
+				users=User.where("username=?",params['username']) 
+			elsif params['email'].present?
+				users=User.where("email=?",params['email']) 
+			else
+				logger.info("no match?  #{params['username']},#{params['email']}")
+			end
+
+			if users.blank?
+				return
+			else
+				params['user_id']=[]
+				users.each do |u|
+					params['user_id']<<u.id
+				end
+			end
+		end
+
 		sql=sql_from_condition_filter(params)
 		#logger.info(sql)
 		@online_pay=OnlinePay.includes(:user).where(sql,params).page(params[:page])
@@ -19,8 +41,32 @@ class OnlinePayController < ApplicationController
 	end
 
 	def export_index
+		if (params['username'].present? || params['email'].present? )
+			users=nil
+			if params['username'].present? && params['email'].present?
+				users=User.where("username=? and email=?",params['username'],params['email']) 
+			elsif params['username'].present?
+				users=User.where("username=?",params['username']) 
+			elsif params['email'].present?
+				users=User.where("email=?",params['email']) 
+			else
+				logger.info("no match?  #{params['username']},#{params['email']}")
+			end
+
+			if users.blank?
+				flash[:notice]="无可导出记录"
+				redirect_to index_online_pay_path and return
+			else
+				params['user_id']=[]
+				users.each do |u|
+					params['user_id']<<u.id
+				end
+			end
+		end
+
 		sql=sql_from_condition_filter(params)
 		if sql.blank?
+			flash[:notice]="无可导出记录"
 			redirect_to index_online_pay_path and return
 		end
 
@@ -29,12 +75,12 @@ class OnlinePayController < ApplicationController
 		csv_string = CSV.generate do |csv|
 			csv << ["导出工号", session[:admin],"导出时间", OnlinePay.current_time_format("%Y-%m-%d %H:%M:%S")]
 			csv << []
-			csv << ["用户名", "交易号", "金额","货币", "状态", "支付类型与子类型","订单号/补款号","备注"]
+			csv << ["用户名", "交易号", "金额","货币", "状态", "支付类型与子类型","订单号/补款号","交易日期","备注"]
 			online_pay.each do |op|
 				csv << [op.user.username,op.reconciliation_id,op.amount,op.get_convert_currency(),
 				              status_mapping(op.status),
 				              payway_paytype_mapping(op.payway.camelize + op.paytype.camelize),
-				              op.order_no,op.reason]
+				              op.order_no,op.created_at,op.reason]
 			end
 		end
 
@@ -248,6 +294,7 @@ class OnlinePayController < ApplicationController
 
 			online_pay.set_is_credit!()
 			online_pay.set_currency!()
+			online_pay.set_country!()
 
 			online_pay
 		end
@@ -271,9 +318,11 @@ class OnlinePayController < ApplicationController
 				next unless CONDITION_PARAMS.include?(k)
 				
 				if( k=="start_time")
-					t_sql="timestamp>=:#{k}"
+					t_sql="created_at>=:#{k}"
 				elsif (k=="end_time")
-					t_sql="timestamp<=:#{k}"
+					t_sql="created_at<=:#{k}"
+				elsif(k=="user_id")
+					t_sql="user_id in (#{v.join(',')})"
 				else
 					t_sql="#{k}=:#{k}"
 				end

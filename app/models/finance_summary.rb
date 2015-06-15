@@ -18,7 +18,7 @@ class FinanceSummary
 
 
 			@fail_num=@total_num-@succ_num
-			@fail_amount=@total_amount-@succ_amount
+			@fail_amount=@total_amount-@succ_amount.round(2)
 		end
 	end
 
@@ -27,7 +27,7 @@ class FinanceSummary
 		@succ_num,@succ_amount=OnlinePay.get_count_sum_by_day_condition(@start_time,@end_time,condition+" and status like 'success%'")
 
 		@fail_num=@total_num-@succ_num
-		@fail_amount=@total_amount-@succ_amount		
+		@fail_amount=(@total_amount-@succ_amount).round(2)
 	end
 
 	def output

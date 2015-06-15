@@ -88,7 +88,10 @@ class ReconciliationDetail < ActiveRecord::Base
 		
 		return nil if self.transactionid.blank? || self.payway.blank?
 		self.online_pay=OnlinePay.find_by_payway_and_paytype_and_reconciliation_id(self.payway,self.paytype,self.transactionid)
-		self.online_pay_status=self.online_pay.status unless self.online_pay.blank?
+		unless self.online_pay.blank?
+			self.online_pay_status=self.online_pay.status 
+			self.country=self.online_pay.country
+		end
 	end
 
 	def set_flag_by_status_and_amount!()

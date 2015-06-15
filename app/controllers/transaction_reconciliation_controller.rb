@@ -2,7 +2,7 @@ class TransactionReconciliationController < ApplicationController
 	# before_action :authenticate_admin!
 	include TransactionReconciliationHelper
 
-	CONDITION_PARAMS=%w{payway paytype reconciliation_flag start_time end_time transactionid online_pay_id confirm_flag}
+	CONDITION_PARAMS=%w{payway paytype reconciliation_flag start_time end_time transactionid online_pay_id confirm_flag country}
 	# def index
 	# 	@reconciliation_details=ReconciliationDetail.includes(:online_pay).all.page(params[:page])
 
@@ -15,11 +15,14 @@ class TransactionReconciliationController < ApplicationController
 	def index
 		#logger.info(sql)
 		unless (params['order_no'].blank?)
-			op=OnlinePay.find_by_order_no(params['order_no'])
-			unless op.blank?
-				params['online_pay_id']=op.id
+			ops=OnlinePay.where("order_no=?",params['order_no'])
+			unless ops.blank?
+				params['online_pay_id']=[]
+				ops.each do |op|
+					params['online_pay_id']<<op.id
+				end
 			else
-				params['online_pay_id']='no_record'
+				return
 			end
 		end
 		
@@ -35,17 +38,22 @@ class TransactionReconciliationController < ApplicationController
 
 	def export
 		unless (params['order_no'].blank?)
-			op=OnlinePay.find_by_order_no(params['order_no'])
-			unless op.blank?
-				params['online_pay_id']=op.id
+			ops=OnlinePay.where("order_no=?",params['order_no'])
+			unless ops.blank?
+				params['online_pay_id']=[]
+				ops.each do |op|
+					params['online_pay_id']<<op.id
+				end
 			else
-				params['online_pay_id']='no_record'
+				flash[:notice]="无可导出记录"
+				redirect_to transaction_reconciliation_index_path and return
 			end
 		end
 		
 		sql=sql_from_condition_filter(params)
 
 		if sql.blank?
+			flash[:notice]="无可导出记录"
 			redirect_to transaction_reconciliation_index_path and return
 		end
 
@@ -75,6 +83,7 @@ class TransactionReconciliationController < ApplicationController
 	def report
 		payway=params['payway']
 		paytype=params['paytype']
+		currency=params['currency']
 		start_time=params['start_time']
 		end_time=params['end_time']
 
@@ -83,8 +92,9 @@ class TransactionReconciliationController < ApplicationController
 		else
 			@finance_summary=FinanceSummary.new(start_time,end_time,1)
 			condition=""
-			condition="and payway='#{payway}'" unless payway.blank?
+			condition+="and payway='#{payway}'" unless payway.blank?
 			condition+=" and paytype='#{paytype}'" unless paytype.blank?
+			condition+=" and currency='#{currency}'" unless currency.blank?
 			@finance_summary.setAmountAndNum!(condition)
 			logger.info(@finance_summary.output)
 		end
@@ -185,6 +195,8 @@ class TransactionReconciliationController < ApplicationController
 					t_sql="timestamp>=:#{k}"
 				elsif (k=="end_time")
 					t_sql="timestamp<=:#{k}"
+				elsif(k=="online_pay_id")
+					t_sql="online_pay_id in (#{v.join(',')})"
 				else
 					t_sql="#{k}=:#{k}"
 				end

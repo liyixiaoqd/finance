@@ -12,9 +12,13 @@
 				 <%= select_tag(:payway,options_for_select([["",""],["paypal","paypal"],["sofort","sofort"],["支付宝","alipay"],["积分","score"],["电子现金","e_cash"]])) %> 
 				 <%= label_tag(:l2, "支付子类型:",class:"label_inline") %>
 				 <%= select_tag(:paytype,options_for_select([["",""],["国内支付","transaction"],["海外支付","oversea"]])) %> 
+				 <%= label_tag(:l3, "货币:",class:"label_inline") %>
+				 <%= select_tag(:currency,options_for_select([["",""],["EUR","EUR"],["GBP","GBP"],["RMB","RMB"]])) %> 
 				 </br>
 				 <%= label_tag(:l4, "交易开始时间:",class:"label_inline") %> <%= datetime_field_tag(:start_time) %>
 				 <%= label_tag(:l5, "交易结束时间:",class:"label_inline") %> <%= datetime_field_tag(:end_time) %>
+				 <%= label_tag(:l6, "国家:",class:"label_inline") %>
+				 <%= select_tag(:reconciliation_flag,options_for_select([["",""],["德国","de"],["荷兰","nl"],["中国","cn"],["奥地利","at"],["英国","gb"]])) %> 
 				 <div class="btn-toolbar">
 					 <%= submit_tag("查询",class: "btn btn-primary",id: "button_submit_time") %>
 				          	<%=button_tag("清除条件",type: 'button',class: "btn",id: "button_clear") %>

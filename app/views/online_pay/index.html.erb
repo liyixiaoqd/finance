@@ -14,9 +14,11 @@
 					 <%= select_tag(:payway,options_for_select([["",""],["paypal","paypal"],["sofort","sofort"],["支付宝","alipay"],["积分","score"],["电子现金","e_cash"]])) %> 
 					 <%= label_tag(:l2, "支付子类型:",class:"label_inline") %>
 					 <%= select_tag(:paytype,options_for_select([["",""],["国内支付","transaction"],["海外支付","oversea"]])) %> 
+					 <%= label_tag(:l7, "用户名:",class:"label_inline") %> <%= text_field_tag(:username) %>
 					 </br>
 					 <%= label_tag(:l3, "交易号:",class:"label_inline") %> <%= text_field_tag(:reconciliation_id) %>
 					 <%= label_tag(:l4, "订单号/补款号:",class:"label_inline") %> <%= text_field_tag(:order_no) %>
+					 <%= label_tag(:l8, "注册E-Mail:",class:"label_inline") %> <%= text_field_tag(:email) %>
 					 </br>
 					 <%= label_tag(:l5, "交易开始时间:",class:"label_inline") %> <%= datetime_field_tag(:start_time) %>
 					 <%= label_tag(:l6, "交易结束时间:",class:"label_inline") %> <%= datetime_field_tag(:end_time) %>
