@@ -26,6 +26,30 @@ class User < ActiveRecord::Base
 		end
 	end
 
+	def create_finance(watertype,reason,amount,symbol)
+		finance_water_params={
+			'system'=>self.system,
+			'channel'=>self.channel,
+			'userid'=>self.userid,
+			'symbol'=>symbol,
+			'operator'=>'system',
+			'reason'=>reason,
+			'watertype'=>watertype,
+			'operdate'=>OnlinePay.current_time_format(),
+			'amount'=>amount
+		}
+
+		if(watertype=="score")
+			finance_water_params['old_amount']=self.score
+			finance_water_params['new_amount']=self.score+amount
+		elsif(watertype=="e_cash")
+			finance_water_params['old_amount']=self.e_cash
+			finance_water_params['new_amount']=self.e_cash+amount
+		end
+
+		self.finance_water.create!(finance_water_params)
+	end
+
 	private 
 		def create_userid_unique_valid
 			unless self.class.find_by_system_and_userid(self.system,self.userid).blank?

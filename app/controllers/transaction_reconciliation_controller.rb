@@ -107,7 +107,7 @@ class TransactionReconciliationController < ApplicationController
 
 	def modify
 		begin 
-			ReconciliationDetail.transaction do
+			ActiveRecord::Base.transaction do
 				reconciliation_detail=ReconciliationDetail.lock.find(params[:transactionid])
 				if reconciliation_detail.reconciliation_flag!=params[:flag]
 					flash[:notice]="#{params[:transactionid]}对账状态已发生变更,与提交时不同,请重新确认"
@@ -115,12 +115,30 @@ class TransactionReconciliationController < ApplicationController
 				end
 				if (reconciliation_detail.reconciliation_flag==ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC'])
 					reconciliation_detail.reconciliation_flag=ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['FAIL']
+
+
+					if reconciliation_detail.online_pay.blank? || reconciliation_detail.online_pay.user.blank?
+						raise "此记录无对应用户信息"
+					end
+
+					user=reconciliation_detail.online_pay.user
+					user.with_lock do
+						reason="财务#{session[:admin]}手工撤销对账记录:#{reconciliation_detail.transactionid}"
+						user.create_finance("e_cash","",reconciliation_detail.amt,"Add") && user.update_attributes({:e_cash=>reconciliation_detail.amt+user.e_cash})
+						if user.errors.any?
+							errmsg="客户账户处理出错:"
+							user.errors.full_messages.each do |msg|
+								errmsg+=msg+";"
+							end
+							raise errmsg
+						end
+					end
 				else
 					reconciliation_detail.reconciliation_flag=ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC']
 				end
 				reconciliation_detail.reconciliation_describe="#{OnlinePay.current_time_format("%Y-%m-%d %H:%M:%S")} #{session[:admin]} 手工修改状态:#{reconciliation_detail.reconciliation_flag}"
 				reconciliation_detail.update_attributes({})
-				
+				flash[:notice]="#{reconciliation_detail.transactionid}操作成功"
 				redirect_to transaction_reconciliation_index_path(payway: reconciliation_detail.payway,paytype: reconciliation_detail.paytype,transactionid: reconciliation_detail.transactionid) and return
 			end
 		rescue => e 
