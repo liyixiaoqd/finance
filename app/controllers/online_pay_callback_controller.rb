@@ -150,26 +150,42 @@ class OnlinePayCallbackController < ApplicationController
 			online_pay=OnlinePay.get_online_pay_instance("paypal","",params,"",false,true)
 			render text: "#{render_text}" and return if (online_pay.blank? || online_pay.success_url.blank?)
 
-			online_pay.set_status!("submit_credit","")
+			online_pay.set_status!("success_credit","")
 			rollback_callback_status=online_pay.status
 			#check is status has updated
 			render :text=>'success' and return if online_pay.check_has_updated?(rollback_callback_status)
+			begin
+				online_pay.callback_status,rollback_callback_status=rollback_callback_status,online_pay.callback_status
 
-			online_pay.callback_status,rollback_callback_status=rollback_callback_status,online_pay.callback_status
+				pay_detail=OnlinePay.get_instance_pay_detail(online_pay)
+				ret_hash=init_return_ret_hash(online_pay)
+				
+				pay_detail.get_pay_details!(online_pay)
 
-			pay_detail=OnlinePay.get_instance_pay_detail(online_pay)
-			ret_hash=init_return_ret_hash(online_pay)
-			
-			pay_detail.get_pay_details!(online_pay)
+				flag,message,online_pay.reconciliation_id,online_pay.callback_status=pay_detail.process_purchase(online_pay)
 
-			ret_hash['credit_pay_id'] = online_pay.credit_pay_id
-			ret_hash['credit_first'] = online_pay.credit_first_name
-			ret_hash['credit_second'] = online_pay.credit_last_name
-
-			unless online_pay.save()
-				logger.warn("paypal_return:save failure!")
+				if flag==true
+					#update reconciliation_id
+					ret_hash['status']="success"
+					online_pay.save!()
+				else
+					raise "#{message}"
+				end
+			rescue => e
+				ret_hash['status']="failure"
+				ret_hash['status_reason']=e.message
+				unless (online_pay.blank?)
+					online_pay.update_attributes(:status=>"failure_credit",:reason=>e.message)
+				end
 			end
+			# ret_hash['credit_pay_id'] = online_pay.credit_pay_id
+			# ret_hash['credit_first'] = online_pay.credit_first_name
+			# ret_hash['credit_second'] = online_pay.credit_last_name
 
+			# unless online_pay.save()
+			# 	logger.warn("paypal_return:save failure!")
+			# end
+			logger.info(ret_hash)
 			redirect_to OnlinePay.redirect_url_replace("get",online_pay.success_url,ret_hash)
 		end
 	end
@@ -295,23 +311,25 @@ class OnlinePayCallbackController < ApplicationController
 	private 
 		def init_return_ret_hash(online_pay)
 			{
-				'trade_no'=>"#{online_pay.trade_no}",
-				'is_credit'=>"#{online_pay.is_credit}",
-				'credit_pay_id'=>'',
-				'credit_first'=>'',
-				'credit_second'=>''
+				'trade_no'=>online_pay.trade_no,
+				'status'=>"",
+				'status_reason'=>"",
+				'amount'=>online_pay.amount,
+				'payway'=>online_pay.payway,
+				'paytype'=>online_pay.paytype,
+				'sign'=>Digest::MD5.hexdigest("#{online_pay.trade_no}#{Settings.authenticate.signkey}")
 			}
 		end
 
 		def init_notify_ret_hash(online_pay)
 			{
 				'trade_no'=>online_pay.trade_no,
-				'status'=>'',
-				'status_reason'=>'',
+				'status'=>"",
+				'status_reason'=>"",
 				'amount'=>online_pay.amount,
-				'test_mode'=>false,
-				'buyer_email'=>'',
-				'buyer_id'=>''			
+				'payway'=>online_pay.payway,
+				'paytype'=>online_pay.paytype,
+				'sign'=>Digest::MD5.hexdigest("#{online_pay.trade_no}#{Settings.authenticate.signkey}")		
 			}
 		end
 end

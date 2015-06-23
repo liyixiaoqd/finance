@@ -9,32 +9,37 @@ Rails.application.routes.draw do
   post 'admin_manage/sign_out' => 'admin_manage#sign_out'
 
   get 'registe/index' => 'registe#index'
+  get 'registe/:userid/show' => 'registe#show'
 
   get 'finance_water/:id/show' => 'finance_water#show', as: :show_user_finance_water
   get 'finance_water/:id/new' => 'finance_water#new',as: :new_user_finance_water
   get 'finance_water/:id/export' => 'finance_water#export', as: :export_user_finance_water
+  post 'finance_water/:userid/modify_web' => 'finance_water#modify_web'
 
   get 'pay/:userid/show' => 'online_pay#show', as: :show_user_online_pay
   get 'pay/:online_pay_id/show_single_detail' => 'online_pay#show_single_detail', as: :show_single_online_pay
   get 'pay/index' => 'online_pay#index', as: :index_online_pay
   get 'pay/export_index' => 'online_pay#export_index', as: :export_index_online_pay
   get 'pay/:userid/export' => 'online_pay#export', as: :export_user_online_pay
+
   get 'transaction_reconciliation/index' => 'transaction_reconciliation#index'
   get 'transaction_reconciliation/report' => 'transaction_reconciliation#report'
   get 'transaction_reconciliation/export' => 'transaction_reconciliation#export'
   get 'transaction_reconciliation/confirm_search' => 'transaction_reconciliation#confirm_search'
   post 'transaction_reconciliation/confirm' => 'transaction_reconciliation#confirm'
   post 'transaction_reconciliation/:transactionid/modify/:flag' => 'transaction_reconciliation#modify',as: :modify_transaction_reconciliation
+  
   get 'upload_file/index' => 'upload_file#index'
   post 'upload_file/upload' => 'upload_file#upload'
 
   #online_pay inteface use 
   post 'registe' => 'registe#create'
-  get 'registe/:userid/show' => 'registe#show'
+  get 'registe/:userid/obtain' => 'registe#obtain'
+
   post 'finance_water/:userid/modify' => 'finance_water#modify'
-  post 'finance_water/:userid/modify_web' => 'finance_water#modify_web'
+
   post 'pay/:userid/submit' => 'online_pay#submit'
-  post 'pay/:userid/submit_creditcard' => 'online_pay#submit_creditcard'
+  # post 'pay/:userid/submit_creditcard' => 'online_pay#submit_creditcard'
 
   get 'pay/callback/alipay_oversea_return' => 'online_pay_callback#alipay_oversea_return'
   post 'pay/callback/alipay_oversea_notify' => 'online_pay_callback#alipay_oversea_notify'

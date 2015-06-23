@@ -115,18 +115,22 @@ AccessAuthority.create!(:controller=>"OnlinePayController",:action=>"export",
 AccessAuthority.create!(:controller=>"OnlinePayController",:action=>"submit",
 			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>true,
 			:describe=>'支付提交接口')
-AccessAuthority.create!(:controller=>"OnlinePayController",:action=>"submit_creditcard",
-			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>true,
-			:describe=>'支付(信用卡)提交接口')
+# AccessAuthority.create!(:controller=>"OnlinePayController",:action=>"submit_creditcard",
+# 			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>true,
+# 			:describe=>'支付(信用卡)提交接口')
 AccessAuthority.create!(:controller=>"OnlinePayController",:action=>"get_bill_from_payment_system",
 			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>true,
 			:describe=>'获取各支付系统财务对账单接口')
+
 AccessAuthority.create!(:controller=>"RegisteController",:action=>"index",
 			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'USER注册查询显示界面')
 AccessAuthority.create!(:controller=>"RegisteController",:action=>"show",
-			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>true,
+			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'USER详细信息查询界面')
+AccessAuthority.create!(:controller=>"RegisteController",:action=>"obtain",
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>true,
+			:describe=>'USER account amount get')
 AccessAuthority.create!(:controller=>"RegisteController",:action=>"create",
 			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>true,
 			:describe=>'USER注册接口')

@@ -20,32 +20,37 @@ class RegisteController < ApplicationController
 	end
 
 	def show
-		respond_to do |format|
-			unless params_valid("registe_show",params)
-				format.json{ render json:{},status:400 and return }
-				format.html { 
-					flash[:notice]="system valid failure!"
-					redirect_to registe_index_path and return
-				}
-			end
-
-			@user=User.find_by_system_and_userid(params['system'],params['userid'])		
-			format.json{
-				if @user.blank?
-					render json:{},status:400 and return
-				else
-					render json:@user.to_json and return
-				end
-			}
-			format.html{
-				if @user.blank?
-					flash[:notice]="#{params['userid']} not exists in #{params['system']} !"
-					redirect_to registe_index_path and return
-				else 
-					return
-				end
-			}
+		@user=User.find_by_system_and_userid(params['system'],params['userid'])
+		if @user.blank?
+			flash[:notice]="#{params['userid']} not exists in #{params['system']} !"
+			redirect_to registe_index_path and return
 		end
+		# respond_to do |format|
+		# 	unless params_valid("registe_show",params)
+		# 		format.json{ render json:{},status:400 and return }
+		# 		format.html { 
+		# 			flash[:notice]="system valid failure!"
+		# 			redirect_to registe_index_path and return
+		# 		}
+		# 	end
+
+		# 	@user=User.find_by_system_and_userid(params['system'],params['userid'])		
+		# 	format.json{
+		# 		if @user.blank?
+		# 			render json:{},status:400 and return
+		# 		else
+		# 			render json:@user.to_json and return
+		# 		end
+		# 	}
+		# 	format.html{
+		# 		if @user.blank?
+		# 			flash[:notice]="#{params['userid']} not exists in #{params['system']} !"
+		# 			redirect_to registe_index_path and return
+		# 		else 
+		# 			return
+		# 		end
+		# 	}
+		# end
 	end
 
 	def create
@@ -86,6 +91,25 @@ class RegisteController < ApplicationController
 		render json:ret_hash.to_json 
 	end
 	
+	def obtain
+		render json:{},status:400 and return unless params_valid("registe_obtain",params)
+
+		ret_hash={
+			'userid'=>params['userid'],
+			'type'=>[]
+		}
+
+		user=User.find_by_system_and_userid(params['system'],params['userid'])
+		if user.blank?
+			render json:{},status:400 and return
+		end
+
+		ret_hash['type']<<{'watertype'=>'score','amount'=>user['score']}
+		ret_hash['type']<<{'watertype'=>'e_cash','amount'=>user['e_cash']}
+
+		render json:ret_hash.to_json
+	end
+
 	private
 		def new_user_params(params)
 			user=User.new()

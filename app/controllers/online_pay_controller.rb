@@ -166,51 +166,50 @@ class OnlinePayController < ApplicationController
 		render json:ret_hash.to_json
 	end
 
-	def  submit_creditcard
-		render json:{},status:400 and return unless params_valid("online_pay_submit_creditcard",params)
-		ret_hash={
-			'status'=>'failure',
-			'status_reason'=>''
-		}
+	# def  submit_creditcard
+	# 	render json:{},status:400 and return unless params_valid("online_pay_submit_creditcard",params)
+	# 	ret_hash={
+	# 		'status'=>'failure',
+	# 		'status_reason'=>''
+	# 	}
 
-		OnlinePay.transaction do  	#lock table_row
-			online_pay=OnlinePay.get_online_pay_instance(params['payway'],params['paytype'],params,["submit_credit","failure_credit"],true,true)
-			render json:{},status:400  and return if online_pay.blank?
+	# 	OnlinePay.transaction do  	#lock table_row
+	# 		online_pay=OnlinePay.get_online_pay_instance(params['payway'],params['paytype'],params,["submit_credit","failure_credit"],true,true)
+	# 		render json:{},status:400  and return if online_pay.blank?
 			
-			begin
-				supplement_online_pay_credit_params!(online_pay,params)
+	# 		begin
+	# 			supplement_online_pay_credit_params!(online_pay,params)
 
-				pay_detail=OnlinePay.get_instance_pay_detail(online_pay)
-				message=pay_detail.valid_credit_require(online_pay,request)
-				unless(message=="success")
-					raise "require valid failure! #{message}"
-				end
+	# 			pay_detail=OnlinePay.get_instance_pay_detail(online_pay)
+	# 			message=pay_detail.valid_credit_require(online_pay,request)
+	# 			unless(message=="success")
+	# 				raise "require valid failure! #{message}"
+	# 			end
 
-				online_pay.set_status!("success_credit","")
-				online_pay.save!()
-				flag,message,online_pay.reconciliation_id,online_pay.callback_status=pay_detail.process_purchase(online_pay)
+	# 			online_pay.set_status!("success_credit","")
+	# 			online_pay.save!()
+	# 			flag,message,online_pay.reconciliation_id,online_pay.callback_status=pay_detail.process_purchase(online_pay)
 					
-				if flag==true
-					#update reconciliation_id
-					ret_hash['status']="success"
-					online_pay.save()
-				else
-					ret_hash['status_reason']=message
-					raise "#{message}"
-				end	
-			rescue => e
-				#failure also save pay record!!	
-				logger.info("submit_creditcard online_pay failure! : #{e.message}")
-				#online_pay.set_status!("failure_credit",e.message)
-				unless (online_pay.blank?)
-					online_pay.update_attributes(:status=>"failure_credit",:reason=>e.message)
-				end
-				render json:{},status:400 and return
-			end
-		end
+	# 			if flag==true
+	# 				#update reconciliation_id
+	# 				ret_hash['status']="success"
+	# 				online_pay.save!()
+	# 			else
+	# 				ret_hash['status_reason']=message
+	# 				raise "#{message}"
+	# 			end	
+	# 		rescue => e
+	# 			#failure also save pay record!!	
+	# 			logger.info("submit_creditcard online_pay failure! : #{e.message}")
+	# 			#online_pay.set_status!("failure_credit",e.message)
+	# 			unless (online_pay.blank?)
+	# 				online_pay.update_attributes(:status=>"failure_credit",:reason=>e.message)
+	# 			end
+	# 		end
+	# 	end
 
-		render json:ret_hash.to_json
-	end
+	# 	render json:ret_hash.to_json
+	# end
 
 	def get_bill_from_payment_system
 		payment_system=params['payment_system']

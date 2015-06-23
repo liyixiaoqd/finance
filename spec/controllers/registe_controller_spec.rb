@@ -58,33 +58,52 @@ describe RegisteController do
 		end
 	end
 
-	describe "get show" do
-		it "get show no system" do
-			get :show,:userid=>'no_system',:format=>:json
-			expect(response.status).to eq(400)
-
-
-			get :show,:userid=>'no_system',:format=>:html
-			expect(response).to redirect_to(registe_index_path)
-			expect(flash[:notice]).to eq("system valid failure!")
-		end
-
-		it "get show user not exists" do
-			get :show,:userid=>'not_exists_user',:system=>'mypost4u',:format=>:json
-			expect(response.status).to eq(400)
-
-
-			get :show,:userid=>'not_exists_user',:system=>'mypost4u',:format=>:html
-			expect(response).to redirect_to(registe_index_path)
-			expect(flash[:notice]).to eq("not_exists_user not exists in mypost4u !")
-		end
-
-		it "get show user succ" do
-			get :show,:userid=>users(:user_one)['userid'],:system=>'mypost4u',:format=>:json
+	describe "get obtain" do
+		it "get obtain succ" do
+			get :obtain,:userid=>users(:user_one)['userid'],:system=>users(:user_one)['system'],:channel=>'rspec'
 			expect(response.status).to eq(200)
-			expect(response.body).to eq(User.find(users(:user_one)).to_json)
+			user_json=JSON.parse response.body
+			expect(user_json['userid']).to eq(users(:user_one)['userid'])
+			expect(user_json['type'].size).to eq(2)
+			expect(user_json['type'][0]['watertype']).to eq('score')
+			expect(user_json['type'][0]['amount'].to_f).to eq(users(:user_one)['score'])
+			expect(user_json['type'][1]['watertype']).to eq('e_cash')
+			expect(user_json['type'][1]['amount'].to_f).to eq(users(:user_one)['e_cash'])
+		end
+
+		it "get obtain fail" do
+			get :obtain,:userid=>'nouser',:system=>users(:user_one)['system'],:channel=>'rspec'
+			expect(response.status).to eq(400)
 		end
 	end
+
+	# describe "get show" do
+	# 	it "get show no system" do
+	# 		get :show,:userid=>'no_system',:format=>:json
+	# 		expect(response.status).to eq(400)
+
+
+	# 		get :show,:userid=>'no_system',:format=>:html
+	# 		expect(response).to redirect_to(registe_index_path)
+	# 		expect(flash[:notice]).to eq("system valid failure!")
+	# 	end
+
+	# 	it "get show user not exists" do
+	# 		get :show,:userid=>'not_exists_user',:system=>'mypost4u',:format=>:json
+	# 		expect(response.status).to eq(400)
+
+
+	# 		get :show,:userid=>'not_exists_user',:system=>'mypost4u',:format=>:html
+	# 		expect(response).to redirect_to(registe_index_path)
+	# 		expect(flash[:notice]).to eq("not_exists_user not exists in mypost4u !")
+	# 	end
+
+	# 	it "get show user succ" do
+	# 		get :show,:userid=>users(:user_one)['userid'],:system=>'mypost4u',:format=>:json
+	# 		expect(response.status).to eq(200)
+	# 		expect(response.body).to eq(User.find(users(:user_one)).to_json)
+	# 	end
+	# end
 
 	def registe_params(userid)
 		{

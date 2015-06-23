@@ -35,8 +35,10 @@ class OnlinePay < ActiveRecord::Base
 
 	#paypal.callback_status=paypal.stauts
 	PAYPAL_CALLBACK_STATUS={
-		'submit_credit'=>0,
- 		'cancel_notify'=>9
+		# 'submit_credit'=>0,
+		'failure_credit'=>0,
+ 		'cancel_notify'=>9,
+ 		'success_credit'=>9
 	}
 
 	def set_is_credit!()

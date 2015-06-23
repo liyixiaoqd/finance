@@ -105,6 +105,8 @@ describe FinanceWaterController do
 		end
 
 		it "success and pay json" do
+			OnlinePay.where("order_no like 'test%'").delete_all
+			
 			old_score=users(:user_one)['score']
 			old_e_cash=users(:user_one)['e_cash']
 			oper=[

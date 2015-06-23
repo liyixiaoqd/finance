@@ -43,7 +43,8 @@ describe OnlinePayCallbackController do
 			op.reload
 			expect(response.status).to eq(302)
 			expect(response['Location']).to match(op['success_url'])
-			expect(op['status']).to eq("submit_credit")
+			expect(response.body).to match (/sign/)
+			expect(op['status']).to eq("failure_credit")
 
 			if op.credit_pay_id.blank?
 				op.credit_pay_id=payid
@@ -82,6 +83,7 @@ describe OnlinePayCallbackController do
 			op.reload
 			expect(response.status).to eq(302)
 			expect(response['Location']).to match(op['success_url'])
+			expect(response.body).to match (/sign/)
 		end
 
 		it "post sofort_notify" do
@@ -108,6 +110,7 @@ describe OnlinePayCallbackController do
 			op.reload
 			expect(response.status).to eq(302)
 			expect(response['Location']).to match(op['success_url'])
+			expect(response.body).to match (/sign/)
 		end
 
 		it "post alipay_oversea_notify" do
@@ -134,6 +137,7 @@ describe OnlinePayCallbackController do
 			op.reload
 			expect(response.status).to eq(302)
 			expect(response['Location']).to match(op['success_url'])
+			expect(response.body).to match (/sign/)
 		end
 
 		it "get alipay_transaction_notify" do

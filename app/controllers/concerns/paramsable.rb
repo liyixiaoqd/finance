@@ -1,6 +1,6 @@
 module Paramsable extend ActiveSupport::Concern
 	REGISTE_CREATE_PARAMS=%w{system channel userid username email accountInitAmount accountInitReason scoreInitAmount scoreInitReason operator datetime}
-	REGISTE_SHOW_PARAMS=%w{system userid}
+	REGISTE_OBTAIN_PARAMS=%w{system channel userid}
 	FINANCE_WATER_MODIFY_PARAMS=%w{system channel userid operator datetime oper}
 	ONLINE_PAY_SUBMIT_PARAMS=%w{system payway paytype userid amount currency order_no success_url notification_url notification_email abort_url timeout_url ip description country quantity logistics_name}
 	ONLINE_PAY_SUBMIT_CREDITCARD_PARAMS=%w{payway paytype trade_no amount currency ip brand number verification_value month year first_name last_name}
@@ -11,7 +11,7 @@ module Paramsable extend ActiveSupport::Concern
 		params_val=eval(match_name)
 		case match_name
 			when 'REGISTE_CREATE_PARAMS' then valid_flag=check_params(params_val,params)
-			when 'REGISTE_SHOW_PARAMS' then valid_flag=check_params(params_val,params)
+			when 'REGISTE_OBTAIN_PARAMS' then valid_flag=check_params(params_val,params)
 			when 'FINANCE_WATER_MODIFY_PARAMS' then valid_flag=check_params(params_val,params)
 			when 'ONLINE_PAY_SUBMIT_PARAMS' then valid_flag=check_params(params_val,params)
 			when 'ONLINE_PAY_SUBMIT_CREDITCARD_PARAMS' then valid_flag=check_params(params_val,params)
