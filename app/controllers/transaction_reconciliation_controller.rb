@@ -116,23 +116,23 @@ class TransactionReconciliationController < ApplicationController
 				if (reconciliation_detail.reconciliation_flag==ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC'])
 					reconciliation_detail.reconciliation_flag=ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['FAIL']
 
+					# 屏蔽增加客户积分功能,此为业务系统逻辑
+					# if reconciliation_detail.online_pay.blank? || reconciliation_detail.online_pay.user.blank?
+					# 	raise "此记录无对应用户信息"
+					# end
 
-					if reconciliation_detail.online_pay.blank? || reconciliation_detail.online_pay.user.blank?
-						raise "此记录无对应用户信息"
-					end
-
-					user=reconciliation_detail.online_pay.user
-					user.with_lock do
-						reason="财务#{session[:admin]}手工撤销对账记录:#{reconciliation_detail.transactionid}"
-						user.create_finance("e_cash","",reconciliation_detail.amt,"Add") && user.update_attributes({:e_cash=>reconciliation_detail.amt+user.e_cash})
-						if user.errors.any?
-							errmsg="客户账户处理出错:"
-							user.errors.full_messages.each do |msg|
-								errmsg+=msg+";"
-							end
-							raise errmsg
-						end
-					end
+					# user=reconciliation_detail.online_pay.user
+					# user.with_lock do
+					# 	reason="财务#{session[:admin]}手工撤销对账记录:#{reconciliation_detail.transactionid}"
+					# 	user.create_finance("e_cash","",reconciliation_detail.amt,"Add") && user.update_attributes({:e_cash=>reconciliation_detail.amt+user.e_cash})
+					# 	if user.errors.any?
+					# 		errmsg="客户账户处理出错:"
+					# 		user.errors.full_messages.each do |msg|
+					# 			errmsg+=msg+";"
+					# 		end
+					# 		raise errmsg
+					# 	end
+					# end
 				else
 					reconciliation_detail.reconciliation_flag=ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC']
 				end
