@@ -14,7 +14,7 @@ namespace :sync_file do
 		@end = args[:arg2]
 		if @beg.blank? || @end.blank?
 			@beg=OnlinePay.current_time_format("%Y-%m-%d",-1)
-			@end=OnlinePay.current_time_format("%Y-%m-%d",1)
+			@end=OnlinePay.current_time_format("%Y-%m-%d",0)
 		end
 		@interface_logger.info("=================== sync_file start:#{@beg} -- #{@end}===================")
 		Rake::Task["sync_file:finance_water"].invoke
