@@ -61,6 +61,12 @@ class OnlinePay < ActiveRecord::Base
 		end
 	end
 
+	def set_ip!(ip)
+		if self.ip.blank?
+			self.ip=ip
+		end
+	end
+
 	def set_country!()
 		if (self.country.blank?)
 			if (self.payway=="alipay")

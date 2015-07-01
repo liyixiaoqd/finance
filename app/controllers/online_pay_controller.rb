@@ -295,6 +295,7 @@ class OnlinePayController < ApplicationController
 			online_pay.set_is_credit!()
 			online_pay.set_currency!()
 			online_pay.set_country!()
+			online_pay.set_ip!(request.remote_ip)
 
 			online_pay
 		end
