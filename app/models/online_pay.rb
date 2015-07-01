@@ -56,7 +56,9 @@ class OnlinePay < ActiveRecord::Base
 	end
 
 	def set_currency!()
-		if(self.currency.blank?)
+		if self.payway=="alipay" && self.paytype=="oversea"
+			self.currency="EUR"
+		elsif(self.currency.blank?)
 			self.currency="RMB"
 		end
 	end
