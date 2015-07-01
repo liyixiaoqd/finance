@@ -4,7 +4,8 @@ module Paramsable extend ActiveSupport::Concern
 	FINANCE_WATER_MODIFY_PARAMS=%w{system channel userid operator datetime oper}
 	ONLINE_PAY_SUBMIT_PARAMS=%w{system payway paytype userid amount currency order_no success_url notification_url notification_email abort_url timeout_url ip description country quantity logistics_name}
 	ONLINE_PAY_SUBMIT_CREDITCARD_PARAMS=%w{payway paytype trade_no amount currency ip brand number verification_value month year first_name last_name}
-	
+	FINANCE_WATER_REFUND_PARAMS=%w{payway paytype order_no datetime amount}
+
 	def params_valid(action_name,params)
 		valid_flag=true;
 		match_name=action_name.upcase+"_PARAMS"
@@ -15,6 +16,7 @@ module Paramsable extend ActiveSupport::Concern
 			when 'FINANCE_WATER_MODIFY_PARAMS' then valid_flag=check_params(params_val,params)
 			when 'ONLINE_PAY_SUBMIT_PARAMS' then valid_flag=check_params(params_val,params)
 			when 'ONLINE_PAY_SUBMIT_CREDITCARD_PARAMS' then valid_flag=check_params(params_val,params)
+			when 'FINANCE_WATER_REFUND_PARAMS' then valid_flag=check_params(params_val,params)
 			else
 				valid_flag=false
 				logger.warn("match #{valid_flag} #{action_name} - #{match_name}")

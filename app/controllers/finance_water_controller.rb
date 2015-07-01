@@ -192,6 +192,49 @@ class FinanceWaterController < ApplicationController
 		end
 	end
 
+
+	def refund
+		unless params_valid("finance_water_refund",params)
+			render json:{'SYSTEM'=>'PARAMS WRONG!'},status:400 and return 
+		end
+
+		ret_hash={
+			'status'=>'failure',
+			'reasons'=>[]
+		}
+
+		begin
+			ActiveRecord::Base.transaction do
+				online_pay=OnlinePay.find_by_payway_and_paytype_and_order_no(params['payway'],params['paytype'],params['order_no'])
+				if online_pay.blank?
+					raise "无此订单号#{params['order_no']}"
+				elsif online_pay.status[0,7]!="success"
+					raise "支付状态#{online_pay.status}不允许进行退费操作!"
+				elsif online_pay.amount!=params['amount'].to_f
+					raise "支付金额不匹配#{online_pay.amount}<>#{params['amount']}不允许进行退费操作!"
+				end
+
+				reconciliation_detail=new_reconciliation_detail_each(online_pay,params)
+				reconciliation_detail.save
+
+				if reconciliation_detail.errors.any?
+					reconciliation_detail.errors.full_messages.each do |msg|
+						ret_hash['reasons']<<{'reason'=>msg}
+					end
+					raise "create reconciliation_detail failure"
+				end
+
+				ret_hash['status']='success'
+			end
+		rescue => e
+			logger.info("create reconciliation_detail failure! : #{e.message}")
+			ret_hash['reasons']<<{'reason'=>e.message} if ret_hash['reasons'].blank?
+			logger.info("FINANCE.MODIFY_WEB RET HASH:#{ret_hash}")
+		end
+
+		render json:ret_hash.to_json
+	end
+
 	private
 		def new_online_pay_each(user,finance_each,params)
 			if finance_each['is_pay']=="Y"

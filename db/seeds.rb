@@ -68,6 +68,9 @@ AccessAuthority.create!(:controller=>"FinanceWaterController",:action=>"modify",
 AccessAuthority.create!(:controller=>"FinanceWaterController",:action=>"modify_web",
 			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'USER财务流水变更界面调用')
+AccessAuthority.create!(:controller=>"FinanceWaterController",:action=>"refund",
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>true,
+			:describe=>'订单取消接口')
 
 AccessAuthority.create!(:controller=>"OnlinePayCallbackController",:action=>"alipay_oversea_return",
 			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>false,

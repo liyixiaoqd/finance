@@ -37,6 +37,7 @@ Rails.application.routes.draw do
   get 'registe/:userid/obtain' => 'registe#obtain'
 
   post 'finance_water/:userid/modify' => 'finance_water#modify'
+  post 'finance_water/refund' => 'finance_water#refund'
 
   post 'pay/:userid/submit' => 'online_pay#submit'
   # post 'pay/:userid/submit_creditcard' => 'online_pay#submit_creditcard'

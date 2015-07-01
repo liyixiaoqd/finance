@@ -130,6 +130,35 @@ describe FinanceWaterController do
 		end
 	end
 
+	context "order refund" do
+		it "failure call no order" do
+			refund_params={
+				'payway'=>'alipay',
+				'paytype'=>'oversea',
+				'order_no'=>'aaa',
+				'datetime'=>Time.now,
+				'amount'=>10.0
+			}
+			post :refund,refund_params
+			expect(response.status).to eq 200
+			expect(response.body).to match (/无此订单号/)
+		end
+
+		it "success call" do
+			op=OnlinePay.last
+			refund_params={
+				'payway'=>op.payway,
+				'paytype'=>op.paytype,
+				'order_no'=>op.order_no,
+				'datetime'=>Time.now,
+				'amount'=>op.amount
+			}
+			post :refund,refund_params
+			expect(response.status).to eq 200
+			expect(response.body).to match (/success/)
+		end
+	end
+
 	def modify_web_params(amount,symbol,format)
 		{
 			'system' => 'mypost4u',
