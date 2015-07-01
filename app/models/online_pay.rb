@@ -41,6 +41,12 @@ class OnlinePay < ActiveRecord::Base
  		'success_credit'=>9
 	}
 
+	def set_channel!()
+		if (self.channel.blank?)
+			self.channel="web"
+		end
+	end
+
 	def set_is_credit!()
 		if(self.system=='paypal')
 			self.is_credit=true

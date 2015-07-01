@@ -242,7 +242,7 @@ class OnlinePayController < ApplicationController
 			if(ol_p.blank?)
 				nil
 			else
-				if ol_p.status=="failure_submit"
+				if ol_p.status=="failure_submit" || ol_p.status="submit"
 					ol_p
 				else
 					raise "#{params['order_no']}.status:#{ol_p.status} can not be repeat call!!!"
@@ -291,6 +291,7 @@ class OnlinePayController < ApplicationController
 			online_pay.remote_ip=request.remote_ip
 			online_pay.rate_amount=online_pay.amount
 
+			online_pay.set_channel!()
 			online_pay.set_is_credit!()
 			online_pay.set_currency!()
 			online_pay.set_country!()
