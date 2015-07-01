@@ -7,5 +7,6 @@
 <!-- 	<td><%= online_pay.callback_status %></td> -->
 	<td><%= payway_paytype_mapping(online_pay.payway.camelize + online_pay.paytype.camelize) %></td>
 	<td><%= online_pay.order_no %></td>
+	<td><%= online_pay.created_at %></td>
 	<td><%= online_pay.reason %></td>
 </tr>
