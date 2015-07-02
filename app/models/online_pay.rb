@@ -130,7 +130,9 @@ class OnlinePay < ActiveRecord::Base
 			# TRADE_FINISHED。
 			# 即 时 到 账 的 交 易 状 态 变 更 顺 序 依 次 是 : WAIT_BUYER_PAY →
 			# TRADE_FINISHED。
-			if(self.callback_status=="TRADE_FINISHED")
+			if(self.callback_status=="TRADE_FINISHED" || 
+				self.callback_status=="WAIT_SELLER_SEND_GOODS"|| 
+				self.callback_status=="WAIT_BUYER_CONFIRM_GOODS")
 				self.status="success_notify"
 			elsif(self.callback_status=="TRADE_CLOSED")
 				self.status="cancel_notify"
