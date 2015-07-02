@@ -172,7 +172,7 @@ class OnlinePayCallbackController < ApplicationController
 				if online_pay.method_url_success?("post",redirect_notify_url,false,ret_hash)
 					online_pay.set_status!("success_notify","")
 				else
-					online_pay.set_status!("failure_notify_third","")
+					online_pay.set_status!("failure_notify_third","call notify_url wrong")
 				end
 				online_pay.save!()
 				ret_hash['status']="success"

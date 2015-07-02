@@ -1,0 +1,45 @@
+desc "支付异步失败重发任务"
+
+namespace :async_notice do
+	desc "失败重发任务"
+	task :online_pay,[:arg1,:arg2] =>[:environment] do|t,args|
+		@interface_logger = Logger.new("log/async_notice.log")
+		@interface_logger.level=Logger::INFO
+		@interface_logger.datetime_format="%Y-%m-%d %H:%M:%S"
+		@interface_formatter=proc{|severity,datetime,progname,msg|
+			"[#{datetime}] :#{msg}\n"
+		}
+
+		@interface_logger.info("=================== async_notice online_pay start===================")
+		ops=OnlinePay.where("status='failure_notify_third'")
+		@interface_logger.info("re notice: #{ops.size} ")
+		ops.each do |op|
+			begin
+				ret_hash={
+					'trade_no'=>op.trade_no,
+					'status'=>"",
+					'status_reason'=>"",
+					'amount'=>op.amount,
+					'payway'=>op.payway,
+					'paytype'=>op.paytype,
+					'sign'=>Digest::MD5.hexdigest("#{op.trade_no}#{Settings.authenticate.signkey}")		
+				}
+
+				op.with_lock do
+					redirect_notify_url=OnlinePay.redirect_url_replace("post",op.notification_url)
+					response=op.method_url_response("post",redirect_notify_url,false,ret_hash)
+					if response.code=="200" && response.body=="success"
+						op.set_status!("success_notify","")
+					else
+						op.set_status!("failure_notify_third","recall info[#{response.code}:#{response.body}]")
+					end
+					op.save!()
+				end
+				@interface_logger.info("#{op.order_no} re call info:#{op.status} #{op.reason}")
+			rescue => e
+				@interface_logger.info("#{op.order_no} re call error:#{e.message}")
+			end
+		end
+		@interface_logger.info("=================== async_notice online_pay end===================")
+	end
+end
