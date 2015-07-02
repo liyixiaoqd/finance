@@ -253,6 +253,15 @@ class OnlinePay < ActiveRecord::Base
 				raise "no trade_no get from params! #{pay_combine}=#{payway}+#{paytype}!"
 			end
 
+			# 特殊处理支付宝trade_no后缀存在时间戳
+			if pay_combine=="alipay_oversea" || pay_combine=="alipay_transaction"
+				op=OnlinePay.find_by_payway_and_paytype_and_order_no(payway,paytype,trade_no)
+				if op.blank?
+					raise "spec alipay get onlinepay wrong!"
+				end
+				trade_no=op.trade_no
+			end
+
 			#use lock !!
 			#OnlinePay.lock.find_by_payway_and_paytype_and_trade_no_and_status(payway,paytype,trade_no,'submit')
 			if status.blank?
