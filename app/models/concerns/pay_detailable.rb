@@ -54,6 +54,11 @@ module PayDetailable extend ActiveSupport::Concern
 		method_url_response(method,url_path,https_boolean,params).code
 	end
 
+	def method_url_success?(method,url_path,https_boolean,params={})
+		response=method_url_response(method,url_path,https_boolean,params)
+		response.code=="200" && response.body=="success"
+	end
+
 	def price_in_cents(price)
 		(price*100).round
 	end

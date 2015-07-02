@@ -48,12 +48,11 @@ class OnlinePayCallbackController < ApplicationController
 					redirect_url=OnlinePay.redirect_url_replace("post",online_pay.notification_url)
 					logger.info("alipay_oversea_notify:#{redirect_url}")
 				
-					online_pay.save!()
-					response_code=online_pay.method_url_response_code("post",redirect_url,false,ret_hash)
-					unless response_code=="200"
-						raise "call #{redirect_url} failure : #{response_code}"
+					if !online_pay.method_url_success?("post",redirect_url,false,ret_hash)
+						online_pay.set_status!("failure_notify_third","call notify_url wrong")
 					end
 
+					online_pay.save!()
 					render_text="success"
 				rescue => e  	#rollback online_pay!!!
 					#online_pay.set_status!("failure_notify",e.message)
@@ -125,12 +124,14 @@ class OnlinePayCallbackController < ApplicationController
 							raise message
 						end
 					end
-					online_pay.save!()
-					response_code=online_pay.method_url_response_code("post",redirect_url,false,ret_hash)
-					unless response_code=="200"
-						raise "call #{redirect_url} failure : #{response_code}"
+					# response_code=online_pay.method_url_response_code("post",redirect_url,false,ret_hash)
+					# unless response_code=="200"
+					# 	raise "call #{redirect_url} failure : #{response_code}"
+					# end
+					if !online_pay.method_url_success?("post",redirect_url,false,ret_hash)
+						online_pay.set_status!("failure_notify_third","call notify_url wrong")
 					end
-
+					online_pay.save!()
 					render_text="success"	
 				rescue => e
 					#online_pay.set_status!("failure_notify",e.message)
@@ -150,12 +151,10 @@ class OnlinePayCallbackController < ApplicationController
 			online_pay=OnlinePay.get_online_pay_instance("paypal","",params,"",false,true)
 			render text: "#{render_text}" and return if (online_pay.blank? || online_pay.success_url.blank?)
 
-			online_pay.set_status!("success_credit","")
-			rollback_callback_status=online_pay.status
-			#check is status has updated
-			render :text=>'success' and return if online_pay.check_has_updated?(rollback_callback_status)
+			# check is status has updated! paypal no need
+			# render :text=>'success' and return if online_pay.check_has_updated?(rollback_callback_status)
 			begin
-				online_pay.callback_status,rollback_callback_status=rollback_callback_status,online_pay.callback_status
+				#online_pay.callback_status,rollback_callback_status=rollback_callback_status,online_pay.callback_status
 
 				pay_detail=OnlinePay.get_instance_pay_detail(online_pay)
 				ret_hash=init_return_ret_hash(online_pay)
@@ -164,13 +163,19 @@ class OnlinePayCallbackController < ApplicationController
 
 				flag,message,online_pay.reconciliation_id,online_pay.callback_status=pay_detail.process_purchase(online_pay)
 
-				if flag==true
-					#update reconciliation_id
-					ret_hash['status']="success"
-					online_pay.save!()
-				else
+				if flag==false
 					raise "#{message}"
 				end
+
+				redirect_notify_url=OnlinePay.redirect_url_replace("post",online_pay.notification_url)
+				logger.info("paypal post async url:#{redirect_notify_url}")
+				if online_pay.method_url_success?("post",redirect_notify_url,false,ret_hash)
+					online_pay.set_status!("success_notify","")
+				else
+					online_pay.set_status!("failure_notify_third","")
+				end
+				online_pay.save!()
+				ret_hash['status']="success"
 			rescue => e
 				ret_hash['status']="failure"
 				ret_hash['status_reason']=e.message
@@ -186,6 +191,9 @@ class OnlinePayCallbackController < ApplicationController
 			# 	logger.warn("paypal_return:save failure!")
 			# end
 			logger.info(ret_hash)
+			#add post notify_url
+
+			logger.info("paypal get sync url:#{online_pay.success_url}")
 			redirect_to OnlinePay.redirect_url_replace("get",online_pay.success_url,ret_hash)
 		end
 	end
@@ -264,11 +272,14 @@ class OnlinePayCallbackController < ApplicationController
 			logger.info("sofort_notify:#{redirect_url}")
 
 			begin
-				online_pay.save!()
-				response_code=online_pay.method_url_response_code("post",redirect_url,false,ret_hash)
-				unless response_code=="200"
-					raise "call #{redirect_url} failure : #{response_code}"
+				# response_code=online_pay.method_url_response_code("post",redirect_url,false,ret_hash)
+				# unless response_code=="200"
+				# 	raise "call #{redirect_url} failure : #{response_code}"
+				# end
+				if !online_pay.method_url_success?("post",redirect_url,false,ret_hash)
+					online_pay.set_status!("failure_notify_third","call notify_url wrong")
 				end
+				online_pay.save!()
 
 				render_text="success"
 			rescue => e
