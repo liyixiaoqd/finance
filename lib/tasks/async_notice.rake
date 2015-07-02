@@ -25,12 +25,8 @@ namespace :async_notice do
 					'sign'=>Digest::MD5.hexdigest("#{op.trade_no}#{Settings.authenticate.signkey}")		
 				}
 
-				if op.payway=="paypal"
-					ret_hash['status']='success'
-				else
-					ret_hash['status']='success_notify'
-				end
-				
+				ret_hash['status']='success_notify'
+
 				op.with_lock do
 					redirect_notify_url=OnlinePay.redirect_url_replace("post",op.notification_url)
 					response=op.method_url_response("post",redirect_notify_url,false,ret_hash)
