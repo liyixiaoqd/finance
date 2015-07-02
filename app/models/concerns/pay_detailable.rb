@@ -56,7 +56,7 @@ module PayDetailable extend ActiveSupport::Concern
 
 	def method_url_success?(method,url_path,https_boolean,params={})
 		response=method_url_response(method,url_path,https_boolean,params)
-		response.code=="200" && response.body=="success"
+		response.code=="200" && JSON.parse(response.body)['status']=="success"
 	end
 
 	def price_in_cents(price)

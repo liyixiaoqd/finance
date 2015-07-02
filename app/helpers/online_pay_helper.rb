@@ -7,6 +7,7 @@ module OnlinePayHelper
 		'success_notify'=>'支付成功-异步回写成功',
 		'cancel_notify'=>'支付失败-异步回写取消',
 		'failure_notify'=>'支付失败-异步回写失败',
+		'failure_notify_third'=>'支付成功-调用原系统失败',
 		'success_credit'=>'支付成功-请求(信用卡)成功',
 		'failure_credit'=>'支付失败-请求(信用卡)失败',
 		'success_score'=>'支付成功-积分支付',
