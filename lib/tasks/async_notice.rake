@@ -28,7 +28,7 @@ namespace :async_notice do
 				op.with_lock do
 					redirect_notify_url=OnlinePay.redirect_url_replace("post",op.notification_url)
 					response=op.method_url_response("post",redirect_notify_url,false,ret_hash)
-					if response.code=="200" && response.body=="success"
+					if response.code=="200" && JSON.parse(response.body)['status']=="success"
 						op.set_status!("success_notify","")
 					else
 						op.set_status!("failure_notify_third","recall info[#{response.code}:#{response.body}]")
