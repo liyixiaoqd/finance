@@ -341,8 +341,8 @@ class SimulationController < ApplicationController
 				'ip'=>ip,
 				'success_url'=>"#{CALL_HOST}/simulation/callback_return",
 				'abort_url'=>"#{CALL_HOST}/simulation/callback_return",
-				'country'=>'de',
-				'channel'=>'web'
+				'notification_url'=>"#{CALL_HOST}/simulation/callback_notify",
+				'country'=>'de'
 			}
 
 			init_online_pay_params.merge!(paypal_submit_params)
@@ -360,8 +360,7 @@ class SimulationController < ApplicationController
 				'abort_url'=> "#{CALL_HOST}/simulation/callback_return",
 				'notification_url'=>"#{CALL_HOST}/simulation/callback_notify",
 				'timeout_url'=> "#{CALL_HOST}/simulation/callback_return",
-				'country'=>'de',
-				'channel'=>'web'
+				'country'=>'de'
 			}		
 			init_online_pay_params.merge!(sofort_submit_params)
 		end
@@ -376,8 +375,7 @@ class SimulationController < ApplicationController
 				'order_no'=>order_no,
 				'description'=>"TESTMODE:#{order_no}",
 				'success_url'=>"#{CALL_HOST}/simulation/callback_return",
-				'notification_url'=>"#{CALL_HOST}/simulation/callback_notify",
-				'channel'=>'web'
+				'notification_url'=>"#{CALL_HOST}/simulation/callback_notify"
 			}		
 			init_online_pay_params.merge!(alipay_oversea_submit_params)
 		end
@@ -393,8 +391,7 @@ class SimulationController < ApplicationController
 				'description'=>"测试交易:订单号#{order_no}的寄送包裹费用",
 				'success_url'=>"#{CALL_HOST}/simulation/callback_return",
 				'notification_url'=>"#{CALL_HOST}/simulation/callback_notify",
-				'quantity'=>1,
-				'channel'=>'web'
+				'quantity'=>1
 			}		
 			init_online_pay_params.merge!(alipay_transaction_submit_params)
 		end
