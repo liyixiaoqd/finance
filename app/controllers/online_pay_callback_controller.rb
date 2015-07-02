@@ -167,6 +167,7 @@ class OnlinePayCallbackController < ApplicationController
 					raise "#{message}"
 				end
 
+				ret_hash['status']="success"
 				redirect_notify_url=OnlinePay.redirect_url_replace("post",online_pay.notification_url)
 				logger.info("paypal post async url:#{redirect_notify_url}")
 				if online_pay.method_url_success?("post",redirect_notify_url,false,ret_hash)
@@ -175,7 +176,6 @@ class OnlinePayCallbackController < ApplicationController
 					online_pay.set_status!("failure_notify_third","call notify_url wrong")
 				end
 				online_pay.save!()
-				ret_hash['status']="success"
 			rescue => e
 				ret_hash['status']="failure"
 				ret_hash['status_reason']=e.message
