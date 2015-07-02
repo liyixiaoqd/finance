@@ -145,7 +145,7 @@ class OnlinePayController < ApplicationController
 				#alipay trade_no is nil so use  system_orderno
 				if(online_pay.trade_no.blank? && flag=="success")
 					#online_pay.trade_no="finance_#{online_pay.created_at.strftime("%y%m%d%H%M%S") }_#{online_pay.id}"
-					online_pay.trade_no="#{online_pay.system}_#{online_pay.order_no}"
+					online_pay.trade_no="#{online_pay.system}_#{online_pay.order_no}_#{Time.now.to_datetime.strftime '%Q'}"
 					online_pay.update_attributes!('trade_no'=>online_pay.trade_no)
 				end
 
