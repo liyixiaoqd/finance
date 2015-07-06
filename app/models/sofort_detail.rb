@@ -2,7 +2,7 @@ require 'nokogiri'
 
 class SofortDetail
 	include PayDetailable
-	attr_accessor :country,:amount,:description,:currency,:order_no
+	attr_accessor :country,:amount,:description,:currency,:order_no,:success_url
 
 	SPEC_PARAMS_COUNTRY=%w(de nl)
 	#PAY_SOFORT_PARAMS=%w{country currency order_no amount success_url notification_url abort_url timeout_url}
