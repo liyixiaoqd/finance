@@ -177,8 +177,8 @@ class SimulationController < ApplicationController
 	private
 		def method_url_call(method,url_path,https,params={})
 			digest_auth = Net::HTTP::DigestAuth.new
-			uri = URI.parse(url_path+".json")
-			logger.info("sim:#{url_path}.json")
+			uri = URI.parse(url_path)
+			logger.info("sim:#{url_path}")
 			uri.user="finance_name"
 			uri.password="finance_passwd"
 

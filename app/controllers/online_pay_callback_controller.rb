@@ -231,6 +231,7 @@ class OnlinePayCallbackController < ApplicationController
 
 
 	def sofort_return
+		#sofort return no params!   no use this interface!
 		render_text="failure"
 		online_pay=OnlinePay.get_online_pay_instance("sofort","",params,"",false,false)
 		render text: "#{render_text}" and return if (online_pay.blank? || online_pay.success_url.blank?)
