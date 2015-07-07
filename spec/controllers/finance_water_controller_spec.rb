@@ -153,8 +153,9 @@ describe FinanceWaterController do
 				'payway'=>op.payway,
 				'paytype'=>op.paytype,
 				'order_no'=>op.order_no,
+				'parcel_no'=>'refunc_parcel_no',
 				'datetime'=>Time.now,
-				'amount'=>op.amount
+				'amount'=>op.amount-0.01
 			}
 			post :refund,refund_params
 			expect(response.status).to eq 200

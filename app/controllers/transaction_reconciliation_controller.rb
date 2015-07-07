@@ -169,6 +169,7 @@ class TransactionReconciliationController < ApplicationController
 			# end
 
 			all_amount=0.0
+			invoice_date=OnlinePay.current_time_format("%Y-%m-%d")
 			ReconciliationDetail.transaction do
 				reconciliation_details=ReconciliationDetail.lock.where("reconciliation_flag=? and confirm_flag=? and updated_at<=?",ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC'],ReconciliationDetail::CONFIRM_FLAG['INIT'],params['max_updated_at'])
 
@@ -187,6 +188,7 @@ class TransactionReconciliationController < ApplicationController
 				reconciliation_details.each do |rd|
 					rd.confirm_flag=ReconciliationDetail::CONFIRM_FLAG['SUCC']
 					rd.confirm_date=rd.transaction_date
+					rd.invoice_date=invoice_date
 					if rd.reconciliation_describe.blank?
 						rd.reconciliation_describe="#{OnlinePay.current_time_format("%Y-%m-%d %H:%M:%S")} #{session[:admin]} 发票确认"
 					else

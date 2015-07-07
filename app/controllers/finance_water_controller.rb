@@ -210,11 +210,11 @@ class FinanceWaterController < ApplicationController
 					raise "无此订单号#{params['order_no']}"
 				elsif online_pay.status[0,7]!="success"
 					raise "支付状态#{online_pay.status}不允许进行退费操作!"
-				elsif online_pay.amount!=params['amount'].to_f
+				elsif online_pay.amount<params['amount'].to_f
 					raise "支付金额不匹配#{online_pay.amount}<>#{params['amount']}不允许进行退费操作!"
 				end
 
-				reconciliation_detail=new_reconciliation_detail_each(online_pay,params)
+				reconciliation_detail=new_reconciliation_detail_each_refund(online_pay,params)
 				reconciliation_detail.save
 
 				if reconciliation_detail.errors.any?
@@ -287,6 +287,26 @@ class FinanceWaterController < ApplicationController
 			reconciliation_detail.transaction_status='SUCC'
 			reconciliation_detail.reconciliation_flag='2'
 			reconciliation_detail.amt=online_pay.amount
+			reconciliation_detail.currencycode=online_pay.currency
+			reconciliation_detail.netamt=0.0
+			reconciliation_detail.feeamt=0.0
+
+			reconciliation_detail
+		end
+
+		def new_reconciliation_detail_each_refund(online_pay,params)
+			#reconciliation_detail=online_pay.build_reconciliation_detail
+			reconciliation_detail=ReconciliationDetail.new
+			reconciliation_detail.payway=online_pay.payway
+			reconciliation_detail.paytype=online_pay.paytype
+			reconciliation_detail.batch_id='refund_'+online_pay.system
+			reconciliation_detail.transaction_date=OnlinePay.current_time_format("%Y-%m-%d")
+			reconciliation_detail.timestamp=params["datetime"]
+			reconciliation_detail.transactionid=params['parcel_no']
+			reconciliation_detail.reconciliation_describe=online_pay.reconciliation_id
+			reconciliation_detail.transaction_status='SUCC'
+			reconciliation_detail.reconciliation_flag='2'
+			reconciliation_detail.amt=params['amount']
 			reconciliation_detail.currencycode=online_pay.currency
 			reconciliation_detail.netamt=0.0
 			reconciliation_detail.feeamt=0.0
