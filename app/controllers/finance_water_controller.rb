@@ -207,11 +207,14 @@ class FinanceWaterController < ApplicationController
 			ActiveRecord::Base.transaction do
 				online_pay=OnlinePay.find_by_payway_and_paytype_and_order_no(params['payway'],params['paytype'],params['order_no'])
 				if online_pay.blank?
-					raise "无此订单号#{params['order_no']}"
-				elsif online_pay.status[0,7]!="success"
-					raise "支付状态#{online_pay.status}不允许进行退费操作!"
-				elsif online_pay.amount<params['amount'].to_f
-					raise "支付金额不匹配#{online_pay.amount}<>#{params['amount']}不允许进行退费操作!"
+					#raise "无此订单号#{params['order_no']}"
+					logger.info("无此订单,历史数据?")
+				else
+					if online_pay.status[0,7]!="success"
+						raise "支付状态#{online_pay.status}不允许进行退费操作!"
+					elsif online_pay.amount<params['amount'].to_f
+						raise "支付金额不匹配#{online_pay.amount}<>#{params['amount']}不允许进行退费操作!"
+					end
 				end
 
 				reconciliation_detail=new_reconciliation_detail_each_refund(online_pay,params)
@@ -297,17 +300,17 @@ class FinanceWaterController < ApplicationController
 		def new_reconciliation_detail_each_refund(online_pay,params)
 			#reconciliation_detail=online_pay.build_reconciliation_detail
 			reconciliation_detail=ReconciliationDetail.new
-			reconciliation_detail.payway=online_pay.payway
-			reconciliation_detail.paytype=online_pay.paytype
-			reconciliation_detail.batch_id='refund_'+online_pay.system
+			reconciliation_detail.payway=params["payway"]
+			reconciliation_detail.paytype=params["paytype"]
+			reconciliation_detail.batch_id='refund_'+params["system"]
 			reconciliation_detail.transaction_date=OnlinePay.current_time_format("%Y-%m-%d")
 			reconciliation_detail.timestamp=params["datetime"]
 			reconciliation_detail.transactionid=params['parcel_no']
-			reconciliation_detail.reconciliation_describe=online_pay.reconciliation_id
+			reconciliation_detail.reconciliation_describe=params['order_no']
 			reconciliation_detail.transaction_status='SUCC'
 			reconciliation_detail.reconciliation_flag='2'
 			reconciliation_detail.amt=params['amount']
-			reconciliation_detail.currencycode=online_pay.currency
+			reconciliation_detail.currencycode=online_pay.currency unless online_pay.blank?
 			reconciliation_detail.netamt=0.0
 			reconciliation_detail.feeamt=0.0
 
