@@ -9,7 +9,7 @@
 BasicData.delete_all
 BasicData.create!(:basic_type=>"00A",:desc=>"financial reconciliation interface configuration",
 	                   :basic_sub_type=>"001",:sub_desc=>"postpone the date - day",
-	                   :payway=>"paypal",:paytype=>"",:value=>"30")
+	                   :payway=>"paypal",:paytype=>"",:value=>"1")
 
 BasicData.create!(:basic_type=>"00A",:desc=>"financial reconciliation interface configuration",
 	                   :basic_sub_type=>"002",:sub_desc=>"time interval frequency - hour",
@@ -17,7 +17,7 @@ BasicData.create!(:basic_type=>"00A",:desc=>"financial reconciliation interface 
 
 BasicData.create!(:basic_type=>"00A",:desc=>"financial reconciliation interface configuration",
 	                   :basic_sub_type=>"001",:sub_desc=>"postpone the date - day",
-	                   :payway=>"alipay",:paytype=>"transaction",:value=>"30")
+	                   :payway=>"alipay",:paytype=>"transaction",:value=>"1")
 
 BasicData.create!(:basic_type=>"00A",:desc=>"financial reconciliation interface configuration",
 	                   :basic_sub_type=>"002",:sub_desc=>"time interval frequency - hour",
@@ -25,7 +25,7 @@ BasicData.create!(:basic_type=>"00A",:desc=>"financial reconciliation interface 
 
 BasicData.create!(:basic_type=>"00A",:desc=>"financial reconciliation interface configuration",
 	                   :basic_sub_type=>"001",:sub_desc=>"postpone the date - day",
-	                   :payway=>"alipay",:paytype=>"oversea",:value=>"30")
+	                   :payway=>"alipay",:paytype=>"oversea",:value=>"1")
 
 BasicData.create!(:basic_type=>"00A",:desc=>"financial reconciliation interface configuration",
 	                   :basic_sub_type=>"002",:sub_desc=>"time interval frequency - hour",

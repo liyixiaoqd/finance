@@ -124,6 +124,7 @@ describe OnlinePayController do
 			'ip'=>'127.0.0.1',
 			'success_url'=>"#{@CALL_HOST}/simulation/callback_return",
 			'abort_url'=>"#{@CALL_HOST}/simulation/callback_return",
+			'notification_url'=>"#{@CALL_HOST}/simulation/callback_notify",
 			'country'=>'de',
 			'channel'=>'web'
 		}

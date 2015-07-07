@@ -97,7 +97,7 @@ describe OnlinePayCallbackController do
 			op.reload
 			expect(response.status).to eq(200)
 			expect(response.body).to eq ("success")
-			expect(op['status']).to eq("success_notify")
+			expect(op['status']).to eq("failure_notify_third")
 		end
 
 		it "get alipay_oversea_return" do
@@ -123,7 +123,7 @@ describe OnlinePayCallbackController do
 			op.reload
 			expect(response.status).to eq(200)
 			expect(response.body).to eq("success")
-			expect(op['status']).to eq("success_notify")
+			expect(op['status']).to eq("failure_notify_third")
 			expect(op['rate_amount']).not_to eq(op['amount'])
 		end
 
@@ -165,14 +165,14 @@ describe OnlinePayCallbackController do
 			op.reload
 			expect(response.status).to eq(200)
 			expect(response.body).to eq("success")
-			expect(op['status']).to eq("intermediate_notify")
+			expect(op['status']).to eq("failure_notify_third")
 			expect(op['callback_status']).to eq("WAIT_BUYER_CONFIRM_GOODS")
 
 			post :alipay_transaction_notify,alipay_transaction_notify_params_5()
 			op.reload
 			expect(response.status).to eq(200)
 			expect(response.body).to eq("success")
-			expect(op['status']).to eq("success_notify")
+			expect(op['status']).to eq("failure_notify_third")
 			expect(op['callback_status']).to eq("TRADE_FINISHED")
 
 
@@ -180,7 +180,7 @@ describe OnlinePayCallbackController do
 			op.reload
 			expect(response.status).to eq(200)
 			expect(response.body).to eq("success")
-			expect(op['status']).to eq("success_notify")
+			expect(op['status']).to eq("failure_notify_third")
 			expect(op['callback_status']).to eq("TRADE_FINISHED")
 		end
 	end
@@ -190,25 +190,29 @@ describe OnlinePayCallbackController do
 	end
 
 	let(:alipay_oversea_return_params) do
+		op=OnlinePay.where("trade_no='mypost4u_alipay_oversea_20150519_002'").last
+
 		{
 			"sign"=>"8ac74f1c16cd3d8dcc25a7f10c0cc4ec", 
 			"trade_no"=>"2015051900001000980052833147", 
 			"total_fee"=>"0.01", 
 			"sign_type"=>"MD5", 
-			"out_trade_no"=>"mypost4u_alipay_oversea_20150519_002", 
+			"out_trade_no"=>op.order_no, 
 			"trade_status"=>"TRADE_FINISHED", 
 			"currency"=>"EUR"
 		}
 	end
 
 	let(:alipay_oversea_notify_params) do
+		op=OnlinePay.where("trade_no='mypost4u_alipay_oversea_20150519_002'").last
+
 		{
 			"notify_id"=>"e0de91c150d106a5e409a477dc9d3a107g", 
 			"notify_type"=>"trade_status_sync", 
 			"sign"=>"a7a3ff52a4d87ee2017944576b4f681c", 
 			"trade_no"=>"2015051900001000980052833147", 
 			"total_fee"=>"0.01", 
-			"out_trade_no"=>"mypost4u_alipay_oversea_20150519_002", 
+			"out_trade_no"=>op.order_no, 
 			"currency"=>"EUR", 
 			"notify_time"=>"2015-05-19 09:08:33", 
 			"trade_status"=>"TRADE_FINISHED", 
@@ -217,6 +221,8 @@ describe OnlinePayCallbackController do
 	end
 
 	let(:alipay_transaction_return_params) do
+		op=OnlinePay.where("trade_no='mypost4u_alipay_transaction_20150519_000'").last
+
 		{
 			"buyer_actions"=>"REFUND,CONFIRM_GOODS", 
 			"buyer_email"=>"13764886276", 
@@ -234,7 +240,7 @@ describe OnlinePayCallbackController do
 			"notify_id"=>"RqPnCoPT3K9%2Fvwbh3InSN9bfmzKk3CpDC2p8BqOTbj8IE0lLjRCBiSNAHwr%2FHA48bafR", 
 			"notify_time"=>"2015-05-19 09:20:39", 
 			"notify_type"=>"trade_status_sync", 
-			"out_trade_no"=>"mypost4u_alipay_transaction_20150519_000", 
+			"out_trade_no"=>op.order_no, 
 			"payment_type"=>"1", 
 			"price"=>"0.01", 
 			"quantity"=>"1", 
@@ -256,6 +262,8 @@ describe OnlinePayCallbackController do
 	end
 
 	let(:alipay_transaction_notify_params_1) do
+		op=OnlinePay.where("trade_no='mypost4u_alipay_transaction_20150519_000'").last
+
 		{
 			"discount"=>"0.00", 
 			 "payment_type"=>"1", 
@@ -265,7 +273,7 @@ describe OnlinePayCallbackController do
 			 "gmt_create"=>"2015-05-19 09:16:43", 
 			 "notify_type"=>"trade_status_sync", 
 			 "quantity"=>"1", 
-			 "out_trade_no"=>"mypost4u_alipay_transaction_20150519_000", 
+			 "out_trade_no"=>op.order_no, 
 			 "seller_id"=>"2088302722580876", 
 			 "notify_time"=>"2015-05-19 09:16:44", 
 			 "trade_status"=>"WAIT_BUYER_PAY", 
@@ -282,6 +290,8 @@ describe OnlinePayCallbackController do
 	end
 
 	let(:alipay_transaction_notify_params_2) do
+		op=OnlinePay.where("trade_no='mypost4u_alipay_transaction_20150519_000'").last
+
 		{
 			"discount"=>"0.00", 
 			 "logistics_type"=>"DIRECT", 
@@ -295,7 +305,7 @@ describe OnlinePayCallbackController do
 			 "notify_type"=>"trade_status_sync", 
 			 "quantity"=>"1", 
 			 "logistics_payment"=>"SELLER_PAY", 
-			 "out_trade_no"=>"mypost4u_alipay_transaction_20150519_000", 
+			 "out_trade_no"=>op.order_no, 
 			 "seller_id"=>"2088302722580876", 
 			 "notify_time"=>"2015-05-19 09:19:05", 
 			 "trade_status"=>"WAIT_BUYER_PAY", 
@@ -316,6 +326,8 @@ describe OnlinePayCallbackController do
 	end
 
 	let(:alipay_transaction_notify_params_3) do
+		op=OnlinePay.where("trade_no='mypost4u_alipay_transaction_20150519_000'").last
+
 		{
 			"discount"=>"0.00", 
 			 "logistics_type"=>"DIRECT", 
@@ -329,7 +341,7 @@ describe OnlinePayCallbackController do
 			 "notify_type"=>"trade_status_sync", 
 			 "quantity"=>"1", 
 			 "logistics_payment"=>"SELLER_PAY", 
-			 "out_trade_no"=>"mypost4u_alipay_transaction_20150519_000", 
+			 "out_trade_no"=>op.order_no, 
 			 "seller_id"=>"2088302722580876", 
 			 "notify_time"=>"2015-05-19 09:20:36", 
 			 "trade_status"=>"WAIT_SELLER_SEND_GOODS", 
@@ -351,6 +363,8 @@ describe OnlinePayCallbackController do
 	end
 
 	let(:alipay_transaction_notify_params_4) do
+		op=OnlinePay.where("trade_no='mypost4u_alipay_transaction_20150519_000'").last
+
 		{
 			"gmt_send_goods"=>"2015-05-19 09:20:38", 
 			 "discount"=>"0.00", 
@@ -365,7 +379,7 @@ describe OnlinePayCallbackController do
 			 "notify_type"=>"trade_status_sync", 
 			 "quantity"=>"1", 
 			 "logistics_payment"=>"SELLER_PAY", 
-			 "out_trade_no"=>"mypost4u_alipay_transaction_20150519_000", 
+			 "out_trade_no"=>op.order_no, 
 			 "seller_id"=>"2088302722580876", 
 			 "notify_time"=>"2015-05-19 09:20:38", 
 			 "trade_status"=>"WAIT_BUYER_CONFIRM_GOODS", 
@@ -387,6 +401,8 @@ describe OnlinePayCallbackController do
 	end
 
 	let(:alipay_transaction_notify_params_5) do
+		op=OnlinePay.where("trade_no='mypost4u_alipay_transaction_20150519_000'").last
+
 		{
 			"gmt_send_goods"=>"2015-05-19 09:20:38", 
 			 "discount"=>"0.00", 
@@ -401,7 +417,7 @@ describe OnlinePayCallbackController do
 			 "notify_type"=>"trade_status_sync", 
 			 "quantity"=>"1", 
 			 "logistics_payment"=>"SELLER_PAY", 
-			 "out_trade_no"=>"mypost4u_alipay_transaction_20150519_000", 
+			 "out_trade_no"=>op.order_no, 
 			 "seller_id"=>"2088302722580876", 
 			 "notify_time"=>"2015-05-19 09:28:07", 
 			 "trade_status"=>"TRADE_FINISHED", 

@@ -255,8 +255,10 @@ class FinanceWaterController < ApplicationController
 				online_pay.userid=user.userid
 				online_pay.payway=finance_each["watertype"]
 				online_pay.paytype=""
-				online_pay.amount=finance_each["amount"]
+				online_pay.amount=finance_each["pay_amount"]	#use pay_amount not amount
 				online_pay.order_no=finance_each["order_no"]
+				online_pay.actual_amount=finance_each["amount"]
+				online_pay.currency=finance_each["currency"]
 
 				if finance_each["watertype"]=="score"
 					online_pay.payway="score"
@@ -285,6 +287,7 @@ class FinanceWaterController < ApplicationController
 			reconciliation_detail.transaction_status='SUCC'
 			reconciliation_detail.reconciliation_flag='2'
 			reconciliation_detail.amt=online_pay.amount
+			reconciliation_detail.currencycode=online_pay.currency
 			reconciliation_detail.netamt=0.0
 			reconciliation_detail.feeamt=0.0
 
@@ -351,7 +354,6 @@ class FinanceWaterController < ApplicationController
 					finance_water.new_amount=user.e_cash-finance_water.amount
 				end
 			end
-		
 			finance_water	
 		end
 end

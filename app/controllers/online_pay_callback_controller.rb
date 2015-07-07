@@ -49,7 +49,7 @@ class OnlinePayCallbackController < ApplicationController
 					logger.info("alipay_oversea_notify:#{redirect_url}")
 				
 					if !online_pay.method_url_success?("post",redirect_url,false,ret_hash)
-						online_pay.set_status!("failure_notify_third","call notify_url wrong")
+						online_pay.set_status!("failure_notify_third","call notify_url wrong") if online_pay.status=='success_notify'
 					end
 
 					online_pay.save!()
@@ -129,7 +129,7 @@ class OnlinePayCallbackController < ApplicationController
 					# 	raise "call #{redirect_url} failure : #{response_code}"
 					# end
 					if !online_pay.method_url_success?("post",redirect_url,false,ret_hash)
-						online_pay.set_status!("failure_notify_third","call notify_url wrong")
+						online_pay.set_status!("failure_notify_third","call notify_url wrong") if online_pay.status=='success_notify'
 					end
 					online_pay.save!()
 					render_text="success"	
@@ -278,7 +278,7 @@ class OnlinePayCallbackController < ApplicationController
 				# 	raise "call #{redirect_url} failure : #{response_code}"
 				# end
 				if !online_pay.method_url_success?("post",redirect_url,false,ret_hash)
-					online_pay.set_status!("failure_notify_third","call notify_url wrong")
+					online_pay.set_status!("failure_notify_third","call notify_url wrong") if online_pay.status=='success_notify'
 				end
 				online_pay.save!()
 

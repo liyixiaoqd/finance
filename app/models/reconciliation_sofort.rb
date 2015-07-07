@@ -149,7 +149,7 @@ class ReconciliationSofort
 				'payway'=>'sofort',
 				'feeamt'=>0.0,
 				'paytype'=>'',
-				'transaction_date'=>OnlinePay.current_time_format("%Y-%m-%d"),
+				'transaction_date'=>'',
 				'batch_id'=>"upload_file_de",
 				'reconciliation_flag'=>ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['INIT'],
 				'transactionid'=>''
@@ -157,17 +157,23 @@ class ReconciliationSofort
 			j=0
 			row.each do |col|
 				j=j+1
-				next unless j==3 || j==5 || j==6 || j==8 || j==10
+				next unless j==3 || j==5 || j==6 || j==8 || j==10 
 				col.gsub!(/\t$/,"") if col.class.to_s=="String"
 				sofort_detail["amt"],sofort_detail['netamt']=col,col if j==3
 				sofort_detail["currencycode"]=col if j==5
-				sofort_detail['timestamp']=col if j==6
+				if j==6
+					sofort_detail['timestamp']=col 
+					sofort_detail['transaction_date']=col [0,10] unless col.blank?
+				end
 				sofort_detail['name']=col if j==8
 				sofort_detail['transactionid']=col if j==10
 			end
 
 			if sofort_detail['transactionid'].blank?
 				raise "第#{i}行:对账标识(订单号)为空!"
+			end
+			if sofort_detail['transaction_date'].blank?
+				raise "第#{i}行:对账日期(第6列)为空!"
 			end
 			sofort_detail
 		end
@@ -177,7 +183,7 @@ class ReconciliationSofort
 				'transaction_status'=>'SUCC',
 				'payway'=>'sofort',
 				'paytype'=>'',
-				'transaction_date'=>OnlinePay.current_time_format("%Y-%m-%d"),
+				'transaction_date'=>'',
 				'batch_id'=>"upload_file_nl",
 				'reconciliation_flag'=>ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['INIT'],
 				'transactionid'=>''
@@ -186,10 +192,14 @@ class ReconciliationSofort
 			j=0
 			row.each do |col|
 				j=j+1
-				next unless j==2 || j==3 || j==7 || j==8
+				next unless j==2 || j==3 || j==7 || j==8 || j==4
 				col.gsub!(/\t$/,"") if col.class.to_s=="String"
 				sofort_detail["currencycode"]=col if j==2
 				sofort_detail['timestamp']=col if j==3
+				if j==4 && col.present?
+					col=col.to_s
+					sofort_detail['transaction_date']=col[0,4]+"-"+col[4,2]+"-"+col[6,2]
+				end
 				sofort_detail["amt"],sofort_detail['netamt']=col,col if j==7
 				if j==8
 					#sample : 
@@ -202,7 +212,9 @@ class ReconciliationSofort
 			if sofort_detail['transactionid'].blank?
 				raise "第#{i}行:对账标识(订单号)获取失败!"
 			end
-
+			if sofort_detail['transaction_date'].blank?
+				raise "第#{i}行:对账日期(第4列)错误!"
+			end
 			sofort_detail
 		end
 end

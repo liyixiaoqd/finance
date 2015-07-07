@@ -114,6 +114,10 @@ class TransactionReconciliationController < ApplicationController
 					redirect_to transaction_reconciliation_index_path(payway: reconciliation_detail.payway,paytype: reconciliation_detail.paytype,transactionid: reconciliation_detail.transactionid) and return
 				end
 				if (reconciliation_detail.reconciliation_flag==ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC'])
+					#已财务确认的不可撤销
+					if reconciliation_detail.confirm_flag==ReconciliationDetail::CONFIRM_FLAG['SUCC']
+						raise "财务已确认,不可撤销"
+					end
 					reconciliation_detail.reconciliation_flag=ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['FAIL']
 
 					# 屏蔽增加客户积分功能,此为业务系统逻辑
@@ -159,10 +163,10 @@ class TransactionReconciliationController < ApplicationController
 				redirect_to transaction_reconciliation_confirm_search_path and return
 			end
 		
-			if params['end_time'].blank? 
-				flash[:notice]="请输入确认发票日期"
-				redirect_to transaction_reconciliation_confirm_search_path and return
-			end
+			# if params['end_time'].blank? 
+			# 	flash[:notice]="请输入确认发票日期"
+			# 	redirect_to transaction_reconciliation_confirm_search_path and return
+			# end
 
 			all_amount=0.0
 			ReconciliationDetail.transaction do
@@ -182,7 +186,7 @@ class TransactionReconciliationController < ApplicationController
 
 				reconciliation_details.each do |rd|
 					rd.confirm_flag=ReconciliationDetail::CONFIRM_FLAG['SUCC']
-					rd.confirm_date=params['end_time']
+					rd.confirm_date=rd.transaction_date
 					if rd.reconciliation_describe.blank?
 						rd.reconciliation_describe="#{OnlinePay.current_time_format("%Y-%m-%d %H:%M:%S")} #{session[:admin]} 发票确认"
 					else
@@ -192,7 +196,7 @@ class TransactionReconciliationController < ApplicationController
 				end
 			end
 
-			flash[:notice]="确认发票成功!!"
+			flash[:notice]="确认发票成功!! 确认比数:#{params['confirm_num']},确认金额:#{params['confirm_amount']}"
 		rescue => e
 			flash[:notice]=e.message
 		end

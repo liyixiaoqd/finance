@@ -23,11 +23,21 @@ module OnlinePayHelper
 		'ECash'=>'电子现金'
 	}
 
+	ACTUAL_PAY=%w(score e_cash)
+
 	def status_mapping(status)
 		STATUS_MAPPING[status.to_s]
 	end
 
 	def payway_paytype_mapping(payway_type)
 		PAYWAY_PAYTYPE_MAPPING[payway_type]
+	end
+
+	def actual_pay(payway)
+		if ACTUAL_PAY.index(payway).blank?
+			false
+		else
+			true
+		end
 	end
 end
