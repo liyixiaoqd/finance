@@ -248,6 +248,7 @@ class OnlinePayCallbackController < ApplicationController
 	end
 	
 	def sofort_notify
+		logger.info("!!!!!sofort_notify:#{params}")
 		#spec body 
 		if params.size==2
 			#
@@ -258,8 +259,9 @@ class OnlinePayCallbackController < ApplicationController
 			# </status_notification>
 			#
 			params.merge! SofortDetail.getStatusFromXml(resquest.body.read)
+			logger.info("!!!!!sofort_notify:#{params}")
 		end
-		
+
 		OnlinePay.transaction do
 			render_text="failure"
 			online_pay=OnlinePay.get_online_pay_instance("sofort","",params,"",false,true)
