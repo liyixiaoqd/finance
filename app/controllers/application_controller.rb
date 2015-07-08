@@ -25,6 +25,8 @@ class ApplicationController < ActionController::Base
 	  	end
 
 		def authenticate_admin!
+			logger.info("!!!!authenticate_admin:#{request.body.read}")
+			logger.info("!!!!authenticate_admin:#{params}")
 			controller=params['controller'].camelize()+"Controller"
 			action=params['action']
 
