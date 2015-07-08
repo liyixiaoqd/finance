@@ -248,6 +248,8 @@ class OnlinePayCallbackController < ApplicationController
 	end
 	
 	def sofort_notify
+		logger.info("!!!!!!!!!!!sofort_notify:[#{request.body.read}]")
+		logger.info("!!!!!!!!!!!sofort_notify:[#{params}]")
 		OnlinePay.transaction do
 			render_text="failure"
 			online_pay=OnlinePay.get_online_pay_instance("sofort","",params,"",false,true)
