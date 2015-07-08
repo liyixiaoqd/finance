@@ -126,6 +126,11 @@ class SofortDetail
 		[identify_status,identify_status_reason] 
 	end
 
+	def self.getStatusFromXml(body)
+		doc = Nokogiri::XML(body.force_encoding("UTF-8"))
+		{'status_notification'=>{'transaction'=>doc.xpath("//status_notification/transaction").text}}
+	end
+
 	private 
 		def spec_payparams_valid(online_pay)
 			errmsg=''
