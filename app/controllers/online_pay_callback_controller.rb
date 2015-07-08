@@ -258,7 +258,7 @@ class OnlinePayCallbackController < ApplicationController
 			# 	<time>2015-07-08T10:15:06+02:00</time>
 			# </status_notification>
 			#
-			params.merge! SofortDetail.getStatusFromXml(resquest.body.read)
+			params.merge! SofortDetail.getStatusFromXml(request.body.read)
 			logger.info("!!!!!sofort_notify:#{params}")
 		end
 
