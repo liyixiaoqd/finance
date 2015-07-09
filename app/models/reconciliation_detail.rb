@@ -70,6 +70,12 @@ class ReconciliationDetail < ActiveRecord::Base
 			set_flag_by_status_and_amount!()
 		end
 
+		if (self.payway=="sofort")
+			exist_rd=ReconciliationDetail.find_by_payway_and_paytype_and_transactionid(self.payway,self.paytype,self.transactionid)
+			unless exist_rd.blank?
+				exist_rd.delete
+			end
+		end
 		save!()
 
 		# exist_rd=ReconciliationDetail.find_by_payway_and_paytype_and_transactionid(self.payway,self.paytype,self.transactionid)
