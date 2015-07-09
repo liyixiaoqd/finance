@@ -91,6 +91,7 @@ class ReconciliationDetail < ActiveRecord::Base
 		return nil if self.transactionid.blank? || self.payway.blank?
 		if self.payway=="sofort"
 			self.online_pay=OnlinePay.find_by_payway_and_paytype_and_order_no(self.payway,self.paytype,self.transactionid)
+			self.transactionid=self.online_pay.reconciliation_id unless self.online_pay.blank?
 		else
 			self.online_pay=OnlinePay.find_by_payway_and_paytype_and_reconciliation_id(self.payway,self.paytype,self.transactionid)
 		end
