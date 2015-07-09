@@ -199,6 +199,26 @@ class OnlinePay < ActiveRecord::Base
 		has_updated
 	end
 
+	def set_reconciliation()
+		reconciliation_params={
+			'paytype' => self.paytype,
+			'payway' => self.payway,
+			'batch_id' => 'pay_success',
+			'transaction_date' =>  current_time_format("%Y-%m-%d"),
+			'transactionid' => self.reconciliation_id,
+			'transaction_status' => '',
+			'online_pay_status' => self.status,
+			'amt' => self.amount,
+			'currencycode' => self.currency,
+			'reconciliation_flag' => ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['INIT'],
+			'online_pay_id' => self.id,
+			'confirm_flag' =>  "0",
+			'country' => self.country
+		}
+
+		ReconciliationDetail.init(reconciliation_params)
+	end
+
 	def self.get_count_sum_by_day_condition(datatime_beg="",datatime_end="",condition="")
 		if datatime_beg.blank? || datatime_end.blank?
 			datatime_beg=current_time_format("%Y-%m-%d",0)

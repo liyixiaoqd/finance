@@ -22,7 +22,7 @@ class OnlinePayCallbackController < ApplicationController
 
 	#Asynchronous callback --post
 	def alipay_oversea_notify
-		OnlinePay.transaction do   	#lock table
+		ActiveRecord::Base.transaction do   	#lock table
 			render_text="failure"
 			online_pay=OnlinePay.get_online_pay_instance("alipay","oversea",params,"",false,true)
 			render :text=>"#{render_text}" and return if (online_pay.blank? || online_pay.notification_url.blank?)
@@ -47,12 +47,16 @@ class OnlinePayCallbackController < ApplicationController
 
 					redirect_url=OnlinePay.redirect_url_replace("post",online_pay.notification_url)
 					logger.info("alipay_oversea_notify:#{redirect_url}")
-				
+					online_pay.save!()
+					online_pay.set_reconciliation.save!()
+
 					if !online_pay.method_url_success?("post",redirect_url,false,ret_hash)
-						online_pay.set_status!("failure_notify_third","call notify_url wrong") if online_pay.status=='success_notify'
+						if online_pay.status=='success_notify'
+							online_pay.set_status!("failure_notify_third","call notify_url wrong") 
+							online_pay.update_attributes!({})
+						end
 					end
 
-					online_pay.save!()
 					render_text="success"
 				rescue => e  	#rollback online_pay!!!
 					#online_pay.set_status!("failure_notify",e.message)
@@ -90,7 +94,7 @@ class OnlinePayCallbackController < ApplicationController
 	end
 
 	def alipay_transaction_notify
-		OnlinePay.transaction do
+		ActiveRecord::Base.transaction do
 			render_text="failure"
 			online_pay=OnlinePay.get_online_pay_instance("alipay","transaction",params)
 			render :text=>"#{render_text}" and return if (online_pay.blank? || online_pay.notification_url.blank?)
@@ -124,14 +128,19 @@ class OnlinePayCallbackController < ApplicationController
 							raise message
 						end
 					end
+
+					online_pay.save!()
+					online_pay.set_reconciliation.save!()
 					# response_code=online_pay.method_url_response_code("post",redirect_url,false,ret_hash)
 					# unless response_code=="200"
 					# 	raise "call #{redirect_url} failure : #{response_code}"
 					# end
 					if !online_pay.method_url_success?("post",redirect_url,false,ret_hash)
-						online_pay.set_status!("failure_notify_third","call notify_url wrong") if online_pay.status=='success_notify'
+						if online_pay.status=='success_notify'
+							online_pay.set_status!("failure_notify_third","call notify_url wrong") 
+							online_pay.update_attributes!({})
+						end
 					end
-					online_pay.save!()
 					render_text="success"	
 				rescue => e
 					#online_pay.set_status!("failure_notify",e.message)
@@ -146,7 +155,7 @@ class OnlinePayCallbackController < ApplicationController
 
 
 	def paypal_return
-		OnlinePay.transaction do
+		ActiveRecord::Base.transaction do
 			render_text="failure"
 			online_pay=OnlinePay.get_online_pay_instance("paypal","",params,"",false,true)
 			render text: "#{render_text}" and return if (online_pay.blank? || online_pay.success_url.blank?)
@@ -166,16 +175,17 @@ class OnlinePayCallbackController < ApplicationController
 				if flag==false
 					raise "#{message}"
 				end
+				online_pay.set_status!("success_notify","")
+				online_pay.save!()
+				online_pay.set_reconciliation.save!()
 
 				ret_hash['status']="success_notify"
 				redirect_notify_url=OnlinePay.redirect_url_replace("post",online_pay.notification_url)
 				logger.info("paypal post async url:#{redirect_notify_url}")
-				if online_pay.method_url_success?("post",redirect_notify_url,false,ret_hash)
-					online_pay.set_status!("success_notify","")
-				else
+				unless online_pay.method_url_success?("post",redirect_notify_url,false,ret_hash)
 					online_pay.set_status!("failure_notify_third","call notify_url wrong")
+					online_pay.update_attributes!({})
 				end
-				online_pay.save!()
 			rescue => e
 				ret_hash['status']="failure"
 				ret_hash['status_reason']=e.message
@@ -199,7 +209,7 @@ class OnlinePayCallbackController < ApplicationController
 	end
 	
 	def paypal_abort
-		OnlinePay.transaction do
+		ActiveRecord::Base.transaction do
 			render_text="failure"
 			online_pay=OnlinePay.get_online_pay_instance("paypal","",params,"",false,true)
 			render text: "#{render_text}" and return if (online_pay.blank? || online_pay.abort_url.blank?)
@@ -217,8 +227,6 @@ class OnlinePayCallbackController < ApplicationController
 			# if(method_url_response_code("get",redirect_url,false)=="200")
 			# 	render_text="success"
 			# end
-
-
 
 			unless online_pay.save()
 				logger.warn("paypal_abort:save abort failure!")
@@ -262,7 +270,7 @@ class OnlinePayCallbackController < ApplicationController
 			logger.info("!!!!!sofort_notify:#{params}")
 		end
 
-		OnlinePay.transaction do
+		ActiveRecord::Base.transaction do
 			render_text="failure"
 			online_pay=OnlinePay.get_online_pay_instance("sofort","",params,"",false,true)
 			render :text=>"#{render_text}" and return if (online_pay.blank? || online_pay.notification_url.blank?)
@@ -287,14 +295,18 @@ class OnlinePayCallbackController < ApplicationController
 			logger.info("sofort_notify:#{redirect_url}")
 
 			begin
+				online_pay.save!()
+				online_pay.set_reconciliation.save!()
 				# response_code=online_pay.method_url_response_code("post",redirect_url,false,ret_hash)
 				# unless response_code=="200"
 				# 	raise "call #{redirect_url} failure : #{response_code}"
 				# end
 				if !online_pay.method_url_success?("post",redirect_url,false,ret_hash)
-					online_pay.set_status!("failure_notify_third","call notify_url wrong") if online_pay.status=='success_notify'
+					if online_pay.status=='success_notify'
+						online_pay.set_status!("failure_notify_third","call notify_url wrong")
+						online_pay.update_attributes!({})
+					end
 				end
-				online_pay.save!()
 
 				render_text="success"
 			rescue => e
@@ -307,7 +319,7 @@ class OnlinePayCallbackController < ApplicationController
 	end
 	
 	def sofort_abort
-		OnlinePay.transaction do
+		ActiveRecord::Base.transaction do
 			render_text="failure"
 			online_pay=OnlinePay.get_online_pay_instance("sofort","",params,"",false,true)
 			render text: "#{render_text}" and return if (online_pay.blank? || online_pay.abort_url.blank?)

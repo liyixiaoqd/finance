@@ -208,8 +208,7 @@ class TransactionReconciliationController < ApplicationController
 
 	private 
 		def sql_from_condition_filter(params)
-			sql=""
-			index=1
+			sql="reconciliation_flag<>#{ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['NON_SYSTEM']}"
 
 			params.each do |k,v|
 				next if v.blank? 
@@ -225,13 +224,7 @@ class TransactionReconciliationController < ApplicationController
 					t_sql="#{k}=:#{k}"
 				end
 
-				if(index==1)
-					sql=t_sql
-				else
-					sql="#{sql} and #{t_sql}"
-				end
-
-				index=index+1
+				sql="#{sql} and #{t_sql}"
 			end
 
 			sql

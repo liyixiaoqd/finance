@@ -11,7 +11,8 @@ class ReconciliationDetail < ActiveRecord::Base
 	RECONCILIATIONDETAIL_FLAG={
 		'INIT' => '0',
 		'FAIL' => '1',
-		'SUCC' => '2'
+		'SUCC' => '2',
+		'NON_SYSTEM'=>'9'
 	}
 
 	RECONCILIATIONDETAIL_STATUS={
@@ -32,7 +33,7 @@ class ReconciliationDetail < ActiveRecord::Base
 	CONFIRM_FLAG={
 		'INIT' => '0',
 		'FAIL' => '1',
-		'SUCC' => '2'	
+		'SUCC' => '2'
 	}
 
 	def self.init(init_params)
@@ -63,7 +64,7 @@ class ReconciliationDetail < ActiveRecord::Base
 		set_params_by_transactionid!()
 
 		if self.online_pay_id.blank?
-			set_flag!(RECONCILIATIONDETAIL_FLAG['FAIL'],"获取对应在线支付记录失败:#{self.transactionid}")
+			set_flag!(RECONCILIATIONDETAIL_FLAG['NON_SYSTEM'],"获取对应在线支付记录失败:#{self.transactionid}")
 		else
 			set_flag_by_status_and_amount!()
 		end
@@ -107,6 +108,7 @@ class ReconciliationDetail < ActiveRecord::Base
 			if reconciliation_status=="SUCC" && self.online_pay_status =~ /^success/
 				if self.online_pay.rate_amount==self.amt
 					set_flag!(RECONCILIATIONDETAIL_FLAG['SUCC'],"")
+					#RMB交易不需要进行财务确认
 				else
 					set_flag!(RECONCILIATIONDETAIL_FLAG['FAIL'],"amount not match: #{self.online_pay.amount} <=> #{self.amt}")
 				end

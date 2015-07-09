@@ -101,7 +101,8 @@ class ReconciliationAlipayOversea
 				'transactionid'=>array_detail[0],
 				'transaction_status'=>array_detail[7],
 				'amt'=>array_detail[1].to_f,
-				'currencycode'=>array_detail[2],
+				#'currencycode'=>array_detail[2],  所有支付宝都显示RMB
+				'currencycode'=>'RMB',
 				'feeamt'=>array_detail[6].to_f,
 				'netamt'=>array_detail[1].to_f - array_detail[6].to_f,
 				'payway'=>'alipay',
