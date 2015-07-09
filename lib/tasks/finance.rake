@@ -46,10 +46,15 @@ namespace :finance do
 	desc "对账:paypal"
 	task :reconciliation_paypal=>[:environment] do
 		@interface_logger.info("reconciliation_paypal start")
-		reconciliation=ReconciliationPaypal.new("TransactionSearch")
-		message=reconciliation.finance_reconciliation()
-		#message.split('</br>').each do |t| @interface_logger.info t end
-		@interface_logger.info(out_message(message))
+		country_arr=%w(de at nl gb)
+		country_arr.each do |country|
+			@interface_logger.info("country #{country} start")
+			reconciliation=ReconciliationPaypal.new("TransactionSearch",country)
+			message=reconciliation.finance_reconciliation()
+			#message.split('</br>').each do |t| @interface_logger.info t end
+			@interface_logger.info(out_message(message))
+			@interface_logger.info("country #{country} end")
+		end
 		@interface_logger.info("reconciliation_paypal end")
 	end
 

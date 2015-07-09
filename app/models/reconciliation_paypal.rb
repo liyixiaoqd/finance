@@ -9,7 +9,7 @@ class ReconciliationPaypal
 	# STARTDATE		(Required) The earliest transaction date at which to start the search.
 	# ENDDATE		(Optional) The latest transaction date to be included in the search.
 	# ......
-	def initialize(service,startdate="",enddate="")
+	def initialize(service,startdate="",enddate="",country)
 		@service=service
 		post_day=BasicData.get_value("00A","001","paypal","").to_i
 		if(startdate.blank?)
@@ -27,6 +27,7 @@ class ReconciliationPaypal
 		@paypal_reconciliation_hash=init_paypal_reconciliation_hash()
 		@reconciliation_date=current_time_format("%Y%m%d",0)
 		@batch_id=1	# 001
+		@country=country
 		Rails.logger.info("TRANSACTION SEARCH : #{@startdate} -- #{@enddate}")
 	end
 
@@ -34,14 +35,33 @@ class ReconciliationPaypal
 		options={
 			'METHOD' => self.service,
 			'VERSION' => Settings.paypal.paypal_api_other_version,
-			'USER' => Settings.paypal.login_de,
-			'PWD' => Settings.paypal.password_de,
-			'SIGNATURE' => Settings.paypal.signature_de,
 			'STARTDATE' => startdate,
 			# 'CURRENCYCODE' => 'EUR',
 			# 'AMT' => 105,
 			'ENDDATE' => enddate
 		}
+
+		if @country=="de"
+			options['USER']=Settings.paypal.login_de
+			options['PWD']=Settings.paypal.password_de
+			options['SIGNATURE']=Settings.paypal.signature_de
+		elsif @country=="at"
+			options['USER']=Settings.paypal.login_at
+			options['PWD']=Settings.paypal.password_at
+			options['SIGNATURE']=Settings.paypal.signature_at
+		elsif @country=="gb"
+			options['USER']=Settings.paypal.login_gb
+			options['PWD']=Settings.paypal.password_gb
+			options['SIGNATURE']=Settings.paypal.signature_gb
+		elsif @country=="nl"
+			options['USER']=Settings.paypal.login_nl
+			options['PWD']=Settings.paypal.password_nl
+			options['SIGNATURE']=Settings.paypal.signature_nl
+		else
+			Rails.logger.warn("NO COUNTRY SET:#{country}")
+		end
+			
+
 		reconciliation_url=Settings.paypal.paypal_api_other_uri
 		Rails.logger.info(reconciliation_url)
 		method_url_response("post",reconciliation_url,true,options)

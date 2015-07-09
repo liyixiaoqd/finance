@@ -209,6 +209,7 @@ class OnlinePay < ActiveRecord::Base
 			'payway' => self.payway,
 			'batch_id' => 'pay_success',
 			'transaction_date' =>  current_time_format("%Y-%m-%d"),
+			'timestamp'=> Time.now,
 			'transactionid' => self.reconciliation_id,
 			'transaction_status' => 'PEND',
 			'online_pay_status' => self.status,
