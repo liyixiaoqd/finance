@@ -199,6 +199,10 @@ class OnlinePay < ActiveRecord::Base
 		has_updated
 	end
 
+	def is_success?()
+		self.status[0,7]=='success'
+	end
+
 	def set_reconciliation()
 		reconciliation_params={
 			'paytype' => self.paytype,

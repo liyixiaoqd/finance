@@ -48,7 +48,7 @@ class OnlinePayCallbackController < ApplicationController
 					redirect_url=OnlinePay.redirect_url_replace("post",online_pay.notification_url)
 					logger.info("alipay_oversea_notify:#{redirect_url}")
 					online_pay.save!()
-					online_pay.set_reconciliation.save!()
+					online_pay.set_reconciliation.save!() if online_pay.is_success?()
 
 					if !online_pay.method_url_success?("post",redirect_url,false,ret_hash)
 						if online_pay.status=='success_notify'
@@ -130,7 +130,7 @@ class OnlinePayCallbackController < ApplicationController
 					end
 
 					online_pay.save!()
-					online_pay.set_reconciliation.save!()
+					online_pay.set_reconciliation.save!() if online_pay.is_success?()
 					# response_code=online_pay.method_url_response_code("post",redirect_url,false,ret_hash)
 					# unless response_code=="200"
 					# 	raise "call #{redirect_url} failure : #{response_code}"
@@ -177,7 +177,7 @@ class OnlinePayCallbackController < ApplicationController
 				end
 				online_pay.set_status!("success_notify","")
 				online_pay.save!()
-				online_pay.set_reconciliation.save!()
+				online_pay.set_reconciliation.save!() if online_pay.is_success?()
 
 				ret_hash['status']="success_notify"
 				redirect_notify_url=OnlinePay.redirect_url_replace("post",online_pay.notification_url)
@@ -296,7 +296,7 @@ class OnlinePayCallbackController < ApplicationController
 
 			begin
 				online_pay.save!()
-				online_pay.set_reconciliation.save!()
+				online_pay.set_reconciliation.save!() if online_pay.is_success?()
 				# response_code=online_pay.method_url_response_code("post",redirect_url,false,ret_hash)
 				# unless response_code=="200"
 				# 	raise "call #{redirect_url} failure : #{response_code}"
