@@ -23,6 +23,7 @@ class ReconciliationSofort
 		valid_succ_num=0
 		valid_fail_num=0
 		valid_rescue_num=0
+		valid_nosys_num=0
 
 		skip_num=0
 		i=0
@@ -38,7 +39,9 @@ class ReconciliationSofort
 				rd.valid_and_save!()
 			
 				valid_complete_num=valid_complete_num+1
-				if(rd.reconciliation_flag==ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['FAIL'])
+				if(rd.reconciliation_flag==ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['NON_SYSTEM'])
+					valid_nosys_num=valid_nosys_num+1
+				elsif(rd.reconciliation_flag==ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['FAIL'])
 					valid_fail_num=valid_fail_num+1
 				elsif(rd.reconciliation_flag==ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC'])
 					valid_succ_num=valid_succ_num+1
@@ -62,7 +65,7 @@ class ReconciliationSofort
 
 		# "#{reconciliation_date} - #{reconciliation_date} <br> batch_id [ #{@batch_id} ] : </br> {all_num:#{valid_all_num} = complete_num:#{valid_complete_num} + rescue_num:#{valid_rescue_num}</br> complete_num:#{valid_complete_num} = succ_num:#{valid_succ_num} + fail_num:#{valid_fail_num} }</br>"
 		outmsg="文件总比数:#{valid_all_num},导入成功比数:#{valid_complete_num},异常比数:#{valid_rescue_num} ; 
-			   对账成功比数:#{valid_succ_num},对账失败比数:#{valid_fail_num}"
+			   对账成功比数:#{valid_succ_num},对账失败比数:#{valid_fail_num},非系统记录比数:#{valid_nosys_num}"
 	end
 
 	def valid_reconciliation_by_country(country,filename)
@@ -83,6 +86,7 @@ class ReconciliationSofort
 		valid_succ_num=0
 		valid_fail_num=0
 		valid_rescue_num=0
+		valid_nosys_num=0
 
 		xlsx.sheet(0).each do |row|
 			i =i+1
@@ -96,7 +100,9 @@ class ReconciliationSofort
 
 				
 				valid_complete_num=valid_complete_num+1
-				if(rd.reconciliation_flag==ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['FAIL'])
+				if(rd.reconciliation_flag==ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['NON_SYSTEM'])
+					valid_nosys_num=valid_nosys_num+1
+				elsif(rd.reconciliation_flag==ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['FAIL'])
 					valid_fail_num=valid_fail_num+1
 				elsif(rd.reconciliation_flag==ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC'])
 					valid_succ_num=valid_succ_num+1
@@ -117,7 +123,7 @@ class ReconciliationSofort
 		end
 
 		outmsg="文件总比数:#{valid_all_num},导入成功比数:#{valid_complete_num},异常比数:#{valid_rescue_num} ; 
-			   对账成功比数:#{valid_succ_num},对账失败比数:#{valid_fail_num}"
+			   对账成功比数:#{valid_succ_num},对账失败比数:#{valid_fail_num},非系统记录比数:#{valid_nosys_num}"
 		
 		[outmsg,errmsg]
 	end
