@@ -14,7 +14,7 @@ class AlipayOverseaDetail
 
 	def submit
 		options = {
-			'out_trade_no' => @order_no,
+			'out_trade_no' => "#{@system}_#{@order_no}",
 			'subject' => @description,
 			'rmb_fee' => sprintf("%.2f", @amount),
 			'return_url' => Settings.alipay_oversea.return_url,

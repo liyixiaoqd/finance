@@ -16,7 +16,7 @@ class ReconciliationAlipayOversea
 		end
 
 		if(end_date.blank?)
-			@end_date=current_time_format("%Y%m%d",1-post_day)
+			@end_date=@start_date
 		else
 			@end_date=end_date
 		end

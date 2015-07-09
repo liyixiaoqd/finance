@@ -325,7 +325,8 @@ class SimulationController < ApplicationController
 				'description'=>'',
 				'country'=>'',
 				'quantity'=>'',
-				'logistics_name'=>''
+				'logistics_name'=>'',
+				'send_country'=>'de'
 			}
 		end
 

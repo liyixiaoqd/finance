@@ -41,7 +41,7 @@ class OnlinePayCallbackController < ApplicationController
 					online_pay.callback_status=params[:trade_status]
 					online_pay.rate_amount=params[:total_fee]
 					online_pay.set_status_by_callback!()
-					online_pay.reconciliation_id=online_pay.trade_no
+					online_pay.reconciliation_id=params[:out_trade_no]
 					ret_hash['status']=online_pay.status
 					ret_hash['status_reason']=online_pay.callback_status
 
