@@ -197,7 +197,7 @@ describe OnlinePayCallbackController do
 			"trade_no"=>"2015051900001000980052833147", 
 			"total_fee"=>"0.01", 
 			"sign_type"=>"MD5", 
-			"out_trade_no"=>op.order_no, 
+			"out_trade_no"=>"#{op.system}_#{op.order_no}", 
 			"trade_status"=>"TRADE_FINISHED", 
 			"currency"=>"EUR"
 		}
@@ -212,7 +212,7 @@ describe OnlinePayCallbackController do
 			"sign"=>"a7a3ff52a4d87ee2017944576b4f681c", 
 			"trade_no"=>"2015051900001000980052833147", 
 			"total_fee"=>"0.01", 
-			"out_trade_no"=>op.order_no, 
+			"out_trade_no"=>"#{op.system}_#{op.order_no}", 
 			"currency"=>"EUR", 
 			"notify_time"=>"2015-05-19 09:08:33", 
 			"trade_status"=>"TRADE_FINISHED", 

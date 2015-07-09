@@ -23,6 +23,7 @@ class OnlinePayCallbackController < ApplicationController
 	#Asynchronous callback --post
 	def alipay_oversea_notify
 		ActiveRecord::Base.transaction do   	#lock table
+			logger.info(params[:out_trade_no])
 			render_text="failure"
 			online_pay=OnlinePay.get_online_pay_instance("alipay","oversea",params,"",false,true)
 			render :text=>"#{render_text}" and return if (online_pay.blank? || online_pay.notification_url.blank?)

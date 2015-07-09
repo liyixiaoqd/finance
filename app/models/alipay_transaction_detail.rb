@@ -26,7 +26,7 @@ class AlipayTransactionDetail
 			'partner' => Settings.alipay_transaction.pid,
 			'seller_email' => Settings.alipay_transaction.seller_email,
 			'description' => @logistics_name,
-			'out_trade_no' => @order_no,
+			'out_trade_no' => "#{@system}_#{@order_no}",
 			'subject' => @description,
 			'price' => @amount,
 			#'price' => 0.10,

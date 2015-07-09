@@ -241,6 +241,8 @@ class OnlinePayController < ApplicationController
 			ol_p=OnlinePay.find_by_payway_and_paytype_and_order_no(params['payway'],params['paytype'],params['order_no'])
 			if(ol_p.blank?)
 				nil
+			elsif (ol_p.system!=params['system'])
+				nil
 			else
 				if ol_p.status=="failure_submit" || ol_p.status=="submit"
 					ol_p
