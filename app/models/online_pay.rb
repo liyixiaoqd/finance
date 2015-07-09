@@ -210,7 +210,7 @@ class OnlinePay < ActiveRecord::Base
 			'batch_id' => 'pay_success',
 			'transaction_date' =>  current_time_format("%Y-%m-%d"),
 			'transactionid' => self.reconciliation_id,
-			'transaction_status' => '',
+			'transaction_status' => 'PEND',
 			'online_pay_status' => self.status,
 			'amt' => self.amount,
 			'currencycode' => self.currency,
