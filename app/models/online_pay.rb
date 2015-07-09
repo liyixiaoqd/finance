@@ -217,10 +217,11 @@ class OnlinePay < ActiveRecord::Base
 			'reconciliation_flag' => ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['INIT'],
 			'online_pay_id' => self.id,
 			'confirm_flag' =>  "0",
-			'country' => self.country
+			'country' => self.country,
+			'send_country' => self.send_country
 		}
 
-		ReconciliationDetail.init(reconciliation_params)
+		rd=ReconciliationDetail.init(reconciliation_params)
 	end
 
 	def self.get_count_sum_by_day_condition(datatime_beg="",datatime_end="",condition="")

@@ -20,10 +20,13 @@
 				 <%= label_tag(:l7, "发票状态:",class:"label_inline") %> 
 				 <%= select_tag(:confirm_flag,options_for_select([["",""],["未确认","0"],["已确认","2"]])) %> 
 				 </br>
-				 <%= label_tag(:l5, "交易开始时间:",class:"label_inline") %> <%= datetime_field_tag(:start_time) %>
-				 <%= label_tag(:l6, "交易结束时间:",class:"label_inline") %> <%= datetime_field_tag(:end_time) %>
 				 <%= label_tag(:l8, "国家:",class:"label_inline") %>
 				 <%= select_tag(:country,options_for_select([["",""],["德国","de"],["荷兰","nl"],["中国","cn"],["奥地利","at"],["英国","gb"]])) %> 
+				 <%= label_tag(:l9, "包裹发送国家:",class:"label_inline") %>
+				 <%= select_tag(:send_country,options_for_select([["",""],["德国","de"],["荷兰","nl"],["中国","cn"],["奥地利","at"],["英国","gb"]])) %> 
+				 </br>
+				 <%= label_tag(:l5, "交易开始时间:",class:"label_inline") %> <%= datetime_field_tag(:start_time) %>
+				 <%= label_tag(:l6, "交易结束时间:",class:"label_inline") %> <%= datetime_field_tag(:end_time) %>
 				 <div class="btn-toolbar">
 					<%= submit_tag("查询",class: "btn btn-primary") %>
 					<%= link_to "导出",transaction_reconciliation_export_path,class: "btn",method: "get",id: "link_to_export"%>

@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
 	protect_from_forgery with: :exception
 
 	force_ssl if: :ssl_required?
-	before_action :authenticate_admin!, :except => :sofort_notify
+	before_action :authenticate_admin!
 
 	rescue_from RuntimeError,with: :deny_access
 
@@ -25,8 +25,10 @@ class ApplicationController < ActionController::Base
 	  	end
 
 		def authenticate_admin!
-			logger.info("!!!!authenticate_admin.body:#{request.body.read}")
-			logger.info("!!!!authenticate_admin.params:#{params}")
+			unless Rails.env.production?
+				logger.info("!!!!authenticate_admin.body:#{request.body.read}")
+				logger.info("!!!!authenticate_admin.params:#{params}")
+			end
 			controller=params['controller'].camelize()+"Controller"
 			action=params['action']
 

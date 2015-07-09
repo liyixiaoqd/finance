@@ -35,7 +35,16 @@ $(document).ready(function(){
   });
 
   $("#button_refresh").click(function(){
-	location.reload();
+  	// http://127.0.0.1:3000/transaction_reconciliation/confirm_search
+  	new_url=location.href.replace(/\?.*/,"")
+  	new_url+="?end_time="+document.getElementById("end_time").value
+	location.replace(new_url);
+  });
+
+  $(".auto_refresh").change(function(){
+  	new_url=location.href.replace(/\?.*/,"")
+  	new_url+="?end_time="+document.getElementById("end_time").value
+	location.replace(new_url);
   });
 
 

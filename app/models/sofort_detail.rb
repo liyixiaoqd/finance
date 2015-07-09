@@ -30,8 +30,8 @@ class SofortDetail
 				xbuilder.reason @order_no
 			}
 			#sofort success url  redirect_to   self.webpage
-			#xbuilder.success_url Settings.sofort.success_url
-			xbuilder.success_url @success_url
+			xbuilder.success_url Settings.sofort.success_url
+			#xbuilder.success_url @success_url
 			xbuilder.success_link_redirect "true"
 			xbuilder.abort_url Settings.sofort.abort_url
 			xbuilder.timeout_url Settings.sofort.timeout_url

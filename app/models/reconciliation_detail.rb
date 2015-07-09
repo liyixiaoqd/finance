@@ -3,6 +3,7 @@ class ReconciliationDetail < ActiveRecord::Base
 
 	validates :payway, :transactionid, :transaction_status,:batch_id,:transaction_date, presence: true
 	#validates :reconciliation_flag, inclusion: { in: %w{'0','1','2'},message: "%{value} is not a valid ReconciliationDetail.reconciliation_flag" }
+	before_save :set_confirm!
 
 	default_scope { order('payway,paytype asc,timestamp desc') }
 
@@ -92,6 +93,7 @@ class ReconciliationDetail < ActiveRecord::Base
 		unless self.online_pay.blank?
 			self.online_pay_status=self.online_pay.status 
 			self.country=self.online_pay.country
+			self.send_country=self.online_pay.send_country
 		end
 	end
 
@@ -124,13 +126,25 @@ class ReconciliationDetail < ActiveRecord::Base
 		end
 	end
 
+	def set_confirm!()
+		#RMB货币交易自动确认成功,且不出发票
+		if self.currencycode=='RMB' && self.reconciliation_flag==RECONCILIATIONDETAIL_FLAG['SUCC']
+			self.confirm_flag=CONFIRM_FLAG['SUCC']
+			self.confirm_date=self.transaction_date
+			self.invoice_date=self.transaction_date
+		end
+	end
 
 	def warn_to_file(errmsg="unknow")
 		[self.payway,self.paytype,self.transactionid,self.timestamp,self.transaction_type,self.transaction_status,self.amt,self.online_pay_id,self.online_pay_status,self.reconciliation_flag,self.reconciliation_describe,errmsg].join(",")
 	end
 
-	def self.get_confirm_summary(confirm_flag)
-		rd_tj=ReconciliationDetail.select("count(*) as c,sum(amt) as s,max(updated_at) as m").where("reconciliation_flag=? and confirm_flag=?",RECONCILIATIONDETAIL_FLAG['SUCC'],confirm_flag)
+	def self.get_confirm_summary(confirm_flag,transaction_date="")
+		if transaction_date.blank?
+			rd_tj=ReconciliationDetail.select("count(*) as c,sum(amt) as s,max(updated_at) as m").where("reconciliation_flag=? and confirm_flag=?",RECONCILIATIONDETAIL_FLAG['SUCC'],confirm_flag)
+		else
+			rd_tj=ReconciliationDetail.select("count(*) as c,sum(amt) as s,max(updated_at) as m").where("reconciliation_flag=? and confirm_flag=? and transaction_date=?",RECONCILIATIONDETAIL_FLAG['SUCC'],confirm_flag,transaction_date)
+		end
 		if(rd_tj[0]['s'].blank?)
 			[rd_tj[0]['c'],0.00,'']
 		else

@@ -285,6 +285,7 @@ class OnlinePayController < ApplicationController
 			online_pay.country=params.delete('country')
 			online_pay.quantity=params.delete('quantity')
 			online_pay.logistics_name=params.delete('logistics_name')
+			online_pay.send_country=params.delete('send_country')
 			online_pay.other_params=params.inspect
 
 			online_pay.remote_host=request.remote_host

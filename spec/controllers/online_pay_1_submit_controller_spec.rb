@@ -107,7 +107,8 @@ describe OnlinePayController do
 				'country'=>'',
 				'quantity'=>'',
 				'logistics_name'=>'',
-				'userid'=>users(:user_one)['userid']
+				'userid'=>users(:user_one)['userid'],
+				'send_country'=>'nl'
 			}
 		end
 	end

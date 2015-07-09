@@ -115,9 +115,9 @@ describe FinanceWaterController do
 			oper=[
 				{'symbol'=>"Add",'amount'=>"100",'pay_amount'=>'0','currency'=>'','reason'=>'score add 100','watertype'=>"score",'is_pay'=>'N','order_no'=>''},
 				{'symbol'=>"Add",'amount'=>"50",'pay_amount'=>'0','currency'=>'','reason'=>'score add 50','watertype'=>"score",'is_pay'=>'N','order_no'=>''},
-				{'symbol'=>"Sub",'amount'=>"119",'pay_amount'=>'1.19','currency'=>'RMB','reason'=>'score sub 119','watertype'=>"score",'is_pay'=>'Y','order_no'=>'test_score_001'},
+				{'symbol'=>"Sub",'amount'=>"119",'pay_amount'=>'1.19','currency'=>'RMB','send_country'=>'nl','reason'=>'score sub 119','watertype'=>"score",'is_pay'=>'Y','order_no'=>'test_score_001'},
 				{'symbol'=>"Add",'amount'=>"19",'pay_amount'=>'0','currency'=>'','reason'=>'e_cash add 19','watertype'=>"e_cash",'is_pay'=>'N','order_no'=>''},
-				{'symbol'=>"Sub",'amount'=>"19",'pay_amount'=>'0.19','currency'=>'EUR','reason'=>'e_cash sub 19','watertype'=>"e_cash",'is_pay'=>'Y','order_no'=>'test_score_002'},
+				{'symbol'=>"Sub",'amount'=>"19",'pay_amount'=>'0.19','currency'=>'EUR','send_country'=>'at','reason'=>'e_cash sub 19','watertype'=>"e_cash",'is_pay'=>'Y','order_no'=>'test_score_002'},
 			].to_json
 			expect{
 				post :modify,modify_interface_params(oper)

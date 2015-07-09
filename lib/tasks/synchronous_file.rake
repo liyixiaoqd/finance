@@ -88,7 +88,7 @@ namespace :sync_file do
 			end
 
 			split="|&|"
-			ReconciliationDetail.includes(:online_pay).where("confirm_flag=\"#{ReconciliationDetail::CONFIRM_FLAG['SUCC']}\" and invoice_date>=\"#{@beg}\" and invoice_date<\"#{@end}\"").each do |rd|
+			ReconciliationDetail.includes(:online_pay).where("(invoice_date is null or invoice_date='') and confirm_flag=\"#{ReconciliationDetail::CONFIRM_FLAG['SUCC']}\" and confirm_date>=\"#{@beg}\" and confirm_date<\"#{@end}\"").each do |rd|
 				if rd.batch_id[0,7]=="refund_"
 					system=rd.batch_id[7,rd.batch_id.length]
 					order_no=rd.transactionid
@@ -107,7 +107,9 @@ namespace :sync_file do
 					next
 				end
 
-				outline=[order_no,rd.confirm_date.to_s[0,10]]
+				rd.update_attributes!({'invoice_date'=>@end})
+				
+				outline=[order_no,rd.transaction_date.to_s[0,10]]
 				file_hash[system].puts "#{outline.join(split)}"
 			end
 

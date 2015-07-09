@@ -262,6 +262,7 @@ class FinanceWaterController < ApplicationController
 				online_pay.order_no=finance_each["order_no"]
 				online_pay.actual_amount=finance_each["amount"]
 				online_pay.currency=finance_each["currency"]
+				online_pay.send_country=finance_each["send_country"]
 
 				if finance_each["watertype"]=="score"
 					online_pay.payway="score"
@@ -293,20 +294,29 @@ class FinanceWaterController < ApplicationController
 			reconciliation_detail.currencycode=online_pay.currency
 			reconciliation_detail.netamt=0.0
 			reconciliation_detail.feeamt=0.0
+			reconciliation_detail.send_country=online_pay.send_country
 
 			reconciliation_detail
 		end
 
 		def new_reconciliation_detail_each_refund(online_pay,params)
-			#reconciliation_detail=online_pay.build_reconciliation_detail
-			reconciliation_detail=ReconciliationDetail.new
+			#区分订单下的包裹进行退费情况
+			if params['parcel_no'].blank?
+				reconciliation_detail=online_pay.build_reconciliation_detail
+				reconciliation_detail.transactionid=params['order_no']
+				reconciliation_detail.reconciliation_describe="订单退费"
+				reconciliation_detail.batch_id="refund"
+			else
+				reconciliation_detail=ReconciliationDetail.new
+				reconciliation_detail.transactionid=params['parcel_no']
+				reconciliation_detail.reconciliation_describe=params['order_no']
+				reconciliation_detail.batch_id='refund_'+params["system"]
+			end
+			
 			reconciliation_detail.payway=params["payway"]
 			reconciliation_detail.paytype=params["paytype"]
-			reconciliation_detail.batch_id='refund_'+params["system"]
 			reconciliation_detail.transaction_date=OnlinePay.current_time_format("%Y-%m-%d")
 			reconciliation_detail.timestamp=params["datetime"]
-			reconciliation_detail.transactionid=params['parcel_no']
-			reconciliation_detail.reconciliation_describe=params['order_no']
 			reconciliation_detail.transaction_status='SUCC'
 			reconciliation_detail.reconciliation_flag='2'
 			reconciliation_detail.amt=params['amount']
