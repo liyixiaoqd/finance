@@ -136,10 +136,10 @@ $( "#end_time" ).datepicker({
 });
 
 
-function modify_reconciliation(id,flag,order_no){
+function modify_reconciliation(id,flag,msg){
 	url="/transaction_reconciliation/"+id+"/modify/"+flag
 	var myDate = new Date();  
-	transaction_date=prompt(id+"请输入对账确认日期:", myDate.getFullYear()+"-"+(myDate.getMonth()+1)+"-"+myDate.getDate())
+	transaction_date=prompt(msg+"\n请输入对账确认日期:", myDate.getFullYear()+"-"+(myDate.getMonth()+1)+"-"+myDate.getDate())
 	if(transaction_date!=null){
 		post(url, {transactionid:id,flag:flag,transaction_date:transaction_date});  
 	}
