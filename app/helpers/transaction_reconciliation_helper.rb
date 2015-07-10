@@ -9,4 +9,5 @@ module TransactionReconciliationHelper
 	def reconciliation_flag_mapping(reconciliation_flag)
 		RECONCILIATIONDETAIL_FLAG_MAPPING[reconciliation_flag.to_s]
 	end
+
 end

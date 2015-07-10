@@ -5,7 +5,7 @@ class OnlinePayController < ApplicationController
 
 	include Paramsable,OnlinePayHelper
 	
-	CONDITION_PARAMS=%w{payway paytype reconciliation_flag start_time end_time reconciliation_id order_no user_id country}
+	CONDITION_PARAMS=%w{payway paytype reconciliation_flag start_time end_time reconciliation_id order_no user_id system send_country}
 	# before_action :authenticate_admin!,:only=>[:show,:show_single_detail]
 	def index
 		if (params['username'].present? || params['email'].present? )
@@ -93,7 +93,8 @@ class OnlinePayController < ApplicationController
 	end
 
 	def show_single_detail
-		@online_pay=OnlinePay.find(params['online_pay_id'])
+		@online_pay=OnlinePay.includes(:user).find(params['online_pay_id'])
+		render layout: false
 	end
 
 	def export
@@ -238,10 +239,8 @@ class OnlinePayController < ApplicationController
 
 	private 
 		def exists_online_pay(params)
-			ol_p=OnlinePay.find_by_payway_and_paytype_and_order_no(params['payway'],params['paytype'],params['order_no'])
+			ol_p=OnlinePay.find_by_system_and_payway_and_paytype_and_order_no(params['system'],params['payway'],params['paytype'],params['order_no'])
 			if(ol_p.blank?)
-				nil
-			elsif (ol_p.system!=params['system'])
 				nil
 			else
 				if ol_p.status=="failure_submit" || ol_p.status=="submit"

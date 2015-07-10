@@ -89,22 +89,16 @@ namespace :sync_file do
 
 			split="|&|"
 			ReconciliationDetail.includes(:online_pay).where("(invoice_date is null or invoice_date='') and confirm_flag=\"#{ReconciliationDetail::CONFIRM_FLAG['SUCC']}\" and confirm_date>=\"#{@beg}\" and confirm_date<\"#{@end}\"").each do |rd|
-				if rd.batch_id[0,7]=="refund_"
-					system=rd.batch_id[7,rd.batch_id.length]
-					order_no=rd.transactionid
-				else
-					if rd.online_pay.blank? || rd.online_pay.order_no.blank?
-						@interface_logger.info("WARN:order_no is nil? #{rd.id}")
-						next
-					end
-
-					system=rd.online_pay.system
-					order_no=rd.online_pay.order_no
-				end
-					
-				if file_hash[system].blank?
+				if file_hash[rd.system].blank?
 					@interface_logger.info("WARN: no system:#{system} include? #{rd.id}")
 					next
+				end
+
+				#退订单中包裹情况
+				if rd.batch_id=="refund_parcel"
+					order_no=rd.transactionid
+				else
+					order_no=rd.order_no
 				end
 
 				rd.update_attributes!({'invoice_date'=>@end})

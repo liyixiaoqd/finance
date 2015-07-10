@@ -33,3 +33,17 @@ form.button_to {
 .btn-toolbar form.button_to + form.button_to {
   margin-left: 5px;
 }
+
+td.td_nowrap {
+    white-space:nowrap;
+    overflow: hidden;
+    text-overflow:ellipsis;
+}
+
+table#online_pay_details_table{	
+    table-layout:fixed
+}
+
+table#online_pay_single_content,table#reconciliation_details_table{	
+    table-layout:fixed
+}

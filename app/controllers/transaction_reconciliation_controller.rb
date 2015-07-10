@@ -1,8 +1,9 @@
 class TransactionReconciliationController < ApplicationController
 	# before_action :authenticate_admin!
 	include TransactionReconciliationHelper
+	include Timeutilsable
 
-	CONDITION_PARAMS=%w{payway paytype reconciliation_flag start_time end_time transactionid online_pay_id confirm_flag country send_country}
+	CONDITION_PARAMS=%w{payway paytype reconciliation_flag start_time end_time transactionid online_pay_id confirm_flag send_country system order_no}
 	# def index
 	# 	@reconciliation_details=ReconciliationDetail.includes(:online_pay).all.page(params[:page])
 
@@ -14,17 +15,17 @@ class TransactionReconciliationController < ApplicationController
 
 	def index
 		#logger.info(sql)
-		unless (params['order_no'].blank?)
-			ops=OnlinePay.where("order_no=?",params['order_no'])
-			unless ops.blank?
-				params['online_pay_id']=[]
-				ops.each do |op|
-					params['online_pay_id']<<op.id
-				end
-			else
-				return
-			end
-		end
+		# unless (params['order_no'].blank?)
+		# 	ops=OnlinePay.where("order_no=?",params['order_no'])
+		# 	unless ops.blank?
+		# 		params['online_pay_id']=[]
+		# 		ops.each do |op|
+		# 			params['online_pay_id']<<op.id
+		# 		end
+		# 	else
+		# 		return
+		# 	end
+		# end
 		
 		sql=sql_from_condition_filter(params)
 		@reconciliation_details=ReconciliationDetail.includes(:online_pay).where(sql,params).page(params[:page])
@@ -37,18 +38,18 @@ class TransactionReconciliationController < ApplicationController
 	end
 
 	def export
-		unless (params['order_no'].blank?)
-			ops=OnlinePay.where("order_no=?",params['order_no'])
-			unless ops.blank?
-				params['online_pay_id']=[]
-				ops.each do |op|
-					params['online_pay_id']<<op.id
-				end
-			else
-				flash[:notice]="无可导出记录"
-				redirect_to transaction_reconciliation_index_path and return
-			end
-		end
+		# unless (params['order_no'].blank?)
+		# 	ops=OnlinePay.where("order_no=?",params['order_no'])
+		# 	unless ops.blank?
+		# 		params['online_pay_id']=[]
+		# 		ops.each do |op|
+		# 			params['online_pay_id']<<op.id
+		# 		end
+		# 	else
+		# 		flash[:notice]="无可导出记录"
+		# 		redirect_to transaction_reconciliation_index_path and return
+		# 	end
+		# end
 		
 		sql=sql_from_condition_filter(params)
 
@@ -138,6 +139,12 @@ class TransactionReconciliationController < ApplicationController
 					# 	end
 					# end
 				else
+					if params['transaction_date'].blank? ||  isNotTime?(params['transaction_date'])
+						logger.info("!!!!!!!!!!!!#{params['transaction_date']}")
+						raise "请输入对账确认日期!!"
+					else
+						reconciliation_detail.transaction_date=params['transaction_date']
+					end
 					reconciliation_detail.reconciliation_flag=ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC']
 				end
 				reconciliation_detail.reconciliation_describe="#{OnlinePay.current_time_format("%Y-%m-%d %H:%M:%S")} #{session[:admin]} 手工修改状态:#{reconciliation_detail.reconciliation_flag}"
@@ -222,8 +229,8 @@ class TransactionReconciliationController < ApplicationController
 					t_sql="timestamp>=:#{k}"
 				elsif (k=="end_time")
 					t_sql="timestamp<=:#{k}"
-				elsif(k=="online_pay_id")
-					t_sql="online_pay_id in (#{v.join(',')})"
+				# elsif(k=="online_pay_id")
+				# 	t_sql="online_pay_id in (#{v.join(',')})"
 				else
 					t_sql="#{k}=:#{k}"
 				end

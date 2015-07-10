@@ -1,15 +1,20 @@
 <tr class="tr_relpace">
-	<td>  <%= reconciliation_detail.payway %> </td>
-	<td>  <%= reconciliation_detail.paytype%>  </td>
-	<td>  <%= reconciliation_detail.transactionid %>  </td>
-	<td> 
+	<td class="td_nowrap">  <%= reconciliation_detail.payway %> </td>
+	<td class="td_nowrap">  <%= reconciliation_detail.paytype%>  </td>
+	<td class="td_nowrap">  <%= reconciliation_detail.transactionid %>  </td>
+	<td class="td_nowrap"> 
 		<% unless reconciliation_detail.online_pay.blank? %> 
-			 <%= reconciliation_detail.online_pay.order_no %>  
+<!-- 			 <%= link_to reconciliation_detail.online_pay.order_no,show_single_online_pay_path(reconciliation_detail.online_pay),method: :get,target: :_blank %> -->
+		<a href="#" onclick="window.open('<%=show_single_online_pay_path(reconciliation_detail.online_pay)%>',
+			'_blank','scrollbars=0,toolbar=no,location=no,directories=no,status=yrd,menubar=no,scrollbars=no,resizable=yes;width=200');
+			return false">
+			<%=reconciliation_detail.online_pay.order_no%>
+		</a>
 		<% end %> 
 	</td>
-	<td>  <%= reconciliation_flag_mapping(reconciliation_detail.reconciliation_flag) %>  </td>
-	<td>  <%= reconciliation_detail.amt %>  </td>
-	<td>  <%= reconciliation_detail.currencycode %>  </td>
+	<td class="td_nowrap">  <%= reconciliation_flag_mapping(reconciliation_detail.reconciliation_flag) %>  </td>
+	<td class="td_nowrap">  <%= reconciliation_detail.amt %>  </td>
+	<td class="td_nowrap">  <%= reconciliation_detail.currencycode %>  </td>
 <!-- 	<td>  <%= reconciliation_detail.transaction_status %>  </td>
 	<td> 
 		<% unless reconciliation_detail.online_pay_id.blank? %> 
@@ -22,12 +27,16 @@
 		<% end %> 
 		<%= reconciliation_detail.reconciliation_describe %>
 	</td> -->
-	<td>  <%= reconciliation_detail.timestamp %>  </td>
+	<td class="td_nowrap">  <%= reconciliation_detail.timestamp %>  </td>
 	<td>  
+		<% msg="#{reconciliation_detail.transactionid}: #{reconciliation_detail.currencycode} #{reconciliation_detail.amt}" %>
 		<% if  reconciliation_detail.reconciliation_flag==ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC'] %> 
-			<%= link_to "手工撤销",modify_transaction_reconciliation_path(transactionid: reconciliation_detail.id,flag: reconciliation_detail.reconciliation_flag),method: "post",data: { confirm: "请确认是否手工撤销对账成功记录?\n#{reconciliation_detail.transactionid}: #{reconciliation_detail.currencycode} #{reconciliation_detail.amt} " } %>
+			<%= link_to "手工撤销",modify_transaction_reconciliation_path(transactionid: reconciliation_detail.id,flag: reconciliation_detail.reconciliation_flag),method: "post",data: { confirm: "请确认是否手工撤销对账成功记录?\n#{msg}" } %>
 		<% else %>
-			<%= link_to "手工对账",modify_transaction_reconciliation_path(transactionid: reconciliation_detail.id,flag: reconciliation_detail.reconciliation_flag),method: "post",data: { confirm: "请确认是否手工对账成功?\n#{reconciliation_detail.transactionid}: #{reconciliation_detail.currencycode} #{reconciliation_detail.amt} " }%>
+			<a href="#" onclick="alert(<%=msg%>);return false">
+				手工对账
+				<%=msg%>
+			</a>
 		<% end %>
 	</td>
 </tr>

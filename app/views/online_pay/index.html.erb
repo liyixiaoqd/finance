@@ -10,18 +10,33 @@
 		<div class="row-fluid">
 			<div class="well">
 				<%= form_tag index_online_pay_path,method:"get",remote: :true,id: "index_and_export_form" do %>
-					 <%= label_tag(:l1, "支付类型:",class:"label_inline") %> 
+					 <%= label_tag(:l1, "交易来源系统:",class:"label_inline") %> 
+					 <%= select_tag(:system,options_for_select([["",""],["包裹网站","mypost4u"],["quaie","quaie"]])) %> 
+					 &nbsp;&nbsp;&nbsp;
+					 <%= label_tag(:l2, "包裹发送国家:",class:"label_inline") %>
+					 <%= select_tag(:send_country,options_for_select([["",""],["德国","de"],["荷兰","nl"],["中国","cn"],["奥地利","at"],["英国","gb"]])) %> 
+					 </br>
+					 <%= label_tag(:l3, "支付类型:",class:"label_inline") %> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 					 <%= select_tag(:payway,options_for_select([["",""],["paypal","paypal"],["sofort","sofort"],["支付宝","alipay"],["积分","score"],["电子现金","e_cash"]])) %> 
-					 <%= label_tag(:l2, "支付子类型:",class:"label_inline") %>
+					 &nbsp;&nbsp;&nbsp;
+					 <%= label_tag(:l4, "支付子类型:",class:"label_inline") %>&nbsp;&nbsp;&nbsp;
 					 <%= select_tag(:paytype,options_for_select([["",""],["国内支付","transaction"],["海外支付","oversea"]])) %> 
-					 <%= label_tag(:l7, "用户名:",class:"label_inline") %> <%= text_field_tag(:username) %>
 					 </br>
-					 <%= label_tag(:l3, "交易号:",class:"label_inline") %> <%= text_field_tag(:reconciliation_id) %>
-					 <%= label_tag(:l4, "订单号/补款号:",class:"label_inline") %> <%= text_field_tag(:order_no) %>
-					 <%= label_tag(:l8, "注册E-Mail:",class:"label_inline") %> <%= text_field_tag(:email) %>
+					 <%= label_tag(:l5, "用户名:",class:"label_inline") %> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					 <%= text_field_tag(:username) %>
+					 &nbsp;&nbsp;&nbsp;
+					 <%= label_tag(:l6, "注册E-Mail:",class:"label_inline") %> &nbsp;&nbsp;&nbsp;
+					 <%= text_field_tag(:email) %>
 					 </br>
-					 <%= label_tag(:l5, "交易开始时间:",class:"label_inline") %> <%= datetime_field_tag(:start_time) %>
-					 <%= label_tag(:l6, "交易结束时间:",class:"label_inline") %> <%= datetime_field_tag(:end_time) %>
+					 <%= label_tag(:l7, "交易号:",class:"label_inline") %> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					 <%= text_field_tag(:reconciliation_id) %>
+					 &nbsp;&nbsp;&nbsp;
+					 <%= label_tag(:l8, "订单/补款号:",class:"label_inline") %> &nbsp;&nbsp;
+					 <%= text_field_tag(:order_no) %>
+					 </br>
+					 <%= label_tag(:l9, "交易开始时间:",class:"label_inline") %> <%= datetime_field_tag(:start_time) %>
+					 &nbsp;&nbsp;&nbsp;
+					 <%= label_tag(:l10, "交易结束时间:",class:"label_inline") %> <%= datetime_field_tag(:end_time) %>
 					 <div class="btn-toolbar">
 						 <%= submit_tag("查询",class: "btn btn-primary") %>
 						 <%= link_to "导出",export_index_online_pay_path,class: "btn",method: "get",id: "link_to_export"%>
@@ -39,6 +54,11 @@
 				<%=flash[:notice]%>
 			</div>
 		<% end %>
+		
+		<div class="alert alert-info">
+			<button type="button" class="close" data-dismiss="alert">×</button>
+			<strong>提示:</strong> 点击订单/补款号查看详细信息!
+		</div>
 
 		<div class="well">
 			<table class="table" id="online_pay_details_table">

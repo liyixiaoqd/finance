@@ -1,10 +1,10 @@
 <tr class="tr_relpace">
-	<td><%= online_pay.reconciliation_id %></td>
-	<td><%= online_pay.amount %></td>
-	<td><%= online_pay.get_convert_currency() %></td>
-	<td><%= status_mapping(online_pay.status) %></td>
+	<td class="td_nowrap"><%= online_pay.reconciliation_id %></td>
+	<td class="td_nowrap"><%= online_pay.amount %></td>
+	<td class="td_nowrap"><%= online_pay.get_convert_currency() %></td>
+	<td class="td_nowrap"><%= status_mapping(online_pay.status) %></td>
 <!-- 	<td><%= online_pay.callback_status %></td> -->
-	<td><%= payway_paytype_mapping(online_pay.payway.camelize + online_pay.paytype.camelize) %></td>
-	<td><%= online_pay.order_no %></td>
-	<td><%= online_pay.reason %></td>
+	<td class="td_nowrap"><%= payway_paytype_mapping(online_pay.payway.camelize + online_pay.paytype.camelize) %></td>
+	<td class="td_nowrap"><%= online_pay.order_no %></td>
+	<td class="td_nowrap"><%= online_pay.reason %></td>
 </tr>

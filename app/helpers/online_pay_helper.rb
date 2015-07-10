@@ -23,6 +23,11 @@ module OnlinePayHelper
 		'ECash'=>'电子现金'
 	}
 
+	SYSTEM_MAPPING={
+		'mypost4u' => '包裹网站',
+		'quaie' => 'quaie'
+	}
+
 	ACTUAL_PAY=%w(score e_cash)
 
 	def status_mapping(status)
@@ -31,6 +36,10 @@ module OnlinePayHelper
 
 	def payway_paytype_mapping(payway_type)
 		PAYWAY_PAYTYPE_MAPPING[payway_type]
+	end
+
+	def system_mapping(system)
+		SYSTEM_MAPPING[system]
 	end
 
 	def actual_pay(payway)

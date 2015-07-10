@@ -14,7 +14,7 @@
 				<%= button_to "导出",export_user_online_pay_path(@user),class: "btn",method: "get" %>
 			</div>
 
-			<table class="table">
+			<table class="table" id="online_pay_details_table">
 				<%= render partial: "online_pay_detail_title" %>
 				<%= render partial: "online_pay_detail_content",collection: @online_pays,as: :online_pay %>
 			</table>

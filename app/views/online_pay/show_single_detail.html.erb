@@ -1,10 +1,65 @@
-<% @page_title="支付明细" %>
-<hr>
-
-<%=link_to '返回',:back%>
-<div id="online_pay_details_content">
-	<table id="online_pay_single_content">
-		<%= render partial: "online_pay_detail_title" %>
-		<%= render partial: "online_pay_detail_content",locals: {online_pay: @online_pay} %>
-	</table>
+<%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
+<%= csrf_meta_tags %>
+<div class="container-fluid">
+<!-- 	<% @page_title="订单详细信息" %>
+	<% content_for :breadcrumb do %>
+		<li> <%=link_to t('交易查询'),index_online_pay_path,method: :get%> <span class="divider">/</span></li>
+	<% end %>
+	 -->
+	<div class="row-fluid">
+		<div class="well">
+			<table class="table">
+				<tbody>
+					<tr>
+						<td>订单号/补款号 </td>
+						<td><%= @online_pay.order_no %></td>
+					</tr>
+					<tr>
+						<td>交易号</td>
+						<td><%= @online_pay.reconciliation_id %></td>
+					</tr>
+					<tr>
+						<td>金额</td>
+						<td><%= @online_pay.amount %></td>
+					</tr>
+					<tr>
+						<td>货币</td>
+						<td><%= @online_pay.get_convert_currency() %></td>
+					</tr>
+					<tr>
+						<td>状态</td>
+						<td><%= status_mapping(@online_pay.status) %></td>
+					</tr>
+					<tr>
+						<td>支付类型与子类型</td>
+						<td><%= payway_paytype_mapping(@online_pay.payway.camelize + @online_pay.paytype.camelize) %> </td>
+					</tr>
+					<tr>
+						<td>交易日期</td>
+						<td><%= @online_pay.created_at %></td>
+					</tr>
+					<tr>
+						<td>备注</td>
+						<td><%= @online_pay.reason %></td>
+					</tr>
+					<tr>
+						<td>交易来源系统</td>
+						<td><%= system_mapping(@online_pay.system) %></td>
+					</tr>
+					<tr>
+						<td>包裹发送国家</td>
+						<td><%= @online_pay.send_country %></td>
+					</tr>
+					<tr>
+						<td>用户名</td>
+						<td><%= @online_pay.user.username %></td>
+					</tr>
+					<tr>
+						<td>注册E-Mail</td>
+						<td><%= @online_pay.user.email %></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
 </div>

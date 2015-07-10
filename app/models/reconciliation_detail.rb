@@ -41,14 +41,18 @@ class ReconciliationDetail < ActiveRecord::Base
 		find_params={}
 		other_params={}
 
+		# sofort 使用order_no作为查询条件 其他使用transactionid
 		init_params.each do |k,v|
-			if k=="transactionid"|| k=="payway"|| k=="paytype"
+			if k=="transactionid"|| k=="payway"|| k=="paytype" || k=="order_no"
 				find_params[k]=v
 			else
 				other_params[k]=v
 			end
 		end
 		#Rails.logger.info("find_params:#{find_params}")
+		if find_params['transactionid'].blank? && find_params['order_no'].blank?
+			raise "transactionid与order_no不可都为空"
+		end
 		rd=ReconciliationDetail.find_or_initialize_by(find_params)
 		rd.assign_attributes(other_params)
 		#Rails.logger.info(rd.attributes)
@@ -70,12 +74,12 @@ class ReconciliationDetail < ActiveRecord::Base
 			set_flag_by_status_and_amount!()
 		end
 
-		if (self.payway=="sofort")
-			exist_rd=ReconciliationDetail.find_by_payway_and_paytype_and_transactionid(self.payway,self.paytype,self.transactionid)
-			unless exist_rd.blank?
-				exist_rd.delete
-			end
-		end
+		# if (self.payway=="sofort")
+		# 	exist_rd=ReconciliationDetail.find_by_payway_and_paytype_and_transactionid(self.payway,self.paytype,self.transactionid)
+		# 	unless exist_rd.blank?
+		# 		exist_rd.delete
+		# 	end
+		# end
 		save!()
 
 		# exist_rd=ReconciliationDetail.find_by_payway_and_paytype_and_transactionid(self.payway,self.paytype,self.transactionid)
@@ -95,16 +99,24 @@ class ReconciliationDetail < ActiveRecord::Base
 		self.feeamt=(-1)*self.feeamt if self.feeamt<0
 		
 		return nil if self.transactionid.blank? || self.payway.blank?
-		if self.payway=="sofort"
-			self.online_pay=OnlinePay.find_by_payway_and_paytype_and_order_no(self.payway,self.paytype,self.transactionid)
-			self.transactionid=self.online_pay.reconciliation_id unless self.online_pay.blank?
+		# sofort 使用order_no作为查询条件 其他使用transactionid
+		if self.transactionid.blank?
+			self.online_pay=OnlinePay.find_by_payway_and_paytype_and_order_no(self.payway,self.paytype,self.order_no)
+			if self.online_pay.blank?
+				self.transactionid=self.order_no
+			else
+				self.transactionid=self.online_pay.reconciliation_id 
+			end
 		else
 			self.online_pay=OnlinePay.find_by_payway_and_paytype_and_reconciliation_id(self.payway,self.paytype,self.transactionid)
 		end
+		
 		unless self.online_pay.blank?
 			self.online_pay_status=self.online_pay.status 
 			self.country=self.online_pay.country
 			self.send_country=self.online_pay.send_country
+			self.order_no=self.online_pay.order_no
+			self.system=self.online_pay.system
 		end
 	end
 

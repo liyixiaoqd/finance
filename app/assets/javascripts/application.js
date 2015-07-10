@@ -47,7 +47,6 @@ $(document).ready(function(){
 	location.replace(new_url);
   });
 
-
   $("#login_button").click(function(){
   	var passwd=document.getElementById("admin_admin_passwd_encryption").value
   	document.getElementById("admin_admin_passwd_encryption").value=hex_md5(passwd)
@@ -128,10 +127,45 @@ $.datepicker.regional['zh-CN'] = {
 $.datepicker.setDefaults($.datepicker.regional['zh-CN']);
 
 $( "#start_time" ).datepicker({
-	defaultDate: '-30d'
+	defaultDate: '-1d'
 });
 $( "#end_time" ).datepicker({
-	defaultDate: '-1d'
+	defaultDate: '-0d'
 });
 
 });
+
+
+function modify_reconciliation(id,flag,order_no){
+	url="/transaction_reconciliation/"+id+"/modify/"+flag
+	var myDate = new Date();  
+	transaction_date=prompt(id+"请输入对账确认日期:", myDate.getFullYear()+"-"+(myDate.getMonth()+1)+"-"+myDate.getDate())
+	if(transaction_date!=null){
+		post(url, {transactionid:id,flag:flag,transaction_date:transaction_date});  
+	}
+	// prompt_message="请输入对账日期"+transactionid+":"+currencycode+" "+amt
+	// prompt(prompt_message)
+}
+
+function post(URL, PARAMS) {        
+    var temp = document.createElement("form");        
+    temp.action = URL;        
+    temp.method = "post";        
+    temp.style.display = "none";        
+    for (var x in PARAMS) {        
+        var opt = document.createElement("textarea");        
+        opt.name = x;        
+        opt.value = PARAMS[x];        
+        // alert(opt.name)        
+        temp.appendChild(opt);        
+    }        
+    // add csrf
+    var opt = document.createElement("textarea");        
+    opt.name = "authenticity_token";        
+    opt.value = $('meta[name="csrf-token"]').attr('content');
+    temp.appendChild(opt);        
+
+    document.body.appendChild(temp);        
+    temp.submit();        
+    return temp;        
+} 

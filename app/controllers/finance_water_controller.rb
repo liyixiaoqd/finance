@@ -295,6 +295,8 @@ class FinanceWaterController < ApplicationController
 			reconciliation_detail.netamt=0.0
 			reconciliation_detail.feeamt=0.0
 			reconciliation_detail.send_country=online_pay.send_country
+			reconciliation_detail.system=online_pay.system
+			reconciliation_detail.order_no=online_pay.order_no
 
 			reconciliation_detail
 		end
@@ -303,16 +305,15 @@ class FinanceWaterController < ApplicationController
 			#区分订单下的包裹进行退费情况
 			if params['parcel_no'].blank?
 				reconciliation_detail=online_pay.build_reconciliation_detail
-				reconciliation_detail.transactionid=params['order_no']
-				reconciliation_detail.reconciliation_describe="订单退费"
-				reconciliation_detail.batch_id="refund"
+				reconciliation_detail.transactionid=online_pay.reconciliation_id
+				reconciliation_detail.batch_id='refund_order'
 			else
 				reconciliation_detail=ReconciliationDetail.new
 				reconciliation_detail.transactionid=params['parcel_no']
-				reconciliation_detail.reconciliation_describe=params['order_no']
-				reconciliation_detail.batch_id='refund_'+params["system"]
+				reconciliation_detail.batch_id='refund_parcel'
 			end
 			
+
 			reconciliation_detail.payway=params["payway"]
 			reconciliation_detail.paytype=params["paytype"]
 			reconciliation_detail.transaction_date=OnlinePay.current_time_format("%Y-%m-%d")
@@ -323,6 +324,9 @@ class FinanceWaterController < ApplicationController
 			reconciliation_detail.currencycode=online_pay.currency unless online_pay.blank?
 			reconciliation_detail.netamt=0.0
 			reconciliation_detail.feeamt=0.0
+			reconciliation_detail.system=params["system"]
+			reconciliation_detail.order_no=params["order_no"]
+			reconciliation_detail.reconciliation_describe="订单退费"
 
 			reconciliation_detail
 		end

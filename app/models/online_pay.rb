@@ -219,7 +219,9 @@ class OnlinePay < ActiveRecord::Base
 			'online_pay_id' => self.id,
 			'confirm_flag' =>  "0",
 			'country' => self.country,
-			'send_country' => self.send_country
+			'send_country' => self.send_country,
+			'system' => self.system,
+			'order_no' => self.order_no
 		}
 
 		rd=ReconciliationDetail.init(reconciliation_params)

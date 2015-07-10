@@ -135,7 +135,7 @@ class ReconciliationSofort
 			{
 				'timestamp'=>sofort_detail[33],
 				'name'=>sofort_detail[4],
-				'transactionid'=>sofort_detail[2],
+				'order_no'=>sofort_detail[2],
 				'transaction_status'=>sofort_detail[28],
 				'amt'=>sofort_detail[18].to_f,
 				'currencycode'=>sofort_detail[20],
@@ -158,7 +158,7 @@ class ReconciliationSofort
 				'transaction_date'=>'',
 				'batch_id'=>"upload_file_de",
 				'reconciliation_flag'=>ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['INIT'],
-				'transactionid'=>''
+				'order_no'=>''
 			}
 			j=0
 			row.each do |col|
@@ -172,10 +172,10 @@ class ReconciliationSofort
 					sofort_detail['transaction_date']=col [0,10] unless col.blank?
 				end
 				sofort_detail['name']=col if j==8
-				sofort_detail['transactionid']=col if j==10
+				sofort_detail['order_no']=col if j==10
 			end
 
-			if sofort_detail['transactionid'].blank?
+			if sofort_detail['order_no'].blank?
 				raise "第#{i}行:对账标识(订单号)为空!"
 			end
 			if sofort_detail['transaction_date'].blank?
@@ -192,7 +192,7 @@ class ReconciliationSofort
 				'transaction_date'=>'',
 				'batch_id'=>"upload_file_nl",
 				'reconciliation_flag'=>ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['INIT'],
-				'transactionid'=>''
+				'order_no'=>''
 			}
 
 			j=0
@@ -211,11 +211,11 @@ class ReconciliationSofort
 					#sample : 
 					#/TRTP/SEPA OVERBOEKING/IBAN/NL40ABNA0526989491/BIC/ABNANL2A/NAME/Z SHI/REMI/TIME140178795/EREF/NOTPROVIDED
 					parttern_match=/\/REMI\/(.*?)\//.match(col)
-					sofort_detail['transactionid']=parttern_match[1] unless parttern_match.blank?
+					sofort_detail['order_no']=parttern_match[1] unless parttern_match.blank?
 				end
 			end
 
-			if sofort_detail['transactionid'].blank?
+			if sofort_detail['order_no'].blank?
 				raise "第#{i}行:对账标识(订单号)获取失败!"
 			end
 			if sofort_detail['transaction_date'].blank?
