@@ -162,12 +162,19 @@ class ReconciliationDetail < ActiveRecord::Base
 		[self.payway,self.paytype,self.transactionid,self.timestamp,self.transaction_type,self.transaction_status,self.amt,self.online_pay_id,self.online_pay_status,self.reconciliation_flag,self.reconciliation_describe,errmsg].join(",")
 	end
 
-	def self.get_confirm_summary(confirm_flag,transaction_date="")
-		if transaction_date.blank?
-			rd_tj=ReconciliationDetail.select("count(*) as c,sum(amt) as s,max(updated_at) as m").where("reconciliation_flag=? and confirm_flag=?",RECONCILIATIONDETAIL_FLAG['SUCC'],confirm_flag)
+	def self.get_confirm_summary(confirm_flag)
+		rd_tj=ReconciliationDetail.select("count(*) as c,sum(amt) as s,max(updated_at) as m").where("reconciliation_flag=? and confirm_flag=?",RECONCILIATIONDETAIL_FLAG['SUCC'],confirm_flag)
+
+		if(rd_tj[0]['s'].blank?)
+			[rd_tj[0]['c'],0.00,'']
 		else
-			rd_tj=ReconciliationDetail.select("count(*) as c,sum(amt) as s,max(updated_at) as m").where("reconciliation_flag=? and confirm_flag=? and transaction_date=?",RECONCILIATIONDETAIL_FLAG['SUCC'],confirm_flag,transaction_date)
+			[rd_tj[0]['c'],rd_tj[0]['s'].to_f,rd_tj[0]['m']]
 		end
+	end
+
+	def self.get_confirm_summary(sql,params)
+		rd_tj=ReconciliationDetail.select("count(*) as c,sum(amt) as s,max(updated_at) as m").where(sql,params)
+
 		if(rd_tj[0]['s'].blank?)
 			[rd_tj[0]['c'],0.00,'']
 		else

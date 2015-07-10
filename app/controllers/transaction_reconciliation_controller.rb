@@ -2,6 +2,7 @@ class TransactionReconciliationController < ApplicationController
 	# before_action :authenticate_admin!
 	include TransactionReconciliationHelper
 	include Timeutilsable
+	include Enumsable
 
 	CONDITION_PARAMS=%w{payway paytype reconciliation_flag start_time end_time transactionid online_pay_id confirm_flag send_country system order_no}
 	# def index
@@ -160,8 +161,21 @@ class TransactionReconciliationController < ApplicationController
 	end
 
 	def confirm_search
-		@transaction_date=params['end_time']
-		@confirm_num,@confirm_amount,@max_updated_at=ReconciliationDetail.get_confirm_summary(ReconciliationDetail::CONFIRM_FLAG['INIT'],@transaction_date)
+		if params['start_time'].blank?
+			params['start_time']=OnlinePay.current_time_format("%Y-%m-%d",-1)
+			
+		end
+
+		sql="reconciliation_flag=#{ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC']} and confirm_flag=#{ReconciliationDetail::CONFIRM_FLAG['INIT']} "
+		sql+="and transaction_date=:start_time " unless params['start_time'].blank?
+		sql+="and system=:system " unless params['system'].blank?
+		sql+="and send_country=:send_country" unless params['send_country'].blank?
+
+		@confirm_num,@confirm_amount,@max_updated_at=ReconciliationDetail.get_confirm_summary(sql,params)
+
+		@system=params['system']
+		@send_country=params['send_country']
+		@transaction_date=params['start_time']
 	end
 
 	def confirm
@@ -170,7 +184,6 @@ class TransactionReconciliationController < ApplicationController
 				flash[:notice]="无可确认数据! 提交未确认比数: #{params['confirm_num']}"
 				redirect_to transaction_reconciliation_confirm_search_path and return
 			end
-			transaction_date=params['end_time']
 			# if params['end_time'].blank? 
 			# 	flash[:notice]="请输入确认发票日期"
 			# 	redirect_to transaction_reconciliation_confirm_search_path and return
@@ -178,12 +191,15 @@ class TransactionReconciliationController < ApplicationController
 
 			all_amount=0.0
 			confirm_date=OnlinePay.current_time_format("%Y-%m-%d")
+
+			sql="reconciliation_flag=#{ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC']} and confirm_flag=#{ReconciliationDetail::CONFIRM_FLAG['INIT']} "
+			sql+="and updated_at<=:max_updated_at "  
+			sql+="and transaction_date=:start_time " unless params['start_time'].blank?
+			sql+="and system=:system " unless params['system'].blank?
+			sql+="and send_country=:send_country" unless params['send_country'].blank?
+
 			ReconciliationDetail.transaction do
-				if transaction_date.blank?
-					reconciliation_details=ReconciliationDetail.lock.where("reconciliation_flag=? and confirm_flag=? and updated_at<=?",ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC'],ReconciliationDetail::CONFIRM_FLAG['INIT'],params['max_updated_at'])
-				else
-					reconciliation_details=ReconciliationDetail.lock.where("reconciliation_flag=? and confirm_flag=? and updated_at<=? and transaction_date=?",ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC'],ReconciliationDetail::CONFIRM_FLAG['INIT'],params['max_updated_at'],transaction_date)
-				end
+				reconciliation_details=ReconciliationDetail.lock.where(sql,params)
 
 				if reconciliation_details.size != params['confirm_num'].to_i
 					raise "数据已变更,请重新确认! 比数 #{params['confirm_num']} => #{reconciliation_details.size}"
@@ -209,7 +225,7 @@ class TransactionReconciliationController < ApplicationController
 				end
 			end
 
-			flash[:notice]="确认发票成功!! 确认比数:#{params['confirm_num']},确认金额:#{params['confirm_amount']}"
+			flash[:notice]="#{params['start_time']}_#{params['system']}_#{params['send_country']} 确认发票成功!! 确认比数:#{params['confirm_num']},确认金额:#{params['confirm_amount']}"
 		rescue => e
 			flash[:notice]=e.message
 		end

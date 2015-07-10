@@ -37,13 +37,18 @@ $(document).ready(function(){
   $("#button_refresh").click(function(){
   	// http://127.0.0.1:3000/transaction_reconciliation/confirm_search
   	new_url=location.href.replace(/\?.*/,"")
-  	new_url+="?end_time="+document.getElementById("end_time").value
+  	new_url+="?start_time="+document.getElementById("start_time").value+
+  		    "&system="+document.getElementById("system").value+
+  		    "&send_country="+document.getElementById("send_country").value
+
 	location.replace(new_url);
   });
 
   $(".auto_refresh").change(function(){
   	new_url=location.href.replace(/\?.*/,"")
-  	new_url+="?end_time="+document.getElementById("end_time").value
+  	new_url+="?start_time="+document.getElementById("start_time").value+
+  		    "&system="+document.getElementById("system").value+
+  		    "&send_country="+document.getElementById("send_country").value
 	location.replace(new_url);
   });
 
