@@ -66,3 +66,6 @@ end
 # xlsx
 gem 'roo'
 gem 'roo-xls'
+
+#xml parse
+gem 'actionpack-xml_parser', '~> 1.0.2'

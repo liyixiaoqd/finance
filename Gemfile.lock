@@ -10,6 +10,8 @@ GEM
       activesupport (= 4.1.8)
       rack (~> 1.5.2)
       rack-test (~> 0.6.2)
+    actionpack-xml_parser (1.0.2)
+      actionpack (>= 4.0.0, < 5)
     actionview (4.1.8)
       activesupport (= 4.1.8)
       builder (~> 3.1)
@@ -164,6 +166,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  actionpack-xml_parser (~> 1.0.2)
   activemerchant (~> 1.42.2)
   coffee-rails (~> 4.0.0)
   execjs
