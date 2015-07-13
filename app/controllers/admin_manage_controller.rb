@@ -21,7 +21,11 @@ class AdminManageController < ApplicationController
 
 			unless am.blank?
 				session[:admin]=am.admin_name
-				session[:admin_level]=am.authority.to_i
+				# session[:admin_level]=am.authority.to_i
+				session[:admin_country]=am.get_country_str()
+
+				session[:admin_auth]=am.get_auth_str()
+
 				redirect_to admin_manage_sign_index_path and return
 			end
 
@@ -33,7 +37,8 @@ class AdminManageController < ApplicationController
 	def sign_out
 		if session[:admin].present?
 			session[:admin]=nil
-			session[:admin_level]=nil
+			# session[:admin_level]=nil
+			session[:admin_country]=nil
 		end
 		
 		redirect_to admin_manage_sign_in_path

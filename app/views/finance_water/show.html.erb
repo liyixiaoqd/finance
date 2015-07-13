@@ -11,7 +11,9 @@
 
 		<div class="row-fluid">
 			<div class="btn-toolbar">
-				<%= button_to "新增",new_user_finance_water_path(@user),class: "btn btn-primary",method: "get" %>
+				<% if isAuthority("9") %>
+					<%= button_to "新增",new_user_finance_water_path(@user),class: "btn btn-primary",method: "get" %>
+				<% end %>
 				<%= button_to "导出",export_user_finance_water_path(@user),class: "btn",method: "get" %>
 			</div>
 

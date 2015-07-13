@@ -14,7 +14,7 @@
 					 <%= select_tag(:system,options_for_select([["",""],["包裹网站","mypost4u"],["quaie","quaie"]])) %> 
 					 &nbsp;&nbsp;&nbsp;
 					 <%= label_tag(:l2, "包裹发送国家:",class:"label_inline") %>
-					 <%= select_tag(:send_country,options_for_select([["",""],["德国","de"],["荷兰","nl"],["中国","cn"],["奥地利","at"],["英国","gb"]])) %> 
+					 <%= select_tag(:send_country,options_for_select(dynamic_send_country_select_tag)) %>
 					 </br>
 					 <%= label_tag(:l3, "支付类型:",class:"label_inline") %> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 					 <%= select_tag(:payway,options_for_select([["",""],["paypal","paypal"],["sofort","sofort"],["支付宝","alipay"],["积分","score"],["电子现金","e_cash"]])) %> 

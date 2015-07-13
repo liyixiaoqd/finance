@@ -85,7 +85,7 @@ class TransactionReconciliationController < ApplicationController
 	def report
 		payway=params['payway']
 		paytype=params['paytype']
-		country=params['country']
+		send_country=params['send_country']
 		start_time=params['start_time']
 		end_time=params['end_time']
 
@@ -96,7 +96,7 @@ class TransactionReconciliationController < ApplicationController
 			condition=""
 			condition+="and payway='#{payway}'" unless payway.blank?
 			condition+=" and paytype='#{paytype}'" unless paytype.blank?
-			condition+=" and country='#{country}'" unless country.blank?
+			condition+=" and send_country='#{send_country}'" unless send_country.blank?
 			@finance_summary.setAmountAndNum!(condition)
 			logger.info(@finance_summary.output)
 		end

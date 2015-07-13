@@ -5,6 +5,7 @@ module Enumsable extend ActiveSupport::Concern
 	}
 
 	COUNTRY_MAPPING_TO_DISPLAY={
+		" "=>"ALL",
 		"de"=>"德国",
 		"nl"=>"荷兰",
 		"cn"=>"中国",

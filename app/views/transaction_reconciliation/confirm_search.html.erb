@@ -21,7 +21,7 @@
 					 <%= select_tag(:system,options_for_select([["",""],["包裹网站","mypost4u"],["quaie","quaie"]],@system),class: "auto_refresh") %> 
 					 &nbsp;&nbsp;&nbsp;
 					 <%= label_tag(:l12, "包裹发送国家:",class:"label_inline") %>
-					 <%= select_tag(:send_country,options_for_select([["",""],["德国","de"],["荷兰","nl"],["中国","cn"],["奥地利","at"],["英国","gb"]],@send_country),class: "auto_refresh") %> 
+					<%= select_tag(:send_country,options_for_select(dynamic_send_country_select_tag,@send_country),class: "auto_refresh") %>
 <!-- 					 <%= label_tag(:l2, "最晚对账成功时间:") %>  -->
 					 <%= hidden_field_tag(:max_updated_at,@max_updated_at) %>
 					 </br>

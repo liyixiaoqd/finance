@@ -1,0 +1,42 @@
+<div class="container-fluid">
+<% @page_title="帐号权限" %>
+<% content_for :breadcrumb do %>
+	<li> <%=link_to t('帐号设置'),admin_setting_index_path,method: :get%> <span class="divider">/</span></li>
+<% end %>
+	<div class="row-fluid">
+		<% unless flash[:notice].blank? %>
+			<div class="alert alert-info">
+				<button type="button" class="close" data-dismiss="alert">×</button>
+				<%=flash[:notice]%>
+			</div>
+		<% end %>
+		
+		<div class="alert alert-info">
+			<button type="button" class="close" data-dismiss="alert">×</button>
+			<strong>帐号: <%= @am.admin_name %> , 国家: <%= @am.country %></strong>
+			(国家影响查询数据结果)
+		</div>
+		
+		<div class="btn-toolbar">
+			<%= button_to "权限配置",new_authority_admin_setting_path(@am.admin_name),class: "btn btn-primary",method: "get" %>			
+			<%= button_to "国家配置",new_country_admin_setting_path(@am.admin_name),class: "btn btn-primary",method: "get" %>
+		</div>
+
+		<table class="table">
+			<thead>
+				<tr>
+					<th>模块描述</th>
+					<th>是否有权限</th>
+				</tr>
+			</thead>
+			<tbody>
+				<% @am.admin_authority.each do |aa| %>
+				<tr>
+					<td><%= aa.describe %></td>
+					<td><%= aa.status %></td>
+				</tr>
+				<% end %>
+			</tbody>
+		</table>
+	</div>
+</div>

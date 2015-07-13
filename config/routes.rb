@@ -32,6 +32,13 @@ Rails.application.routes.draw do
   get 'upload_file/index' => 'upload_file#index'
   post 'upload_file/upload' => 'upload_file#upload'
 
+  get 'admin_setting/index' => 'admin_setting#index'
+  get 'admin_setting/:admin_name/show_authority' => 'admin_setting#show_authority',as: :show_authority_admin_setting
+  get 'admin_setting/:admin_name/new_authority' => 'admin_setting#new_authority',as: :new_authority_admin_setting
+  post 'admin_setting/:admin_name/modify_authority' => 'admin_setting#modify_authority',as: :modify_authority_admin_setting
+  get 'admin_setting/:admin_name/new_country' => 'admin_setting#new_country',as: :new_country_admin_setting
+  post 'admin_setting/:admin_name/modify_country' => 'admin_setting#modify_country',as: :modify_country_admin_setting
+
   #online_pay inteface use 
   post 'registe' => 'registe#create'
   get 'registe/:userid/obtain' => 'registe#obtain'

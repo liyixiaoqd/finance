@@ -7,6 +7,8 @@ describe RegisteController do
 
 	let!(:set_session) do
 		request.session[:admin]="admin"
+		request.session[:admin_auth]=",0,1,2,3,4,5,6,7,8,9,99,"
+		request.session[:admin_country]=Enumsable::COUNTRY_MAPPING_TO_DISPLAY.keys.join(",")
 	end
 
 	describe "get index" do

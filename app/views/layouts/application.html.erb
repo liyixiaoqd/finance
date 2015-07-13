@@ -20,7 +20,9 @@
                         	<i class="icon-user"></i> <%=session[:admin]%>
                            	<i class="icon-caret-down"></i>
 		<ul class="dropdown-menu">
-			<li><a tabindex="-1" href="#">设置</a></li>
+			<% if isAuthority('99') %>
+				<li><%=link_to t('帐号设置'),admin_setting_index_path,method: :get,tabindex: -1%></li>
+			<% end %>
 			<li class="divider"></li>
 			<li><%=link_to t('登出'),admin_manage_sign_out_path,method: :post,tabindex: -1%></li>
 		</ul>
@@ -36,32 +38,42 @@
 	<div class="sidebar-nav">	
 	    <a href="#user-menu" class="nav-header" data-toggle="collapse"><i class="icon-user-md"></i>用户管理</a>
 	    <ul id="user-menu" class="nav nav-list collapse in">
-	    <% if session[:admin_level]>=0 %>
+	      <% if isAuthority('0') %>
 	        <li> <%=link_to t('用户明细'),registe_index_path,method: :get,class: "dd"%> </li>
-	    <% end %>
+	      <% end %>
 	    </ul>
 
 	    <a href="#finance-menu" class="nav-header" data-toggle="collapse"><i class="icon-th-list"></i>财务管理</a>
 	    <ul id="finance-menu" class="nav nav-list collapse in">
-	    <% if session[:admin_level]>=0 %>
+	      <% if isAuthority('1') %>
 	        <li > <%=link_to t('交易查询'),index_online_pay_path,method: :get%> </li>
+	      <% end %>
+	      <% if isAuthority('2') %>
 	        <li > <%=link_to t('财务对账'),transaction_reconciliation_index_path,method: :get%> </li>
+	      <% end %>
+	      <% if isAuthority('3') %>
 	        <li > <%=link_to t('财务确认'),transaction_reconciliation_confirm_search_path,method: :get%> </li>
+	      <% end %>
+	      <% if isAuthority('4') %>
 	        <li > <%=link_to t('财务汇总'),transaction_reconciliation_report_path,method: :get%> </li>
-	    <% end %>
+	      <% end %>
 	    </ul>
 
 	    <a href="#file-menu" class="nav-header" data-toggle="collapse"><i class="icon-file"></i>文件上传</a>
 	    <ul id="file-menu" class="nav nav-list collapse in">
+	      <% if isAuthority('5') %>
 	        <li > <%=link_to t('文件上传'),upload_file_index_path,method: :get%> </li>
+	      <% end %>
 	    </ul>
 
 	    <a href="#simulate-menu" class="nav-header" data-toggle="collapse"><i class="icon-indent-left"></i>模拟交易</a>
 	    <ul id="simulate-menu" class="nav nav-list collapse in">
-	    <% if session[:admin_level]>=0 %>
+	      <% if isAuthority('6') %>
 	        <li > <%= link_to '模拟支付',simulation_path %> </li>
+	      <% end %>
+	      <% if isAuthority('7') %>
 	        <li > <%= link_to '模拟对账',simulation_simulate_reconciliation_path,method: :get %> </li>
-	    <% end %>
+	      <% end %>
 	    </ul>
 
 	</div>

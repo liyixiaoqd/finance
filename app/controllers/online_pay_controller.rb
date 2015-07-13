@@ -2,7 +2,7 @@ require 'csv'
 
 class OnlinePayController < ApplicationController
 	protect_from_forgery :except => :submit
-
+	before_action :check_send_country,only: [:index,:export_index]
 	include Paramsable,OnlinePayHelper
 	
 	CONDITION_PARAMS=%w{payway paytype reconciliation_flag start_time end_time reconciliation_id order_no user_id system send_country}

@@ -1,0 +1,40 @@
+<div class="container-fluid">
+<% @page_title="帐号设置" %>
+<% content_for :breadcrumb do %>
+	<li> <%=link_to t('帐号设置'),admin_setting_index_path,method: :get%> <span class="divider">/</span></li>
+<% end %>
+	<div class="row-fluid">
+		<div class="alert alert-info">
+			<button type="button" class="close" data-dismiss="alert">×</button>
+			<strong>帐号: <%= @am.admin_name %> , 国家: <%= @am.country %></strong>
+		</div>
+
+		<table class="table">
+			<thead>
+				<tr>
+					<th>国家</th>
+					<th>是否有权限</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				<% @country_hash.each do |ch| %>
+				<tr>
+					<td><%= ch[0] %></td>
+					<td><%= ch[1][0] %></td>
+
+					<% if ch[1][0]==true %>
+						<td>
+							 <%=link_to t('取消'),modify_country_admin_setting_path(@am.admin_name,country: ch[1][1],status: false),method: :post%>
+						</td>
+					<% else %>
+						<td>
+							 <%=link_to t('增加'),modify_country_admin_setting_path(@am.admin_name,country: ch[1][1],status: true),method: :post%>
+						</td>
+					<% end %>
+				</tr>
+				<% end %>
+			</tbody>
+		</table>
+	</div>
+</div>

@@ -1,0 +1,28 @@
+<div class="container-fluid">
+<% @page_title="帐号设置" %>
+	<div class="row-fluid">
+		<div class="well">
+			<table class="table">
+				<thead>
+					<tr>
+						<th>帐号名</th>
+						<th>国家</th>
+					</tr>
+				</thead>
+				<tbody>
+					<% @admin_manages.each do |am| %>
+					<tr>
+						<td>
+							<%= link_to am.admin_name,show_authority_admin_setting_path(am.admin_name) %>
+						</td>
+						<td><%= am.country %></td>
+					</tr>
+					<% end %>
+				</tbody>
+			</table>
+			<div class="div_paginate">
+				<%= paginate @admin_manages %>
+			</div>
+		</div>
+	</div>
+</div>
