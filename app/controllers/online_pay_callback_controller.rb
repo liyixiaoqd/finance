@@ -257,7 +257,6 @@ class OnlinePayCallbackController < ApplicationController
 	end
 	
 	def sofort_notify
-		logger.info("!!!!!sofort_notify:#{params}")
 		#spec body 
 		if params.size==2
 			#
@@ -268,7 +267,7 @@ class OnlinePayCallbackController < ApplicationController
 			# </status_notification>
 			#
 			params.merge! SofortDetail.getStatusFromXml(request.body.read)
-			logger.info("!!!!!sofort_notify:#{params}")
+			logger.info("xml proc self!!!  sofort_notify:#{params}")
 		end
 
 		ActiveRecord::Base.transaction do
