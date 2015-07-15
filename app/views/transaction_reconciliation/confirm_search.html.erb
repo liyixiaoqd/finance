@@ -15,7 +15,7 @@
 		<div class="row-fluid">
 			<div class="well">
 				<%= form_tag transaction_reconciliation_confirm_path,method:"post" do %>
-				 	 <%= label_tag(:l1, "到帳日期:",class:"label_inline") %> 
+				 	 <%= label_tag(:l1, "交易日期:",class:"label_inline") %> 
 				 	 <%= datetime_field_tag(:start_time,@transaction_date,class: "auto_refresh") %>
 					 <%= label_tag(:l11, "交易来源系统:",class:"label_inline") %> 
 					 <%= select_tag(:system,options_for_select([["",""],["包裹网站","mypost4u"],["quaie","quaie"]],@system),class: "auto_refresh") %> 
