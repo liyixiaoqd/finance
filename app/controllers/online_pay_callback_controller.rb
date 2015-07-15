@@ -257,7 +257,7 @@ class OnlinePayCallbackController < ApplicationController
 	end
 	
 	def sofort_notify
-		#spec body 
+		#sofort使用XML进行回调,已配置rails自行进行解析
 		if params.size==2
 			#
 			#<?xml version="1.0" encoding="UTF-8" ?>

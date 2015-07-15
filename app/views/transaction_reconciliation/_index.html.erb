@@ -1,13 +1,19 @@
 <tr class="tr_relpace">
 	<td class="td_nowrap">  <%= reconciliation_detail.payway %> </td>
 	<td class="td_nowrap">  <%= reconciliation_detail.paytype%>  </td>
-	<td class="td_nowrap">  <%= reconciliation_detail.transactionid %>  </td>
+	<td class="td_nowrap">  
+		<span title="<%=reconciliation_detail.transactionid%>  ">
+			<%=reconciliation_detail.transactionid%>  
+		</span>
+	</td>
 	<td class="td_nowrap"> 
 		<% unless reconciliation_detail.online_pay.blank? %> 
 			<a href="#" onclick="window.open('<%=show_single_online_pay_path(reconciliation_detail.online_pay)%>',
 				'_blank','scrollbars=0,toolbar=no,location=no,directories=no,status=yrd,menubar=no,scrollbars=no,resizable=yes;width=200');
 				return false">
-				<%=reconciliation_detail.online_pay.order_no%>
+				<span title="<%=reconciliation_detail.online_pay.order_no%>  ">
+					<%=reconciliation_detail.online_pay.order_no%>
+				</span>
 			</a>
 		<% end %> 
 	</td>
@@ -26,7 +32,11 @@
 		<% end %> 
 		<%= reconciliation_detail.reconciliation_describe %>
 	</td> -->
-	<td class="td_nowrap">  <%= reconciliation_detail.timestamp %>  </td>
+	<td class="td_nowrap">  
+		<span title="<%= reconciliation_detail.timestamp %>  ">
+			<%= reconciliation_detail.timestamp %>  
+		</span>
+	</td>
 	<td>  
 		<% if isAuthority("8") %>
 			<% if  reconciliation_detail.reconciliation_flag==ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC'] %> 

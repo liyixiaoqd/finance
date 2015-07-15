@@ -1,6 +1,10 @@
 <tr class="tr_relpace">
-	<td class="td_nowrap"><%=link_to  online_pay.user.username,registe_index_path(system: online_pay.user.system,username: online_pay.user.username),method: :get%></td>
-	<td class="td_nowrap"><%= online_pay.reconciliation_id %></td>
+	<td class="td_nowrap"><%=link_to  online_pay.user.username,registe_index_path(system: online_pay.user.system,username: online_pay.user.username),method: :get,title: "#{online_pay.user.username}"%></td>
+	<td class="td_nowrap">
+		<span title="<%= online_pay.reconciliation_id %>">
+			<%= online_pay.reconciliation_id %>
+		</span>
+	</td>
 	<td class="td_nowrap">
 		<%= online_pay.amount %>
 		<% if actual_pay(online_pay.payway) %>
@@ -8,7 +12,11 @@
 		<% end %>
 	</td>
 	<td class="td_nowrap"><%= online_pay.get_convert_currency %></td>
-	<td class="td_nowrap"><%= status_mapping(online_pay.status) %></td>
+	<td class="td_nowrap">
+		<span title="<%= status_mapping(online_pay.status) %>">
+			<%= status_mapping(online_pay.status) %>
+		</span>
+	</td>
 <!-- 	<td><%= online_pay.callback_status %></td> -->
 	<td class="td_nowrap"><%= payway_paytype_mapping(online_pay.payway.camelize + online_pay.paytype.camelize) %></td>
 	<td class="td_nowrap">
@@ -16,9 +24,19 @@
 		<a href="#" onclick="window.open('<%=show_single_online_pay_path(online_pay)%>',
 			'_blank','scrollbars=0,toolbar=no,location=no,directories=no,status=yrd,menubar=no,scrollbars=no,resizable=yes;width=200');
 			return false">
-			<%=online_pay.order_no%>
+			<span title="<%=online_pay.order_no%>">
+				<%=online_pay.order_no%>
+			</span>
 		</a>
 	</td>
-	<td class="td_nowrap"><%= online_pay.created_at %></td>
-	<td class="td_nowrap"><%= online_pay.reason %></td>
+	<td class="td_nowrap">
+		<span title="<%= online_pay.created_at %>">
+			<%= online_pay.created_at %>
+		</span>
+	</td>
+	<td class="td_nowrap">
+		<span title="<%= online_pay.reason %>">
+			<%= online_pay.reason %>
+		</span>
+	</td>
 </tr>
