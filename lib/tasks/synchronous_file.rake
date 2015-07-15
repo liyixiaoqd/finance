@@ -2,7 +2,7 @@ desc "财务对账rake任务 - 产生每日与外部系统对接文件"
 
 namespace :sync_file do
 	desc "生成同步文件"
-	task :product,[:arg1,:arg2] =>[:environment] do|t,args|
+	task :product,[:arg1,:arg2,:arg3] =>[:environment] do|t,args|
 		@interface_logger = Logger.new("log/sync_file.log")
 		@interface_logger.level=Logger::INFO
 		@interface_logger.datetime_format="%Y-%m-%d %H:%M:%S"
@@ -10,18 +10,23 @@ namespace :sync_file do
 			"[#{datetime}] :#{msg}\n"
 		}
 
-		@beg = args[:arg1]
-		@end = args[:arg2]
+		filetype = args[:arg1]
+		@beg = args[:arg2]
+		@end = args[:arg3]
 		if @beg.blank? || @end.blank?
 			@beg=OnlinePay.current_time_format("%Y-%m-%d",-1)
 			@end=OnlinePay.current_time_format("%Y-%m-%d",1)
 		end
-		@interface_logger.info("=================== sync_file start:#{@beg} -- #{@end}===================")
-		Rake::Task["sync_file:finance_water"].invoke
-		@interface_logger.info("---------------------------------")
-		Rake::Task["sync_file:finance_invoice"].invoke
-		@interface_logger.info("---------------------------------")
-		@interface_logger.info("=================== sync_file end:#{@beg} -- #{@end}===================\n\n\n\n")
+
+		@interface_logger.info("=================== sync_file start:[#{filetype}] #{@beg} -- #{@end}===================")
+		if filetype=="finance_water"
+			Rake::Task["sync_file:finance_water"].invoke
+			@interface_logger.info("---------------------------------")
+		elsif filetype=="finance_invoice"
+			Rake::Task["sync_file:finance_invoice"].invoke
+			@interface_logger.info("---------------------------------")
+		end
+		@interface_logger.info("=================== sync_file end:[#{filetype}] #{@beg} -- #{@end}===================\n\n\n\n")
 	end
 
 	desc "生成客户流水文件"
