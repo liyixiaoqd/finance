@@ -54,9 +54,6 @@ class ReconciliationDetail < ActiveRecord::Base
 			raise "transactionid与order_no不可都为空"
 		end
 		rd=ReconciliationDetail.find_or_initialize_by(find_params)
-		if rd.confirm_flag==CONFIRM_FLAG['SUCC']
-			raise "#{rd.transactionid}#{rd.order_no} has confirm!!"
-		end
 		rd.assign_attributes(other_params)
 		#Rails.logger.info(rd.attributes)
 		rd
@@ -69,6 +66,10 @@ class ReconciliationDetail < ActiveRecord::Base
 	end
 
 	def valid_and_save!()
+		if rd.confirm_flag==CONFIRM_FLAG['SUCC']
+			raise "[#{rd.transactionid}] or [#{rd.order_no}] has confirm!!"
+		end
+
 		set_params_by_transactionid!()
 
 		if self.online_pay_id.blank?
