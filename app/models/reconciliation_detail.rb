@@ -66,8 +66,8 @@ class ReconciliationDetail < ActiveRecord::Base
 	end
 
 	def valid_and_save!()
-		if rd.confirm_flag==CONFIRM_FLAG['SUCC']
-			raise "[#{rd.transactionid}] or [#{rd.order_no}] has confirm!!"
+		if self.confirm_flag==CONFIRM_FLAG['SUCC']
+			raise "[#{self.transactionid}] or [#{self.order_no}] has confirm!!"
 		end
 
 		set_params_by_transactionid!()
