@@ -107,7 +107,7 @@ class ReconciliationAlipayOversea
 				'netamt'=>array_detail[1].to_f - array_detail[6].to_f,
 				'payway'=>'alipay',
 				'paytype'=>'oversea',
-				'transaction_date'=>@reconciliation_date,
+				'transaction_date'=>array_detail[3][0,4]+"-"+array_detail[3][4,2]+"-"+array_detail[3][6,2],
 				'batch_id'=>@reconciliation_date+"_"+sprintf("%03d",@batch_id),
 				'reconciliation_flag'=>ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['INIT']
 			}

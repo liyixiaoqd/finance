@@ -173,7 +173,6 @@ class ReconciliationAlipayTransaction
 			hash_alipay={
 				'payway'=>'alipay',
 				'paytype'=>'transaction',
-				'transaction_date'=>@reconciliation_date,
 				'batch_id'=>@reconciliation_date+"_"+sprintf("%03d",@batch_id),
 				'reconciliation_flag'=>ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['INIT'],
 			}
@@ -181,7 +180,9 @@ class ReconciliationAlipayTransaction
 			child=element.child
 			while child
 				case child.name
-				when "trans_date" then hash_alipay["timestamp"]=child.text
+				when "trans_date" then 
+					hash_alipay["timestamp"]=child.text
+					hash_alipay["transaction_date"]=child.text[0,10]
 				when "sub_trans_code_msg" then hash_alipay["transaction_type"]=child.text
 				when "trans_code_msg" then hash_alipay["transaction_type"]=child.text+" - "+hash_alipay["transaction_type"]
 				when "trade_no" then hash_alipay["transactionid"]=child.text

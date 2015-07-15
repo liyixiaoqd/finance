@@ -209,7 +209,7 @@ class ReconciliationPaypal
 				'netamt'=>@paypal_reconciliation_hash['l_netamt'][i].to_f,
 				'payway'=>'paypal',
 				'paytype'=>'',
-				'transaction_date'=>@reconciliation_date,
+				'transaction_date'=>@paypal_reconciliation_hash['l_timestamp'][i][0,10],
 				'batch_id'=>@reconciliation_date+"_"+sprintf("%03d",@batch_id),
 				'reconciliation_flag'=>ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['INIT']
 			}
