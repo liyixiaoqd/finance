@@ -93,7 +93,7 @@ namespace :sync_file do
 			end
 
 			split="|&|"
-			ReconciliationDetail.includes(:online_pay).where("(invoice_date is null or invoice_date='') and confirm_flag=\"#{ReconciliationDetail::CONFIRM_FLAG['SUCC']}\" and confirm_date>=\"#{@beg}\" and confirm_date<\"#{@end}\"").each do |rd|
+			ReconciliationDetail.includes(:online_pay).where("(invoice_date is null or invoice_date='') and confirm_flag=\"#{ReconciliationDetail::CONFIRM_FLAG['SUCC']}\"").each do |rd|
 				if file_hash[rd.system].blank?
 					@interface_logger.info("WARN: no system:#{system} include? #{rd.id}")
 					next
