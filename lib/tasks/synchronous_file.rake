@@ -94,10 +94,12 @@ namespace :sync_file do
 
 			split="|&|"
 			ReconciliationDetail.includes(:online_pay).where("(invoice_date is null or invoice_date='') and confirm_flag=\"#{ReconciliationDetail::CONFIRM_FLAG['SUCC']}\"").each do |rd|
-				if file_hash[rd.system].blank?
-					@interface_logger.info("WARN: no system:#{system} include? #{rd.id}")
+				@interface_logger.info("transactionid:[#{rd.transactionid}],[#{rd.system}]")
+				if rd.system.blank? || file_hash[rd.system].blank?
+					@interface_logger.info("WARN: no system:[#{rd.system}] include,ID:#{rd.id}")
 					next
 				end
+				@interface_logger.info("file_hash[rd.system]:#{file_hash[rd.system]}")
 
 				#退订单中包裹情况
 				if rd.batch_id=="refund_parcel"
@@ -105,9 +107,12 @@ namespace :sync_file do
 				else
 					order_no=rd.order_no
 				end
+				@interface_logger.info("order_no:#{rd.batch_id},#{order_no}")
 
 				rd.update_attributes!({'invoice_date'=>@end})
 				
+				@interface_logger.info("invoice_date:#{@end}")
+
 				outline=[order_no,rd.transaction_date.to_s[0,10]]
 				file_hash[system].puts "#{outline.join(split)}"
 			end
