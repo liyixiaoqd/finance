@@ -48,14 +48,14 @@
 	      <% if isAuthority('1') %>
 	        <li > <%=link_to t('交易查询'),index_online_pay_path,method: :get%> </li>
 	      <% end %>
+	      <% if isAuthority('4') %>
+	        <li > <%=link_to t('交易汇总'),transaction_reconciliation_report_path,method: :get%> </li>
+	      <% end %>
 	      <% if isAuthority('2') %>
 	        <li > <%=link_to t('财务对账'),transaction_reconciliation_index_path,method: :get%> </li>
 	      <% end %>
 	      <% if isAuthority('3') %>
 	        <li > <%=link_to t('财务确认'),transaction_reconciliation_confirm_search_path,method: :get%> </li>
-	      <% end %>
-	      <% if isAuthority('4') %>
-	        <li > <%=link_to t('财务汇总'),transaction_reconciliation_report_path,method: :get%> </li>
 	      <% end %>
 	    </ul>
 

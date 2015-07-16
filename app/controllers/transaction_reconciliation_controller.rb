@@ -180,6 +180,16 @@ class TransactionReconciliationController < ApplicationController
 
 	def confirm
 		begin
+			if params['passwd'].blank?
+				flash[:notice]="请输入密码后再进行确认"
+				redirect_to transaction_reconciliation_confirm_search_path and return
+			end
+
+			if AdminManage.valid_admin({'admin_name'=>session['admin'],'admin_passwd_encryption'=>params['passwd']}).blank?
+				flash[:notice]="密码输入错误,请重新确认"
+				redirect_to transaction_reconciliation_confirm_search_path and return
+			end
+
 			if params['confirm_num'].blank? || params['confirm_num'].to_i==0
 				flash[:notice]="无可确认数据! 提交未确认比数: #{params['confirm_num']}"
 				redirect_to transaction_reconciliation_confirm_search_path and return

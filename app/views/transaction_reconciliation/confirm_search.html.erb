@@ -14,7 +14,7 @@
 		</div>
 		<div class="row-fluid">
 			<div class="well">
-				<%= form_tag transaction_reconciliation_confirm_path,method:"post" do %>
+				<%= form_tag transaction_reconciliation_confirm_path,method:"post",name: "form1" do %>
 				 	 <%= label_tag(:l1, "交易日期:",class:"label_inline") %> 
 				 	 <%= datetime_field_tag(:start_time,@transaction_date,class: "auto_refresh") %>
 					 <%= label_tag(:l11, "交易来源系统:",class:"label_inline") %> 
@@ -29,9 +29,13 @@
 					 <%= label_tag(:l3, "对账成功未确认比数:") %> <%= text_field_tag(:confirm_num_display,@confirm_num,disabled: true) %>	
 					 <%= hidden_field_tag(:confirm_num,@confirm_num) %>
 					  <%= label_tag(:l4, "对账成功未确认金额:") %> <%= text_field_tag(:confirm_amount_display,@confirm_amount,disabled: true) %>
+					 <div class="hidden" id="div_hidden">
+						<%= label_tag(:l13, "请输入密码:") %> 
+					 	<%= password_field_tag(:passwd) %>
+					 </div>
 					 <%= hidden_field_tag(:confirm_amount,@confirm_amount) %>
 					 <div class="btn-toolbar">
-						<%= submit_tag("确认",class: "btn btn-primary") %>
+						<%= button_tag("确认",type: 'button',class: "btn btn-primary",id: "input_passwd") %>
 					          	<%= button_tag("刷新",type: 'button',class: "btn",id: "button_refresh") %>
 				          	</div>
 				<% end %>

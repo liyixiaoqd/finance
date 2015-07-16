@@ -197,7 +197,7 @@ AccessAuthority.create!(:controller=>"TransactionReconciliationController",:acti
 			:describe=>'财务管理 - 财务对账',:access_level=>2)
 AccessAuthority.create!(:controller=>"TransactionReconciliationController",:action=>"report",
 			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
-			:describe=>'财务管理 - 财务汇总',:access_level=>4)
+			:describe=>'财务管理 - 交易汇总',:access_level=>4)
 AccessAuthority.create!(:controller=>"TransactionReconciliationController",:action=>"export",
 			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'各财务系统对账单导出')

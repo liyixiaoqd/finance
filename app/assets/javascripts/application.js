@@ -65,6 +65,21 @@ $(document).ready(function(){
   	}
   });
 
+  $("#input_passwd").click(function(event){
+  	passwd=document.getElementById("passwd").value
+  	if (passwd==""){
+	  	h_div=document.getElementById("div_hidden")
+	  	if (h_div.className=="")
+	  		alert("请输入登入帐号密码")
+	  	else
+	  		h_div.className="";
+	}
+	else{
+		document.getElementById("passwd").value=hex_md5(passwd)
+		form1.submit()
+	}
+  });
+
   $("#link_to_export").click(function(event){
   	input_objs=document.getElementById("index_and_export_form").children
   	var condition="?"
