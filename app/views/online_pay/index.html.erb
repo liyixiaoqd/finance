@@ -34,9 +34,9 @@
 					 <%= label_tag(:l8, "订单/补款号:",class:"label_inline") %> &nbsp;&nbsp;
 					 <%= text_field_tag(:order_no) %>
 					 </br>
-					 <%= label_tag(:l9, "交易开始时间:",class:"label_inline") %> <%= datetime_field_tag(:start_time) %>
+					 <%= label_tag(:l9, "交易发起起期:",class:"label_inline") %> <%= datetime_field_tag(:start_time) %>
 					 &nbsp;&nbsp;&nbsp;
-					 <%= label_tag(:l10, "交易结束时间:",class:"label_inline") %> <%= datetime_field_tag(:end_time) %>
+					 <%= label_tag(:l10, "交易发起止期:",class:"label_inline") %> <%= datetime_field_tag(:end_time) %>
 					 <div class="btn-toolbar">
 						 <%= submit_tag("查询",class: "btn btn-primary") %>
 						 <%= link_to "导出",export_index_online_pay_path,class: "btn",method: "get",id: "link_to_export"%>

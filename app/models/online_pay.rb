@@ -203,6 +203,15 @@ class OnlinePay < ActiveRecord::Base
 		self.status[0,7]=='success'
 	end
 
+	def get_transaction_timestamp()
+		rd=self.reconciliation_detail
+		if rd.present? && rd.reconciliation_flag==ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC']
+			rd.timestamp
+		else
+			nil
+		end
+	end
+
 	def set_reconciliation()
 		reconciliation_params={
 			'paytype' => self.paytype,

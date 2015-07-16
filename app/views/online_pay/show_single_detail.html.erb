@@ -35,8 +35,14 @@
 						<td><%= payway_paytype_mapping(@online_pay.payway.camelize + @online_pay.paytype.camelize) %> </td>
 					</tr>
 					<tr>
-						<td>交易日期</td>
+						<td>交易发起日期</td>
 						<td><%= @online_pay.created_at %></td>
+					</tr>
+					<tr>
+						<td>交易完成日期</td>
+						<td>
+							<% @online_pay.get_transaction_timestamp() %>
+						</td>
 					</tr>
 					<tr>
 						<td>备注</td>
