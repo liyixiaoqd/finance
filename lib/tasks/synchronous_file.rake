@@ -99,7 +99,7 @@ namespace :sync_file do
 					@interface_logger.info("WARN: no system:[#{rd.system}] include,ID:#{rd.id}")
 					next
 				end
-				@interface_logger.info("file_hash[rd.system]:#{file_hash[rd.system]}")
+				@interface_logger.info("file_hash[rd.system]")
 
 				#退订单中包裹情况
 				if rd.batch_id=="refund_parcel"
@@ -114,7 +114,7 @@ namespace :sync_file do
 				@interface_logger.info("invoice_date:#{@end}")
 
 				outline=[order_no,rd.transaction_date.to_s[0,10]]
-				file_hash[system].puts "#{outline.join(split)}"
+				file_hash[rd.system].puts "#{outline.join(split)}"
 			end
 
 			system_list.each do |s|
