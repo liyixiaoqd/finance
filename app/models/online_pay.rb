@@ -234,7 +234,7 @@ class OnlinePay < ActiveRecord::Base
 	def self.get_count_sum_by_day_condition(datatime_beg="",datatime_end="",condition="")
 		if datatime_beg.blank? || datatime_end.blank?
 			datatime_beg=current_time_format("%Y-%m-%d",0)
-			datatime_end=current_time_format("%Y-%m-%d",1)
+			datatime_end=current_time_format("%Y-%m-%d",0)
 		end
 
 		case condition
@@ -244,7 +244,7 @@ class OnlinePay < ActiveRecord::Base
 			sql_condition=condition
 		end
 
-		op_tj=OnlinePay.select("count(*) as c,sum(amount) as s").where("created_at>=? and created_at<? #{sql_condition}",datatime_beg,datatime_end)
+		op_tj=OnlinePay.select("count(*) as c,sum(amount) as s").where("created_at>=? and created_at<=? #{sql_condition}",datatime_beg,datatime_end)
 		if(op_tj[0]['s'].blank?)
 			[op_tj[0]['c'],0.00]
 		else
