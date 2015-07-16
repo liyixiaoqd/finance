@@ -66,16 +66,17 @@ $(document).ready(function(){
   });
 
   $("#input_passwd").click(function(event){
-  	passwd=document.getElementById("passwd").value
-  	if (passwd==""){
+  	dom_passwd=document.getElementById("passwd")
+  	if (dom_passwd.value==""){
 	  	h_div=document.getElementById("div_hidden")
 	  	if (h_div.className=="")
 	  		alert("请输入登入帐号密码")
 	  	else
 	  		h_div.className="";
+	  	dom_passwd.focus()
 	}
 	else{
-		document.getElementById("passwd").value=hex_md5(passwd)
+		document.getElementById("passwd").value=hex_md5(dom_passwd.value)
 		form1.submit()
 	}
   });
