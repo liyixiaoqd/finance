@@ -1,5 +1,6 @@
 class TransactionReconciliationController < ApplicationController
 	# before_action :authenticate_admin!
+	include OnlinePayHelper
 	include TransactionReconciliationHelper
 	include Timeutilsable
 	include Enumsable
@@ -64,18 +65,16 @@ class TransactionReconciliationController < ApplicationController
 		csv_string = CSV.generate do |csv|
 			csv << ["导出工号", session[:admin],"导出时间", OnlinePay.current_time_format("%Y-%m-%d %H:%M:%S")]
 			csv << []
-			csv << ["支付类型", "子类型","交易号", "订单号/补款号", "对账状态","金额","货币","交易时间"]
+			csv << ["支付类型", "子类型","交易号", "订单号/补款号", "对账状态","金额","货币","交易完成时间","交易状态","交易发起日期","交易来源系统","包裹发送国家","用户名","注册E-Mail"]
 			reconciliation_details.each do |rd|
-				if rd.online_pay.blank?
-					order_no=""
-				else
-					order_no=rd.online_pay.order_no
+				out_arr=[rd.payway,rd.paytype,rd.transactionid,rd.order_no,
+				                reconciliation_flag_mapping(rd.reconciliation_flag),
+				                rd.amt,rd.currencycode,rd.timestamp]
+				unless rd.online_pay.blank?         
+					out_arr += [status_mapping(rd.online_pay.status),rd.online_pay.created_at,system_mapping(rd.system),
+						      rd.online_pay.send_country,rd.online_pay.user.username,rd.online_pay.user.email]
 				end
-
-				csv << [rd.payway,rd.paytype,rd.transactionid,
-				              order_no,
-				              reconciliation_flag_mapping(rd.reconciliation_flag),
-				              rd.amt,rd.currencycode,rd.timestamp]
+				csv << out_arr
 			end
 		end
 

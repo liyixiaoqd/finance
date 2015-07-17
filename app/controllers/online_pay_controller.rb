@@ -75,12 +75,20 @@ class OnlinePayController < ApplicationController
 		csv_string = CSV.generate do |csv|
 			csv << ["导出工号", session[:admin],"导出时间", OnlinePay.current_time_format("%Y-%m-%d %H:%M:%S")]
 			csv << []
-			csv << ["用户名", "交易号", "金额","货币", "状态", "支付类型与子类型","订单号/补款号","交易日期","备注"]
+			csv << ["用户名", "交易号", "金额","货币", "状态", "支付类型与子类型","订单号/补款号","交易日期","备注","交易完成日期","交易来源系统","包裹发送国家","注册E-Mail"]
 			online_pay.each do |op|
-				csv << [op.user.username,op.reconciliation_id,op.amount,op.get_convert_currency(),
-				              status_mapping(op.status),
-				              payway_paytype_mapping(op.payway.camelize + op.paytype.camelize),
-				              op.order_no,op.created_at,op.reason]
+				out_arr=[op.user.username,op.reconciliation_id,op.amount,op.get_convert_currency(),
+				                status_mapping(op.status),
+				                payway_paytype_mapping(op.payway.camelize + op.paytype.camelize),
+				                op.order_no,op.created_at,op.reason]
+				if op.reconciliation_detail.blank?
+					out_arr += ['']
+				else
+					out_arr += [op.reconciliation_detail.timestamp]
+				end
+				out_arr += [status_mapping(op.status),op.send_country,op.user.email]
+
+				csv << out_arr
 			end
 		end
 
