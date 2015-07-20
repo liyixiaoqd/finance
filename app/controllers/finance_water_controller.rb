@@ -321,13 +321,18 @@ class FinanceWaterController < ApplicationController
 			reconciliation_detail.transaction_status='SUCC'
 			reconciliation_detail.reconciliation_flag='2'
 			reconciliation_detail.amt=params['amount']
-			reconciliation_detail.currencycode=online_pay.currency unless online_pay.blank?
 			reconciliation_detail.netamt=0.0
 			reconciliation_detail.feeamt=0.0
 			reconciliation_detail.system=params["system"]
 			reconciliation_detail.order_no=params["order_no"]
 			reconciliation_detail.reconciliation_describe="订单退费"
 
+
+			unless online_pay.blank?
+				reconciliation_detail.currencycode=online_pay.currency
+				reconciliation_detail.send_country=online_pay.send_country
+			end
+			
 			reconciliation_detail
 		end
 
