@@ -25,13 +25,13 @@ class ReconciliationAlipayTransaction
 
 		post_day=BasicData.get_value("00A","001","alipay","transaction").to_i
 		if(gmt_start_time.blank?)
-			@gmt_start_time=current_time_format("%Y-%m-%d 00:00:00",1-post_day)
+			@gmt_start_time=current_time_format("%Y-%m-%d 00:00:00",0-post_day)
 		else
 			@gmt_start_time=gmt_start_time
 		end
 
 		if(gmt_end_time.blank?)
-			@gmt_end_time=current_time_format("%Y-%m-%d 00:00:00",2-post_day)
+			@gmt_end_time=current_time_format("%Y-%m-%d 00:00:00",1-post_day)
 		else
 			@gmt_end_time=gmt_end_time
 		end
