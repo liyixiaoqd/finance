@@ -19,12 +19,18 @@
 
       <div class="row-fluid"> 
         <div class="well">
-          <%= form_tag("/finance_water/#{@user.userid}/modify_web", method: "post") do %>
+          <%= form_tag("/finance_water/#{@user.userid}/modify_web", method: "post",name: "form1") do %>
           <%= label_tag(:label1, "流水类型:",class:"label_inline") %> 
           <%= select_tag(:watertype,options_for_select([["积分","score"],["电子现金","e_cash"]])) %> </br>
-          <%= label_tag(:label2, "操作:",class:"label_inline") %> 
-          <%= select_tag(:symbol,options_for_select([["+","Add"],["-","Sub"]],"Add")) %> 
-          <%= label_tag(:label3, "金额:",class:"label_inline") %> 
+
+           <div class="hidden" id="div_hidden_time">
+            <%= label_tag(:label6, "操作日期:",class:"label_inline") %> 
+            <%= datetime_field_tag(:end_time,OnlinePay.current_time_format("%Y-%m-%d"),class: "auto_refresh") %>
+           </div>
+
+          <%= label_tag(:label2, "操作:",class:"label_inline") %> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <%= select_tag(:symbol,options_for_select([["+","Add"],["-","Sub"]],"Add")) %> </br>
+          <%= label_tag(:label3, "金额:",class:"label_inline") %> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           <%= text_field_tag(:amount,0.00) %> </br>
           <%= label_tag(:label4, "新增原因:",class:"label_inline") %> 
           <%= text_area_tag(:reason,"#{session[:admin]} 手动调整" ,size: "40*5") %>
@@ -32,7 +38,16 @@
           <%= hidden_field_tag :channel,"finance_web" %>
           <%= hidden_field_tag :operator,session[:admin] %>
           <%= hidden_field_tag :datetime,Time.now%>
-          <%= submit_tag("提交",class: "btn btn-primary") %>
+
+           <div class="hidden" id="div_hidden">
+            <%= label_tag(:label5, "请输入密码:") %> 
+            <%= password_field_tag(:passwd) %>
+           </div>
+
+           <div class="btn-toolbar">
+            <%= button_tag("提交",type: 'button',class: "btn btn-primary",id: "input_passwd_watertype") %>
+           </div>
+
           <% end %>
         </div>
       </div>

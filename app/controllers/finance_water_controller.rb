@@ -151,7 +151,19 @@ class FinanceWaterController < ApplicationController
 					ret_hash['reasons']<<{'reason'=>"user is not exists!"}
 					flash[:notice]=ret_hash['reasons'];redirect_to :back and return
 				end
+
 				@user=user
+				
+				if params['watertype']=='e_cash'
+					if params['passwd'].blank?
+						raise "请输入密码后再进行确认"
+					end
+
+					if AdminManage.valid_admin({'admin_name'=>session['admin'],'admin_passwd_encryption'=>params['passwd']}).blank?
+						raise "密码输入错误,请重新确认"
+					end
+				end
+
 				finance_water=new_finance_water_params(user,params)
 				update_params={}
 				if(finance_water.watertype=="score")
@@ -374,7 +386,9 @@ class FinanceWaterController < ApplicationController
 			finance_water.channel=params["channel"]
 			finance_water.userid=params["userid"]
 			finance_water.operator=params["operator"]
-			finance_water.operdate=params["datetime"]
+			# use end_time not datetime
+			#finance_water.operdate=params["datetime"]
+			finance_water.operdate=params["end_time"]
 
 			finance_water.symbol=params["symbol"]
 			finance_water.amount=params["amount"]

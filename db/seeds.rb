@@ -32,35 +32,30 @@ BasicData.create!(:basic_type=>"00A",:desc=>"financial reconciliation interface 
 	                   :payway=>"alipay",:paytype=>"oversea",:value=>"24")
 
 AdminManage.delete_all
-AdminManage.create!(:admin_name=>'admin',:admin_passwd=>'eb9839c141dd4df3beecb8a17e98daaf',
-			:is_active=>false,:authority=>'9',:status=>'normal',
-			:role=>'SuperAdmin',:last_login_time=>nil,:country=>'ALL')
-AdminManage.create!(:admin_name=>'finance',:admin_passwd=>'af1d6c48324c1461e12cbdefa91472f7',
-			:is_active=>false,:authority=>'4',:status=>'normal',
-			:role=>'Admin',:last_login_time=>nil,:country=>'de,nl')
-AdminManage.create!(:admin_name=>'guest',:admin_passwd=>'af1d6c48324c1461e12cbdefa91472f7',
+passwd=Digest::MD5.hexdigest("passwd")
+AdminManage.create!(:admin_name=>'admin',:admin_passwd=>Digest::MD5.hexdigest("#{passwd}#{Settings.admin.passwd_key}"),
 			:is_active=>false,:authority=>'0',:status=>'normal',
-			:role=>'Admin',:last_login_time=>nil)
+			:role=>'SuperAdmin',:last_login_time=>nil,:country=>'ALL')
 
-AdminAuthority.delete_all
-aa=AdminManage.first.admin_authority.build
-aa.admin_name=aa.admin_manage.admin_name
-aa.controller="AdminSettingController"
-aa.action="index"
-aa.no=99
-aa.status=true
-aa.describe="帐号设置"
-aa.save!()
+passwd=Digest::MD5.hexdigest("passwd_manager")
+AdminManage.create!(:admin_name=>'finance_manager',:admin_passwd=>Digest::MD5.hexdigest("#{passwd}#{Settings.admin.passwd_key}"),
+			:is_active=>false,:authority=>'0',:status=>'normal',
+			:role=>'manager',:last_login_time=>nil,:country=>'gb')
 
-aa=AdminManage.first.admin_authority.build
-aa.admin_name=aa.admin_manage.admin_name
-aa.controller="OnlinePayController"
-aa.action="index"
-aa.no=1
-aa.describe="财务管理-交易查询"
-aa.status=true
-aa.save!()
+passwd=Digest::MD5.hexdigest("passwd_nl")
+AdminManage.create!(:admin_name=>'finance_nl',:admin_passwd=>Digest::MD5.hexdigest("#{passwd}#{Settings.admin.passwd_key}"),
+			:is_active=>false,:authority=>'0',:status=>'normal',
+			:role=>'finance',:last_login_time=>nil,:country=>'nl')
 
+passwd=Digest::MD5.hexdigest("passwd_gb")
+AdminManage.create!(:admin_name=>'finance_nl',:admin_passwd=>Digest::MD5.hexdigest("#{passwd}#{Settings.admin.passwd_key}"),
+			:is_active=>false,:authority=>'0',:status=>'normal',
+			:role=>'finance',:last_login_time=>nil,:country=>'gb')
+
+passwd=Digest::MD5.hexdigest("passwd_de")
+AdminManage.create!(:admin_name=>'finance_de',:admin_passwd=>Digest::MD5.hexdigest("#{passwd}#{Settings.admin.passwd_key}"),
+			:is_active=>false,:authority=>'0',:status=>'normal',
+			:role=>'finance',:last_login_time=>nil,:country=>'ALL')
 
 AccessAuthority.delete_all
 AccessAuthority.create!(:controller=>"AdminManageController",:action=>"sign_index",
@@ -214,7 +209,7 @@ AccessAuthority.create!(:controller=>"TransactionReconciliationController",:acti
 
 AccessAuthority.create!(:controller=>"UploadFileController",:action=>"index",
 			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
-			:describe=>'文件上传-文件上传',:access_level=>5)
+			:describe=>'文件上传 - 文件上传',:access_level=>5)
 AccessAuthority.create!(:controller=>"UploadFileController",:action=>"upload",
 			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'上传文件处理')
@@ -238,3 +233,34 @@ AccessAuthority.create!(:controller=>"AdminSettingController",:action=>"new_coun
 AccessAuthority.create!(:controller=>"AdminSettingController",:action=>"modify_country",
 			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'单个帐号国家修改提交')
+
+
+AdminAuthority.delete_all
+AdminManage.all.each do |am|
+	AccessAuthority.where("access_level is not null and is_interface=false and is_sign_in=true").each do |aca|
+
+		ada=am.admin_authority.build
+		ada.admin_name=am.admin_name
+		ada.controller=aca.controller
+		ada.action=aca.action
+		ada.no=aca.access_level
+		ada.describe=aca.describe
+		ada.status=true
+
+		if am.admin_name=="admin"	
+			nil
+		elsif am.admin_name=="finance_manager"
+			if ada.controller=="SimulationController"
+				ada.status=false
+			end
+		else
+			if ada.controller=="SimulationController"
+				ada.status=false
+			elsif ada.controller=="AdminSettingController"
+				ada.status=false
+			end
+		end
+
+		ada.save!()
+	end
+end

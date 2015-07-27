@@ -81,6 +81,37 @@ $(document).ready(function(){
 	}
   });
 
+  $("#watertype").change(function(event){
+  	if (this.value=="e_cash"){
+  		document.getElementById("div_hidden_time").className=""
+  	}
+  	else{
+		document.getElementById("div_hidden_time").className="hidden"
+		document.getElementById("div_hidden").className="hidden"
+  	}
+  });  
+
+  $("#input_passwd_watertype").click(function(event){
+  	if(document.getElementById("watertype").value=="e_cash"){
+	  	dom_passwd=document.getElementById("passwd")
+	  	if (dom_passwd.value==""){
+		  	h_div=document.getElementById("div_hidden")
+		  	if (h_div.className=="")
+		  		alert("请输入登入帐号密码")
+		  	else
+		  		h_div.className="";
+		  	dom_passwd.focus()
+		}
+		else{
+			document.getElementById("passwd").value=hex_md5(dom_passwd.value)
+			form1.submit()
+		}
+	}
+	else{
+		form1.submit()
+	}
+  });
+
   $("#link_to_export").click(function(event){
   	input_objs=document.getElementById("index_and_export_form").children
   	var condition="?"
