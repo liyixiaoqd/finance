@@ -7,6 +7,8 @@ Rails.application.routes.draw do
   get 'admin_manage/sign_in' => 'admin_manage#sign_in'
   post 'admin_manage/sign_in' => 'admin_manage#sign_in'
   post 'admin_manage/sign_out' => 'admin_manage#sign_out'
+  get 'admin_manage/passwd_new' => 'admin_manage#passwd_new'
+  post 'admin_manage/passwd_modify' => 'admin_manage#passwd_modify'
 
   get 'registe/index' => 'registe#index'
   get 'registe/:userid/show' => 'registe#show'

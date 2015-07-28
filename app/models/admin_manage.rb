@@ -40,6 +40,10 @@ class AdminManage < ActiveRecord::Base
 		nil
 	end
 
+	def self.encry_passwd(passwd)
+		Digest::MD5.hexdigest("#{passwd}#{Settings.admin.passwd_key}")
+	end
+
 	def self.get_authority(name)
 		begin
 			am=AdminManage.find_by_admin_name!(name)

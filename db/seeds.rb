@@ -67,6 +67,12 @@ AccessAuthority.create!(:controller=>"AdminManageController",:action=>"sign_in",
 AccessAuthority.create!(:controller=>"AdminManageController",:action=>"sign_out",
 			:is_sign_in=>false,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'ADMIN登出界面')
+AccessAuthority.create!(:controller=>"AdminManageController",:action=>"passwd_new",
+			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
+			:describe=>'ADMIN密码修改界面')
+AccessAuthority.create!(:controller=>"AdminManageController",:action=>"passwd_modify",
+			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
+			:describe=>'ADMIN密码修改')
 
 AccessAuthority.create!(:controller=>"FinanceWaterController",:action=>"new",
 			:is_sign_in=>true,:is_interface=>false,

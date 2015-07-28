@@ -57,6 +57,31 @@ $(document).ready(function(){
   	document.getElementById("admin_admin_passwd_encryption").value=hex_md5(passwd)
   });
 
+  $("#modify_passwd_button").click(function(event){
+  	var old_passwd=document.getElementById("old_passwd").value
+  	var new_passwd=document.getElementById("new_passwd").value
+  	var new_passwd_confirm=document.getElementById("new_passwd_confirm").value
+  	var flag=false
+
+  	if (old_passwd=="")
+  		alert("请输入旧密码")
+  	else if(new_passwd=="")
+		alert("请输入新密码")
+	else if (new_passwd!=new_passwd_confirm)
+		alert("新密码输入不一致")
+	else if (new_passwd==old_passwd)
+		alert("新旧密码输入一致")
+  	else{
+  		document.getElementById("old_passwd").value=hex_md5(old_passwd)
+  		document.getElementById("new_passwd").value=hex_md5(new_passwd)
+  		document.getElementById("new_passwd_confirm").value=hex_md5(new_passwd_confirm)
+  		flag=true
+  	}
+
+  	if (flag==false)
+  		event.preventDefault()
+  });
+
 
   $("#button_submit_time").click(function(event){
   	if(document.getElementById("start_time").value=="" || document.getElementById("end_time").value==""){
