@@ -37,25 +37,25 @@ AdminManage.create!(:admin_name=>'admin',:admin_passwd=>Digest::MD5.hexdigest("#
 			:is_active=>false,:authority=>'0',:status=>'normal',
 			:role=>'SuperAdmin',:last_login_time=>nil,:country=>'ALL')
 
-passwd=Digest::MD5.hexdigest("passwd_manager")
-AdminManage.create!(:admin_name=>'finance_manager',:admin_passwd=>Digest::MD5.hexdigest("#{passwd}#{Settings.admin.passwd_key}"),
+passwd=Digest::MD5.hexdigest("finance_kiki")
+AdminManage.create!(:admin_name=>'finance_kiki',:admin_passwd=>Digest::MD5.hexdigest("#{passwd}#{Settings.admin.passwd_key}"),
 			:is_active=>false,:authority=>'0',:status=>'normal',
-			:role=>'manager',:last_login_time=>nil,:country=>'gb')
+			:role=>'manager',:last_login_time=>nil,:country=>'ALL')
 
-passwd=Digest::MD5.hexdigest("passwd_nl")
-AdminManage.create!(:admin_name=>'finance_nl',:admin_passwd=>Digest::MD5.hexdigest("#{passwd}#{Settings.admin.passwd_key}"),
-			:is_active=>false,:authority=>'0',:status=>'normal',
-			:role=>'finance',:last_login_time=>nil,:country=>'nl')
-
-passwd=Digest::MD5.hexdigest("passwd_gb")
-AdminManage.create!(:admin_name=>'finance_nl',:admin_passwd=>Digest::MD5.hexdigest("#{passwd}#{Settings.admin.passwd_key}"),
-			:is_active=>false,:authority=>'0',:status=>'normal',
-			:role=>'finance',:last_login_time=>nil,:country=>'gb')
-
-passwd=Digest::MD5.hexdigest("passwd_de")
-AdminManage.create!(:admin_name=>'finance_de',:admin_passwd=>Digest::MD5.hexdigest("#{passwd}#{Settings.admin.passwd_key}"),
+passwd=Digest::MD5.hexdigest("finance_mao")
+AdminManage.create!(:admin_name=>'finance_mao',:admin_passwd=>Digest::MD5.hexdigest("#{passwd}#{Settings.admin.passwd_key}"),
 			:is_active=>false,:authority=>'0',:status=>'normal',
 			:role=>'finance',:last_login_time=>nil,:country=>'ALL')
+
+passwd=Digest::MD5.hexdigest("definance_lee")
+AdminManage.create!(:admin_name=>'definance_lee',:admin_passwd=>Digest::MD5.hexdigest("#{passwd}#{Settings.admin.passwd_key}"),
+			:is_active=>false,:authority=>'0',:status=>'normal',
+			:role=>'finance',:last_login_time=>nil,:country=>'ALL')
+
+passwd=Digest::MD5.hexdigest("nlfinance_lee")
+AdminManage.create!(:admin_name=>'nlfinance_lee',:admin_passwd=>Digest::MD5.hexdigest("#{passwd}#{Settings.admin.passwd_key}"),
+			:is_active=>false,:authority=>'0',:status=>'normal',
+			:role=>'finance',:last_login_time=>nil,:country=>'nl')
 
 AccessAuthority.delete_all
 AccessAuthority.create!(:controller=>"AdminManageController",:action=>"sign_index",
@@ -255,7 +255,7 @@ AdminManage.all.each do |am|
 
 		if am.admin_name=="admin"	
 			nil
-		elsif am.admin_name=="finance_manager"
+		elsif am.admin_name=="finance_kiki" || am.admin_name=="finance_mao"
 			if ada.controller=="SimulationController"
 				ada.status=false
 			end
@@ -263,6 +263,8 @@ AdminManage.all.each do |am|
 			if ada.controller=="SimulationController"
 				ada.status=false
 			elsif ada.controller=="AdminSettingController"
+				ada.status=false
+			elsif ada.controller=="FinanceWaterController" && ada.action=="modify_web"
 				ada.status=false
 			end
 		end
