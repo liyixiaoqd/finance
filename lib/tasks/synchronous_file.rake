@@ -48,7 +48,7 @@ namespace :sync_file do
 			end
 
 			split="|&|"
-			FinanceWater.where("channel='finance_web' and operdate>=\"#{@beg}\" and operdate<\"#{@end}\"").each do |finance|
+			FinanceWater.unscoped.where("channel='finance_web' and operdate>=\"#{@beg}\" and operdate<\"#{@end}\"").order("operdate asc").each do |finance|
 				if file_hash[finance.system].blank?
 					@interface_logger.info("WARN: no system:#{finance.system} include? #{finance.id}")
 					next
@@ -93,7 +93,7 @@ namespace :sync_file do
 			end
 
 			split="|&|"
-			ReconciliationDetail.includes(:online_pay).where("(invoice_date is null or invoice_date='') and confirm_flag=\"#{ReconciliationDetail::CONFIRM_FLAG['SUCC']}\"").each do |rd|
+			ReconciliationDetail.unscoped.includes(:online_pay).where("(invoice_date is null or invoice_date='') and confirm_flag=\"#{ReconciliationDetail::CONFIRM_FLAG['SUCC']}\"").order("transaction_date asc").each do |rd|
 				@interface_logger.info("transactionid:[#{rd.transactionid}],[#{rd.system}]")
 				if rd.system.blank? || file_hash[rd.system].blank?
 					@interface_logger.info("WARN: no system:[#{rd.system}] include,ID:#{rd.id}")
