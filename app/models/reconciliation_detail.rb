@@ -102,7 +102,7 @@ class ReconciliationDetail < ActiveRecord::Base
 		self.feeamt=0.0 if self.feeamt.blank?
 		self.feeamt=(-1)*self.feeamt if self.feeamt<0
 		
-		return nil if self.transactionid.blank? || self.payway.blank?
+		return nil if ((self.transactionid.blank? && self.order_no.blank?)|| self.payway.blank?)
 		# sofort 使用order_no作为查询条件 其他使用transactionid
 		if self.transactionid.blank?
 			self.online_pay=OnlinePay.find_by_payway_and_paytype_and_order_no(self.payway,self.paytype,self.order_no)
@@ -114,6 +114,7 @@ class ReconciliationDetail < ActiveRecord::Base
 		else
 			self.online_pay=OnlinePay.find_by_payway_and_paytype_and_reconciliation_id(self.payway,self.paytype,self.transactionid)
 		end
+		Rails.logger.info("transactionid:#{self.transactionid}")
 		
 		unless self.online_pay.blank?
 			self.online_pay_status=self.online_pay.status 

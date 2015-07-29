@@ -201,7 +201,10 @@ class ReconciliationSofort
 				next unless j==2 || j==3 || j==7 || j==8 || j==4
 				col.gsub!(/\t$/,"") if col.class.to_s=="String"
 				sofort_detail["currencycode"]=col if j==2
-				sofort_detail['timestamp']=col if j==3
+				if j==3 && col.present?
+					col=col.to_s
+					sofort_detail['timestamp']=col[0,4]+"-"+col[4,2]+"-"+col[6,2]
+				end
 				if j==4 && col.present?
 					col=col.to_s
 					sofort_detail['transaction_date']=col[0,4]+"-"+col[4,2]+"-"+col[6,2]
@@ -214,6 +217,7 @@ class ReconciliationSofort
 					sofort_detail['order_no']=parttern_match[1] unless parttern_match.blank?
 				end
 			end
+			Rails.logger.info("timestamp:#{sofort_detail['timestamp']}")
 
 			if sofort_detail['order_no'].blank?
 				raise "第#{i}行:对账标识(订单号)获取失败!"
