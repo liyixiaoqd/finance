@@ -13,6 +13,10 @@
 				 &nbsp;&nbsp;&nbsp;
 				 <%= label_tag(:l2, "包裹发送国家:",class:"label_inline") %>
 				 <%= select_tag(:send_country,options_for_select(dynamic_send_country_select_tag)) %>
+				  &nbsp;&nbsp;&nbsp;
+				 <%= label_tag(:l11, "货币:",class:"label_inline") %>&nbsp;&nbsp;&nbsp;
+				 <%= select_tag(:currencycode,options_for_select([["",""],["EUR","EUR"],["GBP","GBP"],["RMB","RMB"]])) %> 
+				 &nbsp;&nbsp;
 				 </br>
 				 <%= label_tag(:l3, "支付类型:",class:"label_inline") %> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				 <%= select_tag(:payway,options_for_select([["",""],["paypal","paypal"],["sofort","sofort"],["支付宝","alipay"],["积分","score"],["电子现金","e_cash"]])) %> 

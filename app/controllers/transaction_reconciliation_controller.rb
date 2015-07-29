@@ -6,7 +6,7 @@ class TransactionReconciliationController < ApplicationController
 	include Timeutilsable
 	include Enumsable
 
-	CONDITION_PARAMS=%w{payway paytype reconciliation_flag start_time end_time transactionid online_pay_id confirm_flag send_country system order_no}
+	CONDITION_PARAMS=%w{payway paytype reconciliation_flag start_time end_time transactionid online_pay_id confirm_flag send_country system order_no currencycode}
 	# def index
 	# 	@reconciliation_details=ReconciliationDetail.includes(:online_pay).all.page(params[:page])
 
@@ -89,6 +89,7 @@ class TransactionReconciliationController < ApplicationController
 		payway=params['payway']
 		paytype=params['paytype']
 		send_country=params['send_country']
+		currency=params['currency']
 		start_time=params['start_time']
 		end_time=params['end_time']
 
@@ -100,6 +101,7 @@ class TransactionReconciliationController < ApplicationController
 			condition+="and payway='#{payway}'" unless payway.blank?
 			condition+=" and paytype='#{paytype}'" unless paytype.blank?
 			condition+=" and send_country='#{send_country}'" unless send_country.blank?
+			condition+=" and currency='#{currency}'" unless currency.blank?
 			@finance_summary.setAmountAndNum!(condition)
 			logger.info(@finance_summary.output)
 		end
