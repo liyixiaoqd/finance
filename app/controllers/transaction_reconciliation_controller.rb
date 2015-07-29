@@ -1,5 +1,6 @@
 class TransactionReconciliationController < ApplicationController
 	# before_action :authenticate_admin!
+	before_action :check_send_country,only: [:index,:export,:report,:confirm_search,:confirm]
 	include OnlinePayHelper
 	include TransactionReconciliationHelper
 	include Timeutilsable
@@ -165,7 +166,6 @@ class TransactionReconciliationController < ApplicationController
 	def confirm_search
 		if params['start_time'].blank?
 			params['start_time']=OnlinePay.current_time_format("%Y-%m-%d",-1)
-			
 		end
 
 		sql="reconciliation_flag=#{ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC']} and confirm_flag=#{ReconciliationDetail::CONFIRM_FLAG['INIT']} "

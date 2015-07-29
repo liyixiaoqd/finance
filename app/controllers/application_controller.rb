@@ -102,7 +102,7 @@ class ApplicationController < ActionController::Base
 
 
 		def check_send_country()
-			logger.info("into check_send_country")
+			# logger.info("into check_send_country")
 			if params.include?('send_country')
 				unless session[:admin_country].include?(params['send_country'])
 					logger.info("CHECK_SEND_COUNTRY_WARN: #{session[:admin_country]} NOT INCLUDE #{params['send_country']}")
