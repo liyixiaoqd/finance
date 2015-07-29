@@ -256,9 +256,9 @@ class TransactionReconciliationController < ApplicationController
 				next unless CONDITION_PARAMS.include?(k)
 				
 				if( k=="start_time")
-					t_sql="timestamp>=:#{k}"
+					t_sql="transaction_date>=:#{k}"
 				elsif (k=="end_time")
-					t_sql="timestamp<=:#{k}"
+					t_sql="transaction_date<=:#{k}"
 				# elsif(k=="online_pay_id")
 				# 	t_sql="online_pay_id in (#{v.join(',')})"
 				else
