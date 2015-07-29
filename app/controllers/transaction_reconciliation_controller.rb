@@ -72,7 +72,10 @@ class TransactionReconciliationController < ApplicationController
 				                rd.amt,rd.currencycode,rd.timestamp]
 				unless rd.online_pay.blank?         
 					out_arr += [status_mapping(rd.online_pay.status),rd.online_pay.created_at,system_mapping(rd.system),
-						      rd.online_pay.send_country,rd.online_pay.user.username,rd.online_pay.user.email]
+						      rd.send_country,rd.online_pay.user.username,rd.online_pay.user.email]
+				else
+					out_arr += ['','',system_mapping(rd.system),
+						      rd.send_country,'','']
 				end
 				csv << out_arr
 			end
