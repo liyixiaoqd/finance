@@ -82,7 +82,6 @@ $(document).ready(function(){
   		event.preventDefault()
   });
 
-
   $("#button_submit_time").click(function(event){
   	if(document.getElementById("start_time").value=="" || document.getElementById("end_time").value==""){
 		alert("请输入开始与结束时间")
@@ -138,6 +137,11 @@ $(document).ready(function(){
   });
 
   $("#link_to_export").click(function(event){
+  	if(document.getElementById("start_time").value=="" || document.getElementById("end_time").value==""){
+		alert("请输入开始与结束时间")
+		return false
+  	}
+
   	input_objs=document.getElementById("index_and_export_form").children
   	var condition="?"
   	var control_index=0

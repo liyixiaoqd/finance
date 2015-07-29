@@ -167,7 +167,7 @@ class ReconciliationDetail < ActiveRecord::Base
 	end
 
 	def self.get_confirm_summary(confirm_flag)
-		rd_tj=ReconciliationDetail.select("count(*) as c,sum(amt) as s,max(updated_at) as m").where("reconciliation_flag=? and confirm_flag=?",RECONCILIATIONDETAIL_FLAG['SUCC'],confirm_flag)
+		rd_tj=ReconciliationDetail.select("count(*) as c,sum(amt) as s,max(updated_at) as m").where("confirm_flag=? and reconciliation_flag=?",confirm_flag,RECONCILIATIONDETAIL_FLAG['SUCC'])
 
 		if(rd_tj[0]['s'].blank?)
 			[rd_tj[0]['c'],0.00,'']

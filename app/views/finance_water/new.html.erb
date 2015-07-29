@@ -21,7 +21,7 @@
         <div class="well">
           <%= form_tag("/finance_water/#{@user.userid}/modify_web", method: "post",name: "form1") do %>
           <%= label_tag(:label1, "流水类型:",class:"label_inline") %> 
-          <%= select_tag(:watertype,options_for_select([["积分","score"],["电子现金","e_cash"]])) %> </br>
+          <%= select_tag(:watertype,options_for_select([["积分","score"],["电子现金","e_cash"]],"score")) %> </br>
 
            <div class="hidden" id="div_hidden_time">
             <%= label_tag(:label6, "操作日期:",class:"label_inline") %> 

@@ -93,7 +93,7 @@ namespace :sync_file do
 			end
 
 			split="|&|"
-			ReconciliationDetail.unscoped.includes(:online_pay).where("(invoice_date is null or invoice_date='') and confirm_flag=\"#{ReconciliationDetail::CONFIRM_FLAG['SUCC']}\"").order("transaction_date asc").each do |rd|
+			ReconciliationDetail.unscoped.includes(:online_pay).where("confirm_flag=\"#{ReconciliationDetail::CONFIRM_FLAG['SUCC']}\" and (invoice_date is null or invoice_date='') ").order("transaction_date asc").each do |rd|
 				@interface_logger.info("transactionid:[#{rd.transactionid}],[#{rd.system}]")
 				if rd.system.blank? || file_hash[rd.system].blank?
 					@interface_logger.info("WARN: no system:[#{rd.system}] include,ID:#{rd.id}")

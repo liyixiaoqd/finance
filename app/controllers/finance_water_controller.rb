@@ -217,7 +217,7 @@ class FinanceWaterController < ApplicationController
 
 		begin
 			ActiveRecord::Base.transaction do
-				online_pay=OnlinePay.find_by_payway_and_paytype_and_order_no(params['payway'],params['paytype'],params['order_no'])
+				online_pay=OnlinePay.find_by_system_and_payway_and_paytype_and_order_no(params['system',params['payway'],params['paytype'],params['order_no'])
 				if online_pay.blank?
 					#raise "无此订单号#{params['order_no']}"
 					logger.info("无此订单,历史数据?")
@@ -260,7 +260,7 @@ class FinanceWaterController < ApplicationController
 					raise "支付交易操作符只能为减"
 				end
 
-				unless OnlinePay.find_by_payway_and_paytype_and_order_no(finance_each["watertype"],'',finance_each["order_no"]).blank?
+				unless OnlinePay.find_by_system_and_payway_and_paytype_and_order_no(params['system'],finance_each["watertype"],'',finance_each["order_no"]).blank?
 					raise "已存在此支付记录#{finance_each["order_no"]},不可重复操作!"
 				end
 
@@ -301,7 +301,7 @@ class FinanceWaterController < ApplicationController
 			reconciliation_detail.timestamp=params["datetime"]
 			reconciliation_detail.transactionid=online_pay.reconciliation_id
 			reconciliation_detail.transaction_status='SUCC'
-			reconciliation_detail.reconciliation_flag='2'
+			reconciliation_detail.reconciliation_flag=ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC']
 			reconciliation_detail.amt=online_pay.amount
 			reconciliation_detail.currencycode=online_pay.currency
 			reconciliation_detail.netamt=0.0
@@ -331,7 +331,7 @@ class FinanceWaterController < ApplicationController
 			reconciliation_detail.transaction_date=OnlinePay.current_time_format("%Y-%m-%d")
 			reconciliation_detail.timestamp=params["datetime"]
 			reconciliation_detail.transaction_status='SUCC'
-			reconciliation_detail.reconciliation_flag='2'
+			reconciliation_detail.reconciliation_flag=ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['INIT']
 			reconciliation_detail.amt=params['amount']
 			reconciliation_detail.netamt=0.0
 			reconciliation_detail.feeamt=0.0
