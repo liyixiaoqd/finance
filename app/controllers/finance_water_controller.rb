@@ -217,7 +217,7 @@ class FinanceWaterController < ApplicationController
 
 		begin
 			ActiveRecord::Base.transaction do
-				online_pay=OnlinePay.find_by_system_and_payway_and_paytype_and_order_no(params['system',params['payway'],params['paytype'],params['order_no'])
+				online_pay=OnlinePay.find_by_system_and_payway_and_paytype_and_order_no(params['system'],params['payway'],params['paytype'],params['order_no'])
 				if online_pay.blank?
 					#raise "无此订单号#{params['order_no']}"
 					logger.info("无此订单,历史数据?")
