@@ -159,9 +159,9 @@ $(document).ready(function(){
 				control_index++
 			}
 		}
-		else if(input_objs[i].type=="select-one" && input_objs[i].selectedIndex!=0){
+		else if(input_objs[i].type=="select-one"){
 			control_len++
-			if (input_objs[i].selectedIndex!=0){
+			if (input_objs[i].value!=""){
 				if (condition=="?")
 					condition+=input_objs[i].name+"="+input_objs[i].value
 				else
