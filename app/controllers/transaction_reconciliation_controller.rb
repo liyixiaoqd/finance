@@ -98,7 +98,7 @@ class TransactionReconciliationController < ApplicationController
 		else
 			@finance_summary=FinanceSummary.new(start_time,end_time,1)
 			condition=""
-			condition+="and payway='#{payway}'" unless payway.blank?
+			condition+=" and payway='#{payway}'" unless payway.blank?
 			condition+=" and paytype='#{paytype}'" unless paytype.blank?
 			condition+=" and send_country='#{send_country}'" unless send_country.blank?
 			condition+=" and currency='#{currency}'" unless currency.blank?
@@ -171,13 +171,13 @@ class TransactionReconciliationController < ApplicationController
 		end
 
 		sql="reconciliation_flag=#{ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC']} and confirm_flag=#{ReconciliationDetail::CONFIRM_FLAG['INIT']} "
-		sql+="and transaction_date=:start_time " unless params['start_time'].blank?
-		sql+="and system=:system " unless params['system'].blank?
-		sql+="and send_country=:send_country " unless params['send_country'].blank?
+		sql+=" and transaction_date=:start_time " unless params['start_time'].blank?
+		sql+=" and system=:system " unless params['system'].blank?
+		sql+=" and send_country=:send_country " unless params['send_country'].blank?
 		if params['reconciliation_type']=="out"
-			sql+="and batch_id in('refund_order','refund_parcel') "
+			sql+=" and batch_id in('refund_order','refund_parcel') "
 		else
-			sql+="and batch_id not in('refund_order','refund_parcel') "
+			sql+=" and batch_id not in('refund_order','refund_parcel') "
 		end
 
 		@confirm_num,@confirm_amount,@max_updated_at=ReconciliationDetail.get_confirm_summary(sql,params)
@@ -213,14 +213,14 @@ class TransactionReconciliationController < ApplicationController
 			confirm_date=OnlinePay.current_time_format("%Y-%m-%d")
 
 			sql="reconciliation_flag=#{ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC']} and confirm_flag=#{ReconciliationDetail::CONFIRM_FLAG['INIT']} "
-			sql+="and updated_at<=:max_updated_at "  
-			sql+="and transaction_date=:start_time " unless params['start_time'].blank?
-			sql+="and system=:system " unless params['system'].blank?
-			sql+="and send_country=:send_country" unless params['send_country'].blank?
+			sql+=" and updated_at<=:max_updated_at "  
+			sql+=" and transaction_date=:start_time " unless params['start_time'].blank?
+			sql+=" and system=:system " unless params['system'].blank?
+			sql+=" and send_country=:send_country " unless params['send_country'].blank?
 			if params['reconciliation_type']=="out"
-				sql+="and batch_id in('refund_order','refund_parcel') "
+				sql+=" and batch_id in('refund_order','refund_parcel') "
 			else
-				sql+="and batch_id not in('refund_order','refund_parcel') "
+				sql+=" and batch_id not in('refund_order','refund_parcel') "
 			end
 
 			ReconciliationDetail.transaction do
