@@ -237,7 +237,10 @@ class OnlinePay < ActiveRecord::Base
 	end
 
 	def find_reconciliation()
-		rd=ReconciliationDetail.find_by_payway_and_paytype_and_transactionid(self.payway,self.paytype,self.reconciliation_id)
+		rd=self.reconciliation_detail
+		rd=ReconciliationDetail.find_by_payway_and_paytype_and_transactionid(self.payway,self.paytype,self.reconciliation_id) if rd.blank?
+
+		rd
 	end
 
 	def self.get_count_sum_by_day_condition(datatime_beg="",datatime_end="",condition="")
