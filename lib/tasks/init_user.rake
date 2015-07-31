@@ -1,6 +1,14 @@
 desc "对接相关系统-init"
 
 namespace :init do
+	desc "清理所有数据"
+	task :clean_data => [:environment] do
+		ReconciliationDetail.delete_all
+		OnlinePay.delete_all
+		FinanceWater.delete_all
+		User.delete_all
+	end
+
 	desc "初始化用户"
 	task :init_user,[:filename] =>[:environment] do|t,args|
 		p "init_user start! filename:[#{args[:filename]}]"
