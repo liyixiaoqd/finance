@@ -52,8 +52,8 @@ AdminManage.create!(:admin_name=>'definance_lee',:admin_passwd=>Digest::MD5.hexd
 			:is_active=>false,:authority=>'0',:status=>'normal',
 			:role=>'finance',:last_login_time=>nil,:country=>'ALL')
 
-passwd=Digest::MD5.hexdigest("nlfinance_lee")
-AdminManage.create!(:admin_name=>'nlfinance_lee',:admin_passwd=>Digest::MD5.hexdigest("#{passwd}#{Settings.admin.passwd_key}"),
+passwd=Digest::MD5.hexdigest("nlfinance_ana")
+AdminManage.create!(:admin_name=>'nlfinance_ana',:admin_passwd=>Digest::MD5.hexdigest("#{passwd}#{Settings.admin.passwd_key}"),
 			:is_active=>false,:authority=>'0',:status=>'normal',
 			:role=>'finance',:last_login_time=>nil,:country=>'nl')
 
