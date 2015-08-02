@@ -31,8 +31,7 @@ class OnlinePayController < ApplicationController
 		end
 
 		sql=sql_from_condition_filter(params)
-		#logger.info(sql)
-		@online_pay=OnlinePay.includes(:user).where(sql,params).page(params[:page])
+		@online_pay=OnlinePay.includes(:user).where(sql,params).order("created_at desc").page(params[:page])
 		# @reconciliation_details=Kaminari.paginate_array(@reconciliation_details).page(params[:page]).per(ReconciliationDetail::PAGE_PER)
 		respond_to do |format|
 			format.html { render :index }
@@ -70,7 +69,7 @@ class OnlinePayController < ApplicationController
 			redirect_to index_online_pay_path and return
 		end
 
-		online_pay=OnlinePay.includes(:user).where(sql,params)
+		online_pay=OnlinePay.includes(:user).where(sql,params).order("created_at desc")
 
 		csv_string = CSV.generate do |csv|
 			csv << ["导出工号", session[:admin],"导出时间", OnlinePay.current_time_format("%Y-%m-%d %H:%M:%S")]
@@ -330,9 +329,9 @@ class OnlinePayController < ApplicationController
 				next unless CONDITION_PARAMS.include?(k)
 				
 				if( k=="start_time")
-					t_sql="created_at>=:#{k}"
+					t_sql="left(created_at,10)>=:#{k}"
 				elsif (k=="end_time")
-					t_sql="created_at<=:#{k}"
+					t_sql="left(created_at,10)<=:#{k}"
 				elsif(k=="user_id")
 					t_sql="user_id in (#{v.join(',')})"
 				else

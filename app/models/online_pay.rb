@@ -249,7 +249,7 @@ class OnlinePay < ActiveRecord::Base
 			datatime_beg=current_time_format("%Y-%m-%d",0)
 			datatime_end=current_time_format("%Y-%m-%d",0)
 		end
-
+		#Rails.logger.info("get_count_sum_by_day_condition:#{datatime_beg}-#{datatime_end}")
 		case condition
 		when "status_succ" then	sql_condition=" and status like 'success%'"
 		when "status_fail" then	sql_condition=" and status not like 'success%'"
@@ -257,7 +257,7 @@ class OnlinePay < ActiveRecord::Base
 			sql_condition=condition
 		end
 
-		op_tj=OnlinePay.select("count(*) as c,sum(amount) as s").where("created_at>=? and created_at<=? #{sql_condition}",datatime_beg,datatime_end)
+		op_tj=OnlinePay.select("count(*) as c,sum(amount) as s").where("left(created_at,10)>=? and left(created_at,10)<=? #{sql_condition}",datatime_beg,datatime_end)
 		if(op_tj[0]['s'].blank?)
 			[op_tj[0]['c'],0.00]
 		else

@@ -94,7 +94,7 @@ class TransactionReconciliationController < ApplicationController
 		end_time=params['end_time']
 
 		if start_time.blank? || end_time.blank?
-			@finance_summary=FinanceSummary.new(OnlinePay.current_time_format("%Y-%m-%d",-1),OnlinePay.current_time_format("%Y-%m-%d",0))
+			@finance_summary=FinanceSummary.new(OnlinePay.current_time_format("%Y-%m-%d",0),OnlinePay.current_time_format("%Y-%m-%d",0))
 		else
 			@finance_summary=FinanceSummary.new(start_time,end_time,1)
 			condition=""
@@ -267,9 +267,9 @@ class TransactionReconciliationController < ApplicationController
 				next unless CONDITION_PARAMS.include?(k)
 				
 				if( k=="start_time")
-					t_sql="transaction_date>=:#{k}"
+					t_sql="left(timestamp,10)>=:#{k}"
 				elsif (k=="end_time")
-					t_sql="transaction_date<=:#{k}"
+					t_sql="left(timestamp,10)<=:#{k}"
 				# elsif(k=="online_pay_id")
 				# 	t_sql="online_pay_id in (#{v.join(',')})"
 				else
