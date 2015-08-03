@@ -233,7 +233,7 @@ class OnlinePayController < ApplicationController
 			# else
 			# 	nil
 			# end
-		when "paypal" then reconciliation=ReconciliationPaypal.new("TransactionSearch",start_time,end_time)
+		when "paypal" then reconciliation=ReconciliationPaypal.new("TransactionSearch",start_time,end_time,"de")
 		else
 			render :text=>"wrong payment_system #{payment_system}" and return
 		end

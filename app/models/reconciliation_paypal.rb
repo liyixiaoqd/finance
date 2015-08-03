@@ -15,13 +15,13 @@ class ReconciliationPaypal
 		if(startdate.blank?)
 			@startdate=Time.now.at_beginning_of_day-post_day.day
 		else
-			@startdate=startdate
+			@startdate=startdate.to_time
 		end
 
 		if(enddate.blank?)
 			@enddate=Time.now.at_beginning_of_day-post_day.day+1.day
 		else
-			@enddate=enddate
+			@enddate=enddate.to_time
 		end		
 
 		@paypal_reconciliation_hash=init_paypal_reconciliation_hash()
@@ -73,6 +73,7 @@ class ReconciliationPaypal
 		hour_step=BasicData.get_value("00A","002","paypal","").to_i
 		message="#{@startdate} - #{@enddate} </br> "
 		for h in (0...24/hour_step)
+			Rails.logger.info("#{@startdate},#{h},#{hour_step}")
 			tmp_start = (@startdate+ (h*hour_step).hour).strftime("%Y-%m-%dT%H:%M:%SZ")
 			tmp_end =  (@startdate+ ((h+1)*hour_step).hour).strftime("%Y-%m-%dT%H:%M:%SZ")
 
@@ -169,6 +170,7 @@ class ReconciliationPaypal
 
 				if @paypal_reconciliation_hash.include?(field_name) 
 					@paypal_reconciliation_hash[field_name][field_position]=field_value
+					#Rails.logger.info("PAYPAL ReconciliationDetail Analytical#{field_name}:#{field_value}")
 				else
 					Rails.logger.warn("Analytical failure - paypal_reconciliation_hash : #{array_each} - #{field_name}")
 					next
@@ -195,7 +197,7 @@ class ReconciliationPaypal
 		end
 
 		def get_single_reconciliation_hash(i)
-			{
+			single_reconciliation_hash={
 				'timestamp'=>@paypal_reconciliation_hash['l_timestamp'][i],
 				'timezone'=>@paypal_reconciliation_hash['l_timezone'][i],
 				'transaction_type'=>@paypal_reconciliation_hash['l_type'][i],
@@ -209,10 +211,19 @@ class ReconciliationPaypal
 				'netamt'=>@paypal_reconciliation_hash['l_netamt'][i].to_f,
 				'payway'=>'paypal',
 				'paytype'=>'',
-				'transaction_date'=>@paypal_reconciliation_hash['l_timestamp'][i][0,10],
 				'batch_id'=>@reconciliation_date+"_"+sprintf("%03d",@batch_id),
 				'reconciliation_flag'=>ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['INIT']
 			}
+
+			# if @paypal_reconciliation_hash['l_timezone'][i]=='GMT'
+			# 	single_reconciliation_hash['timestamp']=@paypal_reconciliation_hash['l_timestamp'][i].to_time.to_s
+			# else
+			# 	single_reconciliation_hash['timestamp']=@paypal_reconciliation_hash['l_timestamp'][i]
+			# end
+			single_reconciliation_hash['transaction_date']=single_reconciliation_hash['timestamp'].to_time.to_s[0,10]
+
+			#Rails.logger.info("#{@paypal_reconciliation_hash['l_transactionid'][i]}.timezone:#{@paypal_reconciliation_hash['l_timezone'][i]},timestamp[#{@paypal_reconciliation_hash['l_timestamp'][i]}]=>[#{single_reconciliation_hash['timestamp']}]")
+			single_reconciliation_hash
 		end
 
 		def init_paypal_reconciliation_hash
