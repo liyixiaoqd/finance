@@ -125,6 +125,10 @@ class ReconciliationSofort
 		outmsg="文件总比数:#{valid_all_num},导入成功比数:#{valid_complete_num},异常比数:#{valid_rescue_num} ; 
 			   对账成功比数:#{valid_succ_num},对账失败比数:#{valid_fail_num},非系统记录比数:#{valid_nosys_num}"
 		
+		if errmsg.length>200
+			Rails.logger.info("full errmsg:#{errmsg}")
+			errmsg=errmsg[0,200]+"..."
+		end
 		[outmsg,errmsg]
 	end
 
