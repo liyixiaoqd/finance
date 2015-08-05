@@ -171,6 +171,7 @@ class OnlinePayController < ApplicationController
 			end
 		end
 
+		logger.info("ONLINE_PAY SUBMIT RET:#{ret_hash}")
 		render json:ret_hash.to_json
 	end
 
