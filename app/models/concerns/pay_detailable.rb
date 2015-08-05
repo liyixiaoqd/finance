@@ -56,8 +56,8 @@ module PayDetailable extend ActiveSupport::Concern
 
 	def method_url_success?(method,url_path,https_boolean,params={})
 		ret=true
-		response=method_url_response(method,url_path,https_boolean,params)
 		begin
+			response=method_url_response(method,url_path,https_boolean,params)
 			ret = (response.code=="200" && JSON.parse(response.body)['status']=="success")
 		rescue => e
 			Rails.logger.info("method_url wrong:#{e.message}")
