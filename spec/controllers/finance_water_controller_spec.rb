@@ -135,6 +135,107 @@ describe FinanceWaterController do
 		end
 	end
 
+	context "get water_obtain" do
+		it "failure call water_obtain:params_wrong" do
+			water_obtain_params={
+				'system'=>'mypost4u',
+				'channel'=>'web',
+				'userid'=>'111'
+			}
+			post :water_obtain,water_obtain_params
+
+			expect(response.status).to eq 400
+			expect(response.body).to match (/PARAMS WRONG/)
+		end
+
+		it "failure call water_obtain:no user" do
+			water_obtain_params={
+				'system'=>'mypost4u',
+				'channel'=>'web',
+				'userid'=>'111',
+				'water_no'=>'123'
+			}
+			post :water_obtain,water_obtain_params
+
+			expect(response.status).to eq 400
+			expect(response.body).to match (/NO USER FIND/)
+		end
+
+		it "success call water_obtain:get all" do
+			FinanceWater.create!({
+				'system'=>users(:user_one)['system'],
+				'channel'=>'web',
+				'userid'=>users(:user_one)['userid'],
+				'symbol'=>'Add',
+				'amount'=>30,
+				'old_amount'=>22.2,
+				'new_amount'=>52.2,
+				'watertype'=>'score'
+				})
+
+			water_obtain_params={
+				'system'=>'mypost4u',
+				'channel'=>'web',
+				'userid'=>users(:user_one)['userid'],
+				'water_no'=>''
+			}
+			post :water_obtain,water_obtain_params
+
+			expect(response.status).to eq 200
+			expect(response.body).to match (/water/)
+			res_result=JSON.parse(response.body)
+			expect(res_result['water'].length).to eq 3
+			expect(res_result['water'][0]['type']).to eq "e_cash"
+			expect(res_result['water'][0]['amount']).to eq "11.1"
+			expect(res_result['water'][1]['type']).to eq "score"
+			expect(res_result['water'][1]['amount']).to eq "22.2"
+			expect(res_result['water'][2]['new_amount']).to eq "52.2"
+		end
+
+		it "success call water_obtain:get all" do
+			FinanceWater.create!({
+				'system'=>users(:user_one)['system'],
+				'channel'=>'web',
+				'userid'=>users(:user_one)['userid'],
+				'symbol'=>'Add',
+				'amount'=>30,
+				'old_amount'=>22.2,
+				'new_amount'=>52.2,
+				'watertype'=>'score'
+				})
+
+			FinanceWater.create!({
+				'system'=>users(:user_one)['system'],
+				'channel'=>'web',
+				'userid'=>users(:user_one)['userid'],
+				'symbol'=>'Add',
+				'amount'=>1000,
+				'old_amount'=>52.2,
+				'new_amount'=>1052.2,
+				'watertype'=>'score'
+				})
+
+			water_no=FinanceWater.unscoped().where("userid='#{users(:user_one)['userid']}'").order("id asc")[1]['id']
+
+			water_obtain_params={
+				'system'=>'mypost4u',
+				'channel'=>'web',
+				'userid'=>users(:user_one)['userid'],
+				'water_no'=>water_no
+			}
+			post :water_obtain,water_obtain_params
+
+			expect(response.status).to eq 200
+			expect(response.body).to match (/water/)
+			res_result=JSON.parse(response.body)
+			expect(res_result['water'].length).to eq 2
+			expect(res_result['water'][0]['type']).to eq "score"
+			expect(res_result['water'][0]['amount']).to eq "30.0"
+			expect(res_result['water'][1]['type']).to eq "score"
+			expect(res_result['water'][1]['new_amount']).to eq "1052.2"
+		end
+	end
+
 	context "order refund" do
 		it "success call no order" do
 			refund_params={

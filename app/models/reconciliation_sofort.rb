@@ -50,11 +50,16 @@ class ReconciliationSofort
 				check_file << "#{rd.warn_to_file(e.message)}\n" unless rd.blank?
 				Rails.logger.info(e.message)
 
-				e.message="第#{i}行:#{e.message}"
+				if e.message.blank? || e.message.length>50
+					tmpmsg="第#{i}行:处理出错!"
+				else
+					tmpmsg=e.message
+				end
+
 				if valid_rescue_num==0
-					errmsg=e.message
+					errmsg=tmpmsg
 				elsif valid_rescue_num<5
-					errmsg+=";"+e.message
+					errmsg+=";"+tmpmsg
 				elsif valid_rescue_num==5
 					errmsg+="..."
 				end
@@ -110,10 +115,16 @@ class ReconciliationSofort
 			rescue => e
 				Rails.logger.info("sofort对账异常:"+e.message)
 
+				if e.message.blank? || e.message.length>50
+					tmpmsg="第#{i}行:处理出错!"
+				else
+					tmpmsg=e.message
+				end
+
 				if valid_rescue_num==0
-					errmsg=e.message
+					errmsg=tmpmsg
 				elsif valid_rescue_num<5
-					errmsg+=";"+e.message
+					errmsg+=";"+tmpmsg
 				elsif valid_rescue_num==5
 					errmsg+="..."
 				end

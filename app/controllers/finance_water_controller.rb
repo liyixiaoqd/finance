@@ -250,6 +250,44 @@ class FinanceWaterController < ApplicationController
 		render json:ret_hash.to_json
 	end
 
+	def water_obtain
+		unless params_valid("finance_water_obtain",params)
+			render json:{'SYSTEM'=>'PARAMS WRONG!'},status:400 and return 
+		end
+
+		user=User.find_by_system_and_userid(params['system'],params['userid'])
+		if user.blank?
+			render json:{'ERROR'=>'NO USER FIND!'},status:400 and return 
+		end
+
+		ret_hash={
+			'userid'=>params['userid'],
+			'water'=>[]
+		}
+
+		if params[:water_no].blank?
+			finance_waters=FinanceWater.unscoped().order("id asc")
+		else
+			finance_waters=FinanceWater.unscoped().where("system=:system and userid=:userid and id>:water_no",
+				params).order("id asc")
+		end
+		ret_hash['has_next']= finance_waters.present? && finance_waters.length>=30
+
+		finance_waters.each do |fw|
+			ret_hash['water']  << {
+				'type'=>fw.watertype,
+				'symbol'=>fw.symbol,
+				'old_amount'=>fw.old_amount,
+				'amount'=>fw.amount,
+				'new_amount'=>fw.new_amount,
+				'operdate'=>fw.operdate,
+                       			'water_no'=>fw.id
+			}
+		end
+
+		render json:ret_hash.to_json
+	end
+
 	private
 		def new_online_pay_each(user,finance_each,params)
 			if finance_each['is_pay']=="Y"

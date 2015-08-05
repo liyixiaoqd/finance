@@ -86,6 +86,9 @@ AccessAuthority.create!(:controller=>"FinanceWaterController",:action=>"export",
 AccessAuthority.create!(:controller=>"FinanceWaterController",:action=>"modify",
 			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>true,
 			:describe=>'USER财务流水变更接口')
+AccessAuthority.create!(:controller=>"FinanceWaterController",:action=>"water_obtain",
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>true,
+			:describe=>'USER财务流水获取接口')
 AccessAuthority.create!(:controller=>"FinanceWaterController",:action=>"modify_web",
 			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'用户管理 - 用户明细 - 流水新增',:access_level=>9)
