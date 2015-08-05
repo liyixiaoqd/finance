@@ -143,6 +143,9 @@ describe OnlinePayCallbackController do
 		it "get alipay_transaction_notify" do
 			request.session[:admin]="admin"
 
+			op=OnlinePay.where(payway: 'alipay',paytype: 'transaction').last
+			op.update_attributes!({'system'=>'mypost4u','callback_status'=>'WAIT_BUYER_PAY'}) if op.present?
+
 			op=OnlinePay.where(payway: 'alipay',paytype: 'transaction',status: 'submit').last
 			expect(op).not_to eq nil
 
@@ -182,6 +185,19 @@ describe OnlinePayCallbackController do
 			expect(response.body).to eq("success")
 			expect(op['status']).to eq("failure_notify_third")
 			expect(op['callback_status']).to eq("TRADE_FINISHED")
+		end
+
+		it "get alipay_transaction_notify use quaie" do
+			request.session[:admin]="admin"
+
+			op=OnlinePay.where(payway: 'alipay',paytype: 'transaction').last
+			op.update_attributes!({'system'=>'quaie','callback_status'=>'WAIT_BUYER_CONFIRM_GOODS'})
+			op.reconciliation_detail.delete if op.reconciliation_detail.present?
+
+			expect(op).not_to eq nil
+			expect{
+				post :alipay_transaction_notify,alipay_transaction_notify_params_5()
+			}.to change(FinanceWater,:count).by(1)
 		end
 	end
 

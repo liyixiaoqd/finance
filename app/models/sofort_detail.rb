@@ -134,17 +134,18 @@ class SofortDetail
 	private 
 		def spec_payparams_valid(online_pay)
 			errmsg=''
-			if(online_pay['currency']!="EUR")
+			if(online_pay['system']=='quaie')
+				errmsg="sofort.system can not be quaie"
+			elsif(online_pay['currency']!="EUR")
 				errmsg="sofort.currency must be 'EUR'"
-				Rails.logger.info(errmsg)
 			elsif( !SPEC_PARAMS_COUNTRY.include?(online_pay['country']) )
 				errmsg="sofort.country must in #{SPEC_PARAMS_COUNTRY}"
-				Rails.logger.info(errmsg)
 			end
 
 			if errmsg.blank?
 				true
 			else
+				Rails.logger.info(errmsg)
 				false
 			end
 		end

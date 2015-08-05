@@ -9,4 +9,25 @@ class FinanceWater < ActiveRecord::Base
 	default_scope { order('watertype asc,operdate asc,created_at asc') }
 
 	paginates_per 14
+
+	def self.save_by_online_pay(op)
+		if op.system=="quaie"
+			finance_water=FinanceWater.new
+			finance_water.system=op.system
+			finance_water.channel=op.channel
+			finance_water.userid=op.userid
+			finance_water.operator="system_submit"
+			finance_water.operdate=op.updated_at
+			finance_water.symbol="Add"
+			finance_water.amount=op.amount
+			finance_water.watertype="e_cash"
+
+			finance_water.reason=op.description
+			op.user.with_lock do
+				finance_water.old_amount=op.user.e_cash
+				finance_water.new_amount=op.user.e_cash+finance_water.amount
+			end
+			finance_water.save!()
+		end
+	end
 end
