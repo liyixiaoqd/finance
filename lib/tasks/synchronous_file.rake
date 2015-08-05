@@ -54,7 +54,7 @@ namespace :sync_file do
 					next
 				end
 
-				outline=[finance.userid,finance.watertype,finance.symbol,finance.old_amount,finance.amount,finance.new_amount,finance.reason,finance.operdate]
+				outline=[finance.userid,finance.watertype,finance.symbol,finance.old_amount,finance.amount,finance.new_amount,finance.reason,finance.operdate,finance.id]
 				file_hash[finance.system].puts "#{outline.join(split)}"
 			end
 
