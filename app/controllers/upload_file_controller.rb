@@ -27,7 +27,7 @@ class UploadFileController < ApplicationController
 				reconciliation=ReconciliationSofort.new()
 				flash[:notice],flash[:error]=reconciliation.valid_reconciliation_by_country("de",filename)
 
-				#File.delete(filename)
+				File.delete(filename)
 			else
 				flash[:notice]="未定义的上传业务类型,请重新选择"
 			end
