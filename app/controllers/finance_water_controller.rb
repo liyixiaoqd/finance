@@ -281,7 +281,8 @@ class FinanceWaterController < ApplicationController
 				'amount'=>fw.amount,
 				'new_amount'=>fw.new_amount,
 				'operdate'=>fw.operdate,
-                       			'water_no'=>fw.id
+                       			'water_no'=>fw.id,
+                       			'reason'=>fw.reason
 			}
 		end
 
