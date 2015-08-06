@@ -29,9 +29,13 @@
 				<tbody>
 					<tr>
 						<td><%=@finance_summary.total_num%></td>
-						<td><%=@finance_summary.succ_num%></td>
+						<td>
+							<%=@finance_summary.succ_num + @finance_summary.succ_execption_num%>
+						</td>
 						<td><%=@finance_summary.total_amount%></td>
-						<td><%=@finance_summary.succ_amount%></td>
+						<td>
+							<%=@finance_summary.succ_amount + @finance_summary.succ_execption_amount%>
+						</td>
 					</tr>
 				</tbody>
 			</table>

@@ -38,18 +38,32 @@
 				<tr>
 					<td>总交易比数</td>
 					<td id="td_replace_total_num"><%=@finance_summary.total_num%></td>
-					<td>成功比数</td>
-					<td id="td_replace_succ_num"><%=@finance_summary.succ_num%></td>
-					<td>失败比数</td>
-					<td id="td_replace_fail_num"><%=@finance_summary.fail_num%></td>
-				</tr>
-				<tr>
 					<td>总交易金额</td>
 					<td id="td_replace_total_amount"><%=@finance_summary.total_amount%></td>
+				</tr>
+				<tr>
+					<td>成功比数</td>
+					<td id="td_replace_succ_num"><%=@finance_summary.succ_num%></td>
 					<td>成功金额</td>
 					<td id="td_replace_succ_amount"><%=@finance_summary.succ_amount%></td>
-					<td>失败金额</td>
+				</tr>
+				<tr>
+					<td>成功(异常)比数</td>
+					<td id="td_replace_succ_execption_num"><%=@finance_summary.succ_execption_num%></td>
+					<td>成功(异常)金额</td>
+					<td id="td_replace_succ_execption_amount"><%=@finance_summary.succ_execption_amount%></td>
+				</tr>
+				<tr>
+					<td>失败交易比数</td>
+					<td id="td_replace_fail_num"><%=@finance_summary.fail_num%></td>
+					<td>失败交易金额</td>
 					<td id="td_replace_fail_amount"><%=@finance_summary.fail_amount%></td>
+				</tr>
+				<tr>
+					<td>未完成交易比数</td>
+					<td id="td_replace_uncompleted_num"><%=@finance_summary.uncompleted_num%></td>
+					<td>未完成交易金额</td>
+					<td id="td_replace_uncompleted_amount"><%=@finance_summary.uncompleted_amount%></td>
 				</tr>
 			</table>
 		</div>

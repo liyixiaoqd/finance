@@ -260,7 +260,9 @@ class OnlinePay < ActiveRecord::Base
 		#Rails.logger.info("get_count_sum_by_day_condition:#{datatime_beg}-#{datatime_end}")
 		case condition
 		when "status_succ" then	sql_condition=" and status like 'success%'"
-		when "status_fail" then	sql_condition=" and status not like 'success%'"
+		when "status_fail" then sql_condition=" and status like 'failure%' and status!='failure_notify_third'"
+		when "status_uncompleted" then sql_condition=" status not like 'failure%' and status not like 'success%'"
+		when "status_succ_expection" then sql_condition=" and status = 'failure_notify_third'"
 		else
 			sql_condition=condition
 		end

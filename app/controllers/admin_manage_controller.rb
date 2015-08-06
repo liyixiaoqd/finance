@@ -1,6 +1,7 @@
 class AdminManageController < ApplicationController
 	def sign_index
 		@finance_summary=FinanceSummary.new(OnlinePay.current_time_format("%Y-%m-%d",-1),OnlinePay.current_time_format("%Y-%m-%d",-1))
+		logger.info(@finance_summary.output())
 		# @data=OnlinePay.current_time_format("%Y-%m-%d",0)
 		# begdata=OnlinePay.current_time_format("%Y-%m-%d",-1)
 

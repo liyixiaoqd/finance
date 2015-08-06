@@ -96,7 +96,7 @@ class TransactionReconciliationController < ApplicationController
 		if start_time.blank? || end_time.blank?
 			@finance_summary=FinanceSummary.new(OnlinePay.current_time_format("%Y-%m-%d",0),OnlinePay.current_time_format("%Y-%m-%d",0))
 		else
-			@finance_summary=FinanceSummary.new(start_time,end_time,1)
+			@finance_summary=FinanceSummary.new(start_time,end_time,false)
 			condition=""
 			condition+=" and payway='#{payway}'" unless payway.blank?
 			condition+=" and paytype='#{paytype}'" unless paytype.blank?
