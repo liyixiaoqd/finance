@@ -11,25 +11,25 @@ class FinanceWater < ActiveRecord::Base
 	paginates_per 14
 
 	def self.save_by_online_pay(op)
-		if op.system=="quaie"
-			finance_water=FinanceWater.new
-			finance_water.system=op.system
-			finance_water.channel=op.channel
-			finance_water.userid=op.userid
-			finance_water.operator="system_submit"
-			finance_water.operdate=op.updated_at
-			finance_water.symbol="Add"
-			finance_water.amount=op.amount
-			finance_water.watertype="e_cash"
-
-			finance_water.reason=op.description
+		if op.system=="quaie"			
 			op.user.with_lock do
+				finance_water=op.user.finance_water.build()
+				finance_water.system=op.system
+				finance_water.channel=op.channel
+				finance_water.userid=op.userid
+				finance_water.operator="system_submit"
+				finance_water.operdate=op.updated_at
+				finance_water.symbol="Add"
+				finance_water.amount=op.amount
+				finance_water.watertype="e_cash"
+
+				finance_water.reason=op.description
 				finance_water.old_amount=op.user.e_cash
 				finance_water.new_amount=op.user.e_cash+finance_water.amount
 				op.user.update_attributes!({'e_cash'=>finance_water.new_amount})
+				finance_water.save!()
+				finance_water
 			end
-			finance_water.save!()
-			finance_water
 		else
 			nil
 		end
