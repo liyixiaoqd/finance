@@ -427,7 +427,7 @@ class FinanceWaterController < ApplicationController
 			finance_water.operator=params["operator"]
 			# use end_time not datetime
 			#finance_water.operdate=params["datetime"]
-			finance_water.operdate=params["end_time"]
+			finance_water.operdate=params["end_time"]+" "+OnlinePay.current_time_format("%H:%M:%S")
 
 			finance_water.symbol=params["symbol"]
 			finance_water.amount=params["amount"]

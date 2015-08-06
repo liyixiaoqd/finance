@@ -6,7 +6,7 @@ class FinanceWater < ActiveRecord::Base
 	validates :symbol, inclusion: { in: %w(Add Sub),message: "%{value} is not a valid symbol" }
 	validates :watertype, inclusion: { in: %w(score e_cash trading),message: "%{value} is not a valid watertype" }
 
-	default_scope { order('watertype asc,operdate asc,created_at asc') }
+	default_scope { order('watertype asc,id asc') }
 
 	paginates_per 14
 
