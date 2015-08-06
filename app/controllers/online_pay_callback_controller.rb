@@ -136,7 +136,8 @@ class OnlinePayCallbackController < ApplicationController
 					if online_pay.is_success?() && online_pay.find_reconciliation().blank?
 						logger.info("#{online_pay.order_no},#{online_pay.callback_status} alipay transaction insert into reconciliation!!")
 						online_pay.set_reconciliation.save!()
-						FinanceWater.save_by_online_pay(online_pay)
+						fw=FinanceWater.save_by_online_pay(online_pay)
+						ret_hash['water_no']=fw.id unless fw.blank?
 					end
 					# response_code=online_pay.method_url_response_code("post",redirect_url,false,ret_hash)
 					# unless response_code=="200"

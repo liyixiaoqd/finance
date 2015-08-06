@@ -28,6 +28,9 @@ class FinanceWater < ActiveRecord::Base
 				finance_water.new_amount=op.user.e_cash+finance_water.amount
 			end
 			finance_water.save!()
+			finance_water
+		else
+			nil
 		end
 	end
 end

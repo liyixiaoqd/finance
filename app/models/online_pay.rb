@@ -239,8 +239,7 @@ class OnlinePay < ActiveRecord::Base
 	def find_reconciliation()
 		rd=self.reconciliation_detail
 		Rails.logger.info("rd.blank? = #{rd.blank?}")
-		rd=ReconciliationDetail.find_by_payway_and_paytype_and_transactionid(self.payway,self.paytype,self.reconciliation_id) if rd.blank?
-
+		#rd=ReconciliationDetail.find_by_payway_and_paytype_and_transactionid(self.payway,self.paytype,self.reconciliation_id) if rd.blank?
 		rd
 	end
 
