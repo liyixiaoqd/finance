@@ -34,7 +34,7 @@ class AdminManage < ActiveRecord::Base
 		if am.present? && am.status=="normal" && am.admin_passwd==Digest::MD5.hexdigest("#{passwd}#{Settings.admin.passwd_key}")
 			return am
 		else
-			logger.info("#{passwd} <=> #{am.admin_passwd}")
+			logger.info("username or password is wrong!")
 		end
 
 		nil
