@@ -26,6 +26,7 @@ class FinanceWater < ActiveRecord::Base
 			op.user.with_lock do
 				finance_water.old_amount=op.user.e_cash
 				finance_water.new_amount=op.user.e_cash+finance_water.amount
+				op.user.update_attributes!({'e_cash'=>finance_water.new_amount})
 			end
 			finance_water.save!()
 			finance_water
