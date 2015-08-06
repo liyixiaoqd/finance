@@ -5,7 +5,7 @@ class OnlinePayController < ApplicationController
 	before_action :check_send_country,only: [:index,:export_index]
 	include Paramsable,OnlinePayHelper
 	
-	CONDITION_PARAMS=%w{payway paytype reconciliation_flag start_time end_time reconciliation_id order_no user_id system send_country}
+	CONDITION_PARAMS=%w{payway paytype reconciliation_flag start_time end_time reconciliation_id order_no user_id system send_country online_pay_status}
 	# before_action :authenticate_admin!,:only=>[:show,:show_single_detail]
 	def index
 		if (params['username'].present? || params['email'].present? )
@@ -328,13 +328,23 @@ class OnlinePayController < ApplicationController
 			params.each do |k,v|
 				next if v.blank? 
 				next unless CONDITION_PARAMS.include?(k)
-				
-				if( k=="start_time")
+
+				if(k=="start_time")
 					t_sql="left(created_at,10)>=:#{k}"
 				elsif (k=="end_time")
 					t_sql="left(created_at,10)<=:#{k}"
 				elsif(k=="user_id")
 					t_sql="user_id in (#{v.join(',')})"
+				elsif(k=="online_pay_status")
+					if v=="succ"
+						t_sql="status like 'success%'"
+					elsif v=="fail"
+						t_sql="status like 'failure%' and status!='failure_notify_third'"
+					elsif v=="fail_third"
+						t_sql="status = 'failure_notify_third'"
+					else
+						t_sql="status not like 'failure%' and status not like 'success%'"
+					end
 				else
 					t_sql="#{k}=:#{k}"
 				end

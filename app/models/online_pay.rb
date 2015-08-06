@@ -212,6 +212,15 @@ class OnlinePay < ActiveRecord::Base
 		end
 	end
 
+	def get_transaction_desc()
+		rd=self.reconciliation_detail
+		if rd.present? && rd.reconciliation_flag==ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC']
+			rd.reconciliation_describe
+		else
+			nil
+		end
+	end
+
 	def set_reconciliation()
 		reconciliation_params={
 			'paytype' => self.paytype,

@@ -15,6 +15,9 @@
 					 &nbsp;&nbsp;&nbsp;
 					 <%= label_tag(:l2, "包裹发送国家:",class:"label_inline") %>
 					 <%= select_tag(:send_country,options_for_select(dynamic_send_country_select_tag)) %>
+					 &nbsp;&nbsp;&nbsp;
+					 <%= label_tag(:l11, "交易状态:",class:"label_inline") %>
+					 <%= select_tag(:online_pay_status,options_for_select([["",""],["成功","succ"],["支付成功_调用原系统失败","fail_third"],["未完成","quaie"],["失败","fail"]])) %>
 					 </br>
 					 <%= label_tag(:l3, "支付类型:",class:"label_inline") %> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 					 <%= select_tag(:payway,options_for_select([["",""],["paypal","paypal"],["sofort","sofort"],["支付宝","alipay"],["积分","score"],["电子现金","e_cash"]])) %> 

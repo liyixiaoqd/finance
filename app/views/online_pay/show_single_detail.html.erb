@@ -45,8 +45,12 @@
 						</td>
 					</tr>
 					<tr>
-						<td>备注</td>
+						<td>交易备注</td>
 						<td><%= @online_pay.reason %></td>
+					</tr>
+					<tr>
+						<td>对账备注</td>
+						<td><%= @online_pay.get_transaction_desc() %></td>
 					</tr>
 					<tr>
 						<td>交易来源系统</td>
