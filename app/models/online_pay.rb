@@ -327,7 +327,6 @@ class OnlinePay < ActiveRecord::Base
 					op=OnlinePay.find_by_payway_and_paytype_and_order_no(payway,paytype,trade_no)
 				end
 				Rails.logger.info("spec alipay after: #{trade_no}")
-				op=OnlinePay.find_by_payway_and_paytype_and_order_no(payway,paytype,trade_no)
 				# op=OnlinePay.where("payway=? and paytype=? and order_no='system_'?",)
 				if op.blank?
 					raise "spec alipay get onlinepay wrong!"
