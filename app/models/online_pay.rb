@@ -320,7 +320,11 @@ class OnlinePay < ActiveRecord::Base
 				#trade_no为 system_orderno
 				Rails.logger.info("spec alipay before: #{trade_no}")
 				if trade_no.include?("_")
+					system=trade_no.sub(/_.*/,"")
 					trade_no=trade_no.sub(/.*?_/,"")
+					op=OnlinePay.find_by_system_and_payway_and_paytype_and_order_no(system,payway,paytype,trade_no)
+				else
+					op=OnlinePay.find_by_payway_and_paytype_and_order_no(payway,paytype,trade_no)
 				end
 				Rails.logger.info("spec alipay after: #{trade_no}")
 				op=OnlinePay.find_by_payway_and_paytype_and_order_no(payway,paytype,trade_no)
