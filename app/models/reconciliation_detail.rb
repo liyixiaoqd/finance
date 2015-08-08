@@ -1,4 +1,5 @@
 class ReconciliationDetail < ActiveRecord::Base
+	include Enumsable
 	belongs_to :online_pay
 
 	validates :payway, :transactionid, :transaction_status,:batch_id,:transaction_date, presence: true
@@ -73,7 +74,16 @@ class ReconciliationDetail < ActiveRecord::Base
 		set_params_by_transactionid!()
 
 		if self.online_pay_id.blank?
-			set_flag!(RECONCILIATIONDETAIL_FLAG['NON_SYSTEM'],"获取对应在线支付记录失败:#{self.transactionid}")
+			if self.transactionid.present? && self.transactionid.include?("_")
+				system=self.transactionid.sub(/_.*/,"")
+				if system.present? && SYSTEM_MAPPING_TO_DISPLAY.include?(system)
+					set_flag!(RECONCILIATIONDETAIL_FLAG['FAIL'],"获取对应在线支付记录失败:#{self.transactionid}")
+				else
+					set_flag!(RECONCILIATIONDETAIL_FLAG['NON_SYSTEM'],"获取对应在线支付记录失败:#{self.transactionid}")
+				end
+			else
+				set_flag!(RECONCILIATIONDETAIL_FLAG['NON_SYSTEM'],"获取对应在线支付记录失败:#{self.transactionid}")
+			end
 		else
 			set_flag_by_status_and_amount!()
 		end
