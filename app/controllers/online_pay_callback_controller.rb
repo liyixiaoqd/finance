@@ -35,10 +35,11 @@ class OnlinePayCallbackController < ApplicationController
 			#delete request params
 			notify_params = params.except(*request.path_parameters.keys)
 			#valid reques is right
-			if(pay_detail.notify_verify?(notify_params,Settings.alipay_oversea.pid,Settings.alipay_oversea.secret))	
-				begin
-					ret_hash=init_notify_ret_hash(online_pay)
-					rollback_callback_status=online_pay.callback_status
+			begin
+				ret_hash=init_notify_ret_hash(online_pay)
+				rollback_callback_status=online_pay.callback_status
+					
+				if(pay_detail.notify_verify?(notify_params,Settings.alipay_oversea.pid,Settings.alipay_oversea.secret))	
 					online_pay.callback_status=params[:trade_status]
 					online_pay.rate_amount=params[:total_fee]
 					online_pay.set_status_by_callback!()
@@ -61,12 +62,12 @@ class OnlinePayCallbackController < ApplicationController
 					end
 
 					render_text="success"
-				rescue => e  	#rollback online_pay!!!
-					#online_pay.set_status!("failure_notify",e.message)
-					online_pay.update_attributes(:status=>"failure_notify",:reason=>e.message,:callback_status=>rollback_callback_status)
-					logger.info("alipay_oversea_notify failure!! : #{e.message}")
 				end
-			end
+			rescue => e  	#rollback online_pay!!!
+				#online_pay.set_status!("failure_notify",e.message)
+				online_pay.update_attributes(:status=>"failure_notify",:reason=>e.message,:callback_status=>rollback_callback_status)
+				logger.info("alipay_oversea_notify failure!! : #{e.message}")
+			end	
 			render text: "#{render_text}"
 		end
 	end	
@@ -108,10 +109,11 @@ class OnlinePayCallbackController < ApplicationController
 			#delete request params
 			notify_params = params.except(*request.path_parameters.keys)
 			#valid reques is right
-			if(pay_detail.notify_verify?(notify_params,Settings.alipay_transaction.pid,Settings.alipay_transaction.secret))	
-				begin
-					ret_hash=init_notify_ret_hash(online_pay)
-					rollback_callback_status=online_pay.callback_status
+			begin
+				ret_hash=init_notify_ret_hash(online_pay)
+				rollback_callback_status=online_pay.callback_status
+
+				if(pay_detail.notify_verify?(notify_params,Settings.alipay_transaction.pid,Settings.alipay_transaction.secret))	
 					online_pay.callback_status=params[:trade_status]
 					online_pay.set_status_by_callback!()
 					online_pay.reconciliation_id=params[:trade_no]
@@ -150,12 +152,13 @@ class OnlinePayCallbackController < ApplicationController
 						end
 					end
 					render_text="success"	
-				rescue => e
-					#online_pay.set_status!("failure_notify",e.message)
-					online_pay.update_attributes(:status=>"failure_notify",:reason=>e.message,:callback_status=>rollback_callback_status)
-					logger.info("alipay_transaction_notify failure!! : #{e.message}")
 				end
+			rescue => e
+				#online_pay.set_status!("failure_notify",e.message)
+				online_pay.update_attributes(:status=>"failure_notify",:reason=>e.message,:callback_status=>rollback_callback_status) 
+				logger.info("alipay_transaction_notify failure!! : #{e.message}")
 			end
+			
 			render text: "#{render_text}"
 		end
 	end
