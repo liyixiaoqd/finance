@@ -36,7 +36,7 @@ module PayDetailable extend ActiveSupport::Concern
 		http = Net::HTTP.new(uri.host, uri.port)
 
 		http.use_ssl =  uri.scheme == 'https' if (https_boolean==true || url_path[0,5].upcase=="HTTPS")
-
+		http.read_timeout=10
 		if(method=="get")
 			request = Net::HTTP::Get.new(uri.request_uri) 
 		else
@@ -45,7 +45,12 @@ module PayDetailable extend ActiveSupport::Concern
 		end
 
 		#test !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		response=http.request(request)
+		begin
+			response=http.request(request)
+		rescue => e
+			Rails.logger.info("CALL URL:#{url_path} EXPECTION:#{e.message}")
+			response=MyResponse.new
+		end
 		Rails.logger.info("url.code:#{response.code}")
 		response		
 	end
