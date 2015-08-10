@@ -11,7 +11,22 @@ module OnlinePayHelper
 		'success_credit'=>'支付成功-请求(信用卡)成功',
 		'failure_credit'=>'支付失败-请求(信用卡)失败',
 		'success_score'=>'支付成功-积分支付',
-		'success_e_cash'=>'支付成功-电子现金支付',
+		'success_e_cash'=>'支付成功-电子现金支付'
+	}
+
+	STATUS_MAPPING_TO_TYPE={
+		'submit'=>'manual_payment',
+		'failure_submit'=>'manual_payment',
+		'submit_credit'=>'manual_payment',
+		'intermediate_notify'=>'manual_payment',
+		'success_notify'=>'success',
+		'cancel_notify'=>'manual_payment',
+		'failure_notify'=>'manual_payment',
+		'failure_notify_third'=>'recall_notify',
+		'success_credit'=>'success',
+		'failure_credit'=>'manual_payment',
+		'success_score'=>'success',
+		'success_e_cash'=>'success'
 	}
 
 	PAYWAY_PAYTYPE_MAPPING={
@@ -48,5 +63,15 @@ module OnlinePayHelper
 		else
 			true
 		end
+	end
+
+	def get_expection_type_by_auth(status)
+		type=STATUS_MAPPING_TO_TYPE[status]
+		if type.present? && type=='manual_payment'
+			type='' unless isAuthority('10')
+		elsif type.present? && type=='recall_notify'
+			type='' unless isAuthority('11')
+		end
+		type
 	end
 end

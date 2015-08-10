@@ -215,14 +215,12 @@ AccessAuthority.create!(:controller=>"TransactionReconciliationController",:acti
 			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'财务管理 - 财务确认',:access_level=>3)
 
-
 AccessAuthority.create!(:controller=>"UploadFileController",:action=>"index",
 			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'文件上传 - 文件上传',:access_level=>5)
 AccessAuthority.create!(:controller=>"UploadFileController",:action=>"upload",
 			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'上传文件处理')
-
 
 AccessAuthority.create!(:controller=>"AdminSettingController",:action=>"index",
 			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
@@ -242,6 +240,13 @@ AccessAuthority.create!(:controller=>"AdminSettingController",:action=>"new_coun
 AccessAuthority.create!(:controller=>"AdminSettingController",:action=>"modify_country",
 			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'单个帐号国家修改提交')
+
+AccessAuthority.create!(:controller=>"ExpectionHandlingController",:action=>"manual_payment",
+			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
+			:describe=>'财务管理 - 交易查询 - 手动支付',:access_level=>10)
+AccessAuthority.create!(:controller=>"ExpectionHandlingController",:action=>"recall_notify",
+			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
+			:describe=>'财务管理 - 交易查询 - 手动调用',:access_level=>11)
 
 
 AdminAuthority.delete_all

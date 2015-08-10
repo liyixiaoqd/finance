@@ -4,13 +4,13 @@ class AdminSettingController < ApplicationController
 	end
 
 	def show_authority
-		@am=AdminManage.includes(:admin_authority).find_by_admin_name(params['admin_name'])
+		@am=AdminManage.includes(:admin_authority).order("admin_authorities.describe asc").find_by_admin_name(params['admin_name'])
 	end
 
 	def new_authority
 		@aa_hash={}
 
-		aas=AccessAuthority.where("access_level is not null and is_interface=false and is_sign_in=true and controller!='SimulationController'")
+		aas=AccessAuthority.where("access_level is not null and is_interface=false and is_sign_in=true and controller!='SimulationController'").order("access_authorities.describe asc")
 
 		aas.each do |aa|
 			aa_user=AdminAuthority.find_by_admin_name_and_controller_and_action_and_no(params['admin_name'],aa.controller,aa.action,aa.access_level)

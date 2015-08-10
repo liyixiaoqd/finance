@@ -36,7 +36,7 @@ module PayDetailable extend ActiveSupport::Concern
 		http = Net::HTTP.new(uri.host, uri.port)
 
 		http.use_ssl =  uri.scheme == 'https' if (https_boolean==true || url_path[0,5].upcase=="HTTPS")
-		http.read_timeout=10
+		http.read_timeout=20
 		if(method=="get")
 			request = Net::HTTP::Get.new(uri.request_uri) 
 		else

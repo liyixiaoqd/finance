@@ -23,7 +23,7 @@ class FinanceWater < ActiveRecord::Base
 				finance_water.amount=op.amount
 				finance_water.watertype="e_cash"
 
-				finance_water.reason=op.description
+				finance_water.reason=op.description+",id="+op.id
 				finance_water.old_amount=op.user.e_cash
 				finance_water.new_amount=op.user.e_cash+finance_water.amount
 				op.user.update_attributes!({'e_cash'=>finance_water.new_amount})

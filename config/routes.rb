@@ -41,6 +41,9 @@ Rails.application.routes.draw do
   get 'admin_setting/:admin_name/new_country' => 'admin_setting#new_country',as: :new_country_admin_setting
   post 'admin_setting/:admin_name/modify_country' => 'admin_setting#modify_country',as: :modify_country_admin_setting
 
+  post 'expection_handling/:online_pay_id/manual_payment' => 'expection_handling#manual_payment',as: :expection_handling_manual_payment
+  post 'expection_handling/:online_pay_id/recall_notify' => 'expection_handling#recall_notify',as: :expection_handling_recall_notify
+  
   #online_pay inteface use 
   post 'registe' => 'registe#create'
   get 'registe/:userid/obtain' => 'registe#obtain'

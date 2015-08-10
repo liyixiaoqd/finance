@@ -22,6 +22,7 @@ namespace :async_notice do
 					'amount'=>op.amount,
 					'payway'=>op.payway,
 					'paytype'=>op.paytype,
+					'water_no'=>'',
 					'sign'=>Digest::MD5.hexdigest("#{op.trade_no}#{Settings.authenticate.signkey}")		
 				}
 
@@ -32,6 +33,7 @@ namespace :async_notice do
 					response=op.method_url_response("post",redirect_notify_url,false,ret_hash)
 					if response.code=="200" && JSON.parse(response.body)['status']=="success"
 						op.set_status!("success_notify","")
+						op.reconciliation_detail.update_attributes!({:online_pay_status=>op.status}) unless op.reconciliation_detail.blank? 
 					else
 						op.set_status!("failure_notify_third","recall info[#{response.code}:#{response.body}]")
 					end
