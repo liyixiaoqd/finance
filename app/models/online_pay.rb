@@ -205,7 +205,7 @@ class OnlinePay < ActiveRecord::Base
 
 	def get_transaction_timestamp()
 		rd=self.reconciliation_detail
-		if rd.present? && rd.reconciliation_flag==ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC']
+		if rd.present? && rd.reconciliation_flag!=ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['INIT']
 			rd.timestamp
 		else
 			nil
@@ -214,7 +214,7 @@ class OnlinePay < ActiveRecord::Base
 
 	def get_transaction_desc()
 		rd=self.reconciliation_detail
-		if rd.present? && rd.reconciliation_flag==ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC']
+		if rd.present? && rd.reconciliation_flag!=ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['INIT']
 			rd.reconciliation_describe
 		else
 			nil
