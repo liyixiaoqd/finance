@@ -144,7 +144,7 @@ describe OnlinePayCallbackController do
 			request.session[:admin]="admin"
 
 			op=OnlinePay.where(payway: 'alipay',paytype: 'transaction').last
-			op.update_attributes!({'system'=>'mypost4u','callback_status'=>'WAIT_BUYER_PAY'}) if op.present?
+			op.update_attributes!({'system'=>'mypost4u','callback_status'=>''}) if op.present?
 
 			op=OnlinePay.where(payway: 'alipay',paytype: 'transaction',status: 'submit').last
 			expect(op).not_to eq nil
