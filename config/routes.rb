@@ -49,7 +49,7 @@ Rails.application.routes.draw do
   get 'registe/:userid/obtain' => 'registe#obtain'
 
   post 'finance_water/:userid/modify' => 'finance_water#modify'
-  post 'finance_water/:userid/water_obtain' => 'finance_water#water_obtain'
+  get 'finance_water/:userid/water_obtain' => 'finance_water#water_obtain'
   post 'finance_water/refund' => 'finance_water#refund'
 
   post 'pay/:userid/submit' => 'online_pay#submit'
