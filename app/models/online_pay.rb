@@ -9,6 +9,8 @@ class OnlinePay < ActiveRecord::Base
 	validates :amount, numericality:{:greater_than_or_equal_to=>0.00}
 	validates :status, inclusion: { in: ONLINE_PAY_STATUS_ENUM,message: "%{value} is not a valid online_pay.status" }
 
+	before_create :create_unique_valid
+
 	paginates_per 14
 
 	ALIPAY_OVERSEA_CALLBACK_STATUS={
@@ -354,4 +356,16 @@ class OnlinePay < ActiveRecord::Base
 			nil
 		end
 	end
+
+	private 
+		def create_unique_valid
+			unless self.class.find_by_system_and_payway_and_paytype_and_order_no(self.system,self.payway,self.paytype,self.order_no).blank?
+				Rails.logger.info("ONLINE_PAY UNIQUE VALID :fail")
+				errors.add(:base,"user has exists")
+				return false
+			else
+				Rails.logger.info("ONLINE_PAY UNIQUE VALID :succ")
+				return true
+			end
+		end
 end
