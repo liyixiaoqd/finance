@@ -120,6 +120,7 @@ class TransactionReconciliationController < ApplicationController
 					flash[:notice]="#{params[:transactionid]}对账状态已发生变更,与提交时不同,请重新确认"
 					redirect_to transaction_reconciliation_index_path(payway: reconciliation_detail.payway,paytype: reconciliation_detail.paytype,transactionid: reconciliation_detail.transactionid) and return
 				end
+
 				if (reconciliation_detail.reconciliation_flag==ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC'])
 					#已财务确认的不可撤销
 					if reconciliation_detail.confirm_flag==ReconciliationDetail::CONFIRM_FLAG['SUCC']
@@ -150,6 +151,8 @@ class TransactionReconciliationController < ApplicationController
 						raise "请输入对账确认日期!!"
 					else
 						reconciliation_detail.transaction_date=params['transaction_date']
+						reconciliation_detail.timestamp=OnlinePay.current_time_format("%Y-%m-%d %H:%M:%S")
+						reconciliation_detail.timestamp[0,10]=params['transaction_date']
 					end
 					reconciliation_detail.reconciliation_flag=ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC']
 				end
