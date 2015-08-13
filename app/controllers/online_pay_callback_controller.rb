@@ -169,7 +169,10 @@ class OnlinePayCallbackController < ApplicationController
 			render text: "#{render_text}" and return if (online_pay.blank? || online_pay.success_url.blank?)
 
 			# check is status has updated! paypal no need
-			# render :text=>'success' and return if online_pay.check_has_updated?(rollback_callback_status)
+			if online_pay.status=="success_notify" || online_pay.status=="failure_notify_third"
+				render :text=>'success' and return 
+			end
+			
 			begin
 				#online_pay.callback_status,rollback_callback_status=rollback_callback_status,online_pay.callback_status
 

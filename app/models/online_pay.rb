@@ -361,7 +361,7 @@ class OnlinePay < ActiveRecord::Base
 		def create_unique_valid
 			unless self.class.find_by_system_and_payway_and_paytype_and_order_no(self.system,self.payway,self.paytype,self.order_no).blank?
 				Rails.logger.info("ONLINE_PAY UNIQUE VALID :fail")
-				errors.add(:base,"user has exists")
+				errors.add(:base,"order has exists")
 				return false
 			else
 				Rails.logger.info("ONLINE_PAY UNIQUE VALID :succ")

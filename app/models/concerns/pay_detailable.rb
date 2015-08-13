@@ -46,7 +46,9 @@ module PayDetailable extend ActiveSupport::Concern
 
 		#test !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		begin
-			response=http.request(request)
+			Timeout::timeout(22){
+				response=http.request(request)
+			}
 		rescue => e
 			Rails.logger.info("CALL URL:#{url_path} EXPECTION:#{e.message}")
 			response=MyResponse.new
