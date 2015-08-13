@@ -124,7 +124,7 @@ class OnlinePayController < ApplicationController
 	end
 
 	def submit
-		logger.info(params.inspect)
+		#logger.info(params.inspect)
 		render json:{},status:400 and return unless params_valid("online_pay_submit",params)
 		ret_hash={
 			'redirect_url'=>'',
@@ -132,43 +132,58 @@ class OnlinePayController < ApplicationController
 			'is_credit'=>''
 		}
 
-		ActiveRecord::Base.transaction do	
-			begin	
-				online_pay=new_online_pay_params(params,request)
+		online_pay=nil
+		pay_detail=nil
+
+		begin
+		#先产生order_no
+			user=User.find_by_system_and_userid(params['system'],params['userid'])
+			if(user.blank?)
+				render json:{},status:400 and return
+			end
+
+			logger.info("ONLINE PAY SUBMIT LOCK USER START:#{user.username} - #{params['order_no']}")
+			user.with_lock do 				
+				online_pay=new_online_pay_params(user,params,request)
 				if(online_pay.status=='failure_submit')
 					logger.warn("no user:#{online_pay.userid} pay record save!")
 					render json:{},status:400 and return
 				end
 
-				pay_detail=OnlinePay.get_instance_pay_detail(online_pay)
-
-				flag,online_pay.redirect_url,online_pay.trade_no,online_pay.is_credit,message=pay_detail.submit()
-
-				logger.info("#{flag} - #{online_pay.redirect_url} - #{online_pay.trade_no} - #{message}")
-
-				unless(flag=="success")
-					online_pay.set_status!("failure_submit",message)
-				end
 				online_pay.save!
-				#alipay trade_no is nil so use  system_orderno
-				if(online_pay.trade_no.blank? && flag=="success")
-					#online_pay.trade_no="finance_#{online_pay.created_at.strftime("%y%m%d%H%M%S") }_#{online_pay.id}"
-					online_pay.trade_no="#{online_pay.system}_#{online_pay.order_no}_#{Time.now.to_datetime.strftime '%Q'}"
-					online_pay.update_attributes!('trade_no'=>online_pay.trade_no)
-				end
-
-				ret_hash['redirect_url']=CGI.escape(online_pay.redirect_url)
-				ret_hash['trade_no']=online_pay.trade_no
-				ret_hash['is_credit']=online_pay.is_credit
-			rescue => e
-				#failure also save pay record!!
-				logger.info("create online_pay failure! : #{e.message}")
-				unless (online_pay.blank?)
-					online_pay.set_status!("failure_submit",e.message)
-					online_pay.save
-				end
-				render json:{},status:400 and return
 			end
+			logger.info("ONLINE PAY SUBMIT LOCK USER END:#{user.username} - #{online_pay.order_no} - #{online_pay.id}")
+
+			# logger.info("ONLINE PAY SUBMIT LOCK ONLINE_PAY START:#{online_pay.id} - #{online_pay.order_no}")
+			# online_pay.with_lock do 
+			pay_detail=OnlinePay.get_instance_pay_detail(online_pay)
+			flag,online_pay.redirect_url,online_pay.trade_no,online_pay.is_credit,message=pay_detail.submit()
+
+			logger.info("#{flag} - #{online_pay.redirect_url} - #{online_pay.trade_no} - #{message}")
+
+			unless(flag=="success")
+				online_pay.set_status!("failure_submit",message)
+			end
+			#alipay trade_no is nil so use  system_orderno
+			if(online_pay.trade_no.blank? && flag=="success")
+				#online_pay.trade_no="finance_#{online_pay.created_at.strftime("%y%m%d%H%M%S") }_#{online_pay.id}"
+				online_pay.trade_no="#{online_pay.system}_#{online_pay.order_no}_#{Time.now.to_datetime.strftime '%Q'}"
+			end
+			online_pay.update_attributes!({})
+
+			ret_hash['redirect_url']=CGI.escape(online_pay.redirect_url)
+			ret_hash['trade_no']=online_pay.trade_no
+			ret_hash['is_credit']=online_pay.is_credit
+			# end
+			# logger.info("ONLINE PAY SUBMIT LOCK ONLINE_PAY END:#{online_pay.id} - #{online_pay.order_no}")
+		rescue => e
+			#failure also save pay record!!
+			logger.info("online_pay create or call failure! : #{e.message}")
+			unless (online_pay.blank?)
+				online_pay.set_status!("failure_submit",e.message)
+				online_pay.save
+			end
+			render json:{},status:400 and return
 		end
 
 		logger.info("ONLINE_PAY SUBMIT RET:#{ret_hash}")
@@ -259,17 +274,17 @@ class OnlinePayController < ApplicationController
 			end
 		end
 
-		def new_online_pay_params(params,request)
+		def new_online_pay_params(user,params,request)
 			online_pay=exists_online_pay(params)
 			if online_pay.blank?
-				user=User.find_by_system_and_userid(params['system'],params['userid'])
-				if(user.blank?)
-					online_pay=OnlinePay.new()
-					online_pay.set_status!("failure_submit","user not exists")
-				else
-					online_pay=user.online_pay.build()
-					online_pay.set_status!("submit","")
-				end
+				# user=User.find_by_system_and_userid(params['system'],params['userid'])
+				# if(user.blank?)
+				# 	online_pay=OnlinePay.new()
+				# 	online_pay.set_status!("failure_submit","user not exists")
+				# else
+				online_pay=user.online_pay.build()
+				online_pay.set_status!("submit","")
+				# end
 			else
 				online_pay.set_status!("submit","")
 			end
