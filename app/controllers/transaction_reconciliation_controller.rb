@@ -151,8 +151,9 @@ class TransactionReconciliationController < ApplicationController
 						raise "请输入对账确认日期!!"
 					else
 						reconciliation_detail.transaction_date=params['transaction_date']
-						reconciliation_detail.timestamp=OnlinePay.current_time_format("%Y-%m-%d %H:%M:%S").to_s
-						reconciliation_detail.timestamp[0,10]=params['transaction_date']
+						tmp_timestamp=OnlinePay.current_time_format("%Y-%m-%d %H:%M:%S")
+						tmp_timestamp[0,10]=params['transaction_date']
+						reconciliation_detail.timestamp=tmp_timestamp
 					end
 					reconciliation_detail.reconciliation_flag=ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC']
 				end
