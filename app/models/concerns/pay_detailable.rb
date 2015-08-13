@@ -45,6 +45,7 @@ module PayDetailable extend ActiveSupport::Concern
 		end
 
 		#test !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		response=nil
 		begin
 			Timeout::timeout(22){
 				response=http.request(request)
