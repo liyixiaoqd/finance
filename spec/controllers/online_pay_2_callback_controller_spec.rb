@@ -191,12 +191,12 @@ describe OnlinePayCallbackController do
 			request.session[:admin]="admin"
 
 			op=OnlinePay.where(payway: 'alipay',paytype: 'transaction').last
-			op.update_attributes!({'system'=>'quaie','callback_status'=>'WAIT_BUYER_CONFIRM_GOODS'})
+			op.update_attributes!({'system'=>'quaie','callback_status'=>'WAIT_SELLER_SEND_GOODS'})
 			op.reconciliation_detail.delete if op.reconciliation_detail.present?
 
 			expect(op).not_to eq nil
 			expect{
-				post :alipay_transaction_notify,alipay_transaction_notify_params_5()
+				post :alipay_transaction_notify,alipay_transaction_notify_params_4()
 			}.to change(FinanceWater,:count).by(1)
 		end
 	end
