@@ -232,28 +232,21 @@ class OnlinePayCallbackController < ApplicationController
 			online_pay=OnlinePay.get_online_pay_instance("paypal","",params,"",false,true)
 			render text: "#{render_text}" and return if (online_pay.blank? || online_pay.abort_url.blank?)
 
-			# check is status has updated!
-			if online_pay.status=="success_notify" || online_pay.status=="failure_notify_third"
-				render :text=>'success' and return 
-			end
-			
-			# render text: "#{render_text}"		
-			online_pay.set_status!("cancel_notify","abort")
-			rollback_callback_status=online_pay.status	
-			#check is status has updated
-			render :text=>'success' and return if online_pay.check_has_updated?(rollback_callback_status)
-			
-			online_pay.callback_status,rollback_callback_status=rollback_callback_status,online_pay.callback_status
-
 			redirect_url=OnlinePay.redirect_url_replace("get",online_pay.abort_url,{})
 			logger.info("paypal_abort:#{redirect_url}")
 			# if(method_url_response_code("get",redirect_url,false)=="200")
 			# 	render_text="success"
 			# end
-
-			unless online_pay.save()
-				logger.warn("paypal_abort:save abort failure!")
+			# check is status has updated!
+			if online_pay.status=="success_notify" || online_pay.status=="failure_notify_third"
+				logger.warn("paypal_abort:#{online_pay.order_no} has success!! can not abort!")
+			else
+				online_pay.set_status!("cancel_notify","abort")
+				unless online_pay.save()
+					logger.warn("paypal_abort:save abort failure!")
+				end
 			end
+			
 
 			redirect_to redirect_url
 		end
@@ -348,22 +341,23 @@ class OnlinePayCallbackController < ApplicationController
 			online_pay=OnlinePay.get_online_pay_instance("sofort","",params,"",false,true)
 			render text: "#{render_text}" and return if (online_pay.blank? || online_pay.abort_url.blank?)
 
-			# render text: "#{render_text}"		
-			online_pay.set_status!("cancel_notify","abort or timeout")
-			rollback_callback_status=online_pay.status		
-			#check is status has updated
-			render :text=>'success' and return if online_pay.check_has_updated?(rollback_callback_status)
-
-			online_pay.callback_status,rollback_callback_status=rollback_callback_status,online_pay.callback_status
-
 			redirect_url=OnlinePay.redirect_url_replace("get",online_pay.abort_url,{})
 			logger.info("sofort_abort:#{redirect_url}")
 			# if(method_url_response_code("get",redirect_url,false)=="200")
 			# 	render_text="success"
 			# end
 
-			unless online_pay.save()
-				logger.warn("sofort_abort:save abort or timeout failure!")
+			# render text: "#{render_text}"		
+			online_pay.set_status!("cancel_notify","abort or timeout")
+			rollback_callback_status=online_pay.status		
+			#check is status has updated
+			if online_pay.check_has_updated?(rollback_callback_status)
+				logger.warn("sofort_abort:#{online_pay.order_no} has success!! can not abort!")
+			else
+				online_pay.callback_status,rollback_callback_status=rollback_callback_status,online_pay.callback_status
+				unless online_pay.save()
+					logger.warn("sofort_abort:save abort or timeout failure!")
+				end
 			end
 
 			redirect_to redirect_url

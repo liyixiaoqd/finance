@@ -26,20 +26,22 @@ class OnlinePay < ActiveRecord::Base
 		'TRADE_FINISHED' => 9
 	}
 
+	#交易成功优先级最高,其次为交易取消
 	SOFORT_CALLBACK_STATUS={
  		'loss' => 0,
 		'pending' => 1,
 		'refunded' => 2,
 		'received' => 9,
 		'untraceable' => 9,
-		'cancel_notify'=>9
+		'cancel_notify'=>8
 	}
 
+	#交易成功优先级最高,其次为交易取消
 	#paypal.callback_status=paypal.stauts
 	PAYPAL_CALLBACK_STATUS={
 		# 'submit_credit'=>0,
 		'failure_credit'=>0,
- 		'cancel_notify'=>9,
+ 		'cancel_notify'=>8,
  		'success_credit'=>9
 	}
 
