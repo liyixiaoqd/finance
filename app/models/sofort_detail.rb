@@ -4,7 +4,7 @@ class SofortDetail
 	include PayDetailable
 	attr_accessor :country,:amount,:description,:currency,:order_no,:success_url
 
-	SPEC_PARAMS_COUNTRY=%w(de nl)
+	SPEC_PARAMS_COUNTRY=%w(de nl at)
 	#PAY_SOFORT_PARAMS=%w{country currency order_no amount success_url notification_url abort_url timeout_url}
 	def initialize(online_pay)
 		if !payparams_valid("sofort",online_pay) ||  !spec_payparams_valid(online_pay)
@@ -22,6 +22,8 @@ class SofortDetail
 				xbuilder.project_id Settings.sofort.project_id_de
 			elsif @country == "nl"
 				xbuilder.project_id Settings.sofort.project_id_nl
+			elsif @country == "at"
+				xbuilder.project_id Settings.sofort.project_id_at
 			end
 
 			xbuilder.amount @amount
@@ -162,6 +164,8 @@ class SofortDetail
 				req.basic_auth Settings.sofort.customer_number_de,Settings.sofort.api_key_de
 			elsif country == "nl"
 				req.basic_auth Settings.sofort.customer_number_nl,Settings.sofort.api_key_nl
+			elsif country == "at"
+				req.basic_auth Settings.sofort.customer_number_at,Settings.sofort.api_key_at
 			end
 			[http,req]
 		end

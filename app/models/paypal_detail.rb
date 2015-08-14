@@ -43,6 +43,16 @@ class PaypalDetail
 					    :amount   => price_in_cents(@amount),
 					    :description => @description} ]
 			)
+		elsif @country == "at"
+			response = EXPRESS_GATEWAY_AT.setup_purchase( (@amount.to_f*100).round,
+			:ip                => @ip,
+			:currency          => @currency,
+			:return_url        => Settings.paypal.return_url,
+			:cancel_return_url => Settings.paypal.cancel_url,
+			:items             => [ { :name => @order_no,
+					    :amount   => price_in_cents(@amount),
+					    :description => @description} ]
+			)
 		end
 
 		#return  flag   redirect_url    trade_no    is_credit    errmsg

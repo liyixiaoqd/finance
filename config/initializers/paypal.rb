@@ -14,6 +14,11 @@ paypal_options_gb = {
   :password => Settings.paypal.password_gb,
   :signature => Settings.paypal.signature_gb
 }
+paypal_options_at = {
+  :login => Settings.paypal.login_at,
+  :password => Settings.paypal.password_at,
+  :signature => Settings.paypal.signature_at
+}
 #::STANDARD_GATEWAY_DE = ActiveMerchant::Billing::PaypalGateway.new(paypal_options_de)
 ::EXPRESS_GATEWAY_DE = ActiveMerchant::Billing::PaypalExpressGateway.new(paypal_options_de)
 
@@ -22,3 +27,6 @@ paypal_options_gb = {
 
 #::STANDARD_GATEWAY_GB = ActiveMerchant::Billing::PaypalGateway.new(paypal_options_gb)
 ::EXPRESS_GATEWAY_GB = ActiveMerchant::Billing::PaypalExpressGateway.new(paypal_options_gb)
+
+#::STANDARD_GATEWAY_GB = ActiveMerchant::Billing::PaypalGateway.new(paypal_options_gb)
+::EXPRESS_GATEWAY_AT = ActiveMerchant::Billing::PaypalExpressGateway.new(paypal_options_at)
