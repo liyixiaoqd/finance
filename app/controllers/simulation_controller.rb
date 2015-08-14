@@ -179,8 +179,8 @@ class SimulationController < ApplicationController
 			digest_auth = Net::HTTP::DigestAuth.new
 			uri = URI.parse(url_path)
 			logger.info("sim:#{url_path}")
-			uri.user="finance_name"
-			uri.password="finance_passwd"
+			uri.user=Settings.authenticate.username
+			uri.password=Settings.authenticate.passwd
 
 			http = Net::HTTP.new(uri.host, uri.port)
 			http.use_ssl =  uri.scheme == 'https' if url_path[0,5]=="https"
