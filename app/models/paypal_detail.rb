@@ -95,6 +95,9 @@ class PaypalDetail
 			response=EXPRESS_GATEWAY_NL.purchase(price_in_cents(online_pay.amount), express_purchase_options(online_pay,"EUR"))
 		elsif online_pay.country == "gb"
 			response=EXPRESS_GATEWAY_GB.purchase(price_in_cents(online_pay.amount), express_purchase_options(online_pay,"GBP"))
+		elsif online_pay.country == "at"
+			response=EXPRESS_GATEWAY_AT.purchase(price_in_cents(online_pay.amount), express_purchase_options(online_pay,"GBP"))
+
 		end
 
 		# Rails.logger.info("#{response.success?} , #{response.message}")
