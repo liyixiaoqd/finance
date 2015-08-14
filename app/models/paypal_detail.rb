@@ -71,6 +71,8 @@ class PaypalDetail
 			details=EXPRESS_GATEWAY_NL.details_for(online_pay.trade_no)
 		elsif online_pay.country == "gb"
 			details=EXPRESS_GATEWAY_GB.details_for(online_pay.trade_no)
+		elsif online_pay.country == "at"
+			details=EXPRESS_GATEWAY_AT.details_for(online_pay.trade_no)
 		end
 		Rails.logger.info("get_pay_details:#{online_pay.country}:#{details.payer_id}")
 		
@@ -96,7 +98,7 @@ class PaypalDetail
 		elsif online_pay.country == "gb"
 			response=EXPRESS_GATEWAY_GB.purchase(price_in_cents(online_pay.amount), express_purchase_options(online_pay,"GBP"))
 		elsif online_pay.country == "at"
-			response=EXPRESS_GATEWAY_AT.purchase(price_in_cents(online_pay.amount), express_purchase_options(online_pay,"GBP"))
+			response=EXPRESS_GATEWAY_AT.purchase(price_in_cents(online_pay.amount), express_purchase_options(online_pay,"EUR"))
 
 		end
 
