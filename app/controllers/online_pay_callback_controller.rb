@@ -173,7 +173,7 @@ class OnlinePayCallbackController < ApplicationController
 			online_pay=OnlinePay.get_online_pay_instance("paypal","",params,"",false,true)
 			render text: "#{render_text}" and return if (online_pay.blank? || online_pay.success_url.blank?)
 
-			# check is status has updated! paypal no need
+			# check is status has updated!
 			if online_pay.status=="success_notify" || online_pay.status=="failure_notify_third"
 				render :text=>'success' and return 
 			end
@@ -232,6 +232,11 @@ class OnlinePayCallbackController < ApplicationController
 			online_pay=OnlinePay.get_online_pay_instance("paypal","",params,"",false,true)
 			render text: "#{render_text}" and return if (online_pay.blank? || online_pay.abort_url.blank?)
 
+			# check is status has updated!
+			if online_pay.status=="success_notify" || online_pay.status=="failure_notify_third"
+				render :text=>'success' and return 
+			end
+			
 			# render text: "#{render_text}"		
 			online_pay.set_status!("cancel_notify","abort")
 			rollback_callback_status=online_pay.status	

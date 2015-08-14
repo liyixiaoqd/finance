@@ -8,6 +8,8 @@ describe OnlinePayController do
 			OnlinePay.where("order_no like ?","SPEC%").delete_all
 
 			expect(OnlinePay.where("order_no like ?","SPEC%").count).to eq 0
+
+			ReconciliationDetail.where("order_no like ?","SPEC%").delete_all
 		end
 	end
 

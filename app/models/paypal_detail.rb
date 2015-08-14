@@ -2,7 +2,7 @@ class PaypalDetail
 	include PayDetailable
 	attr_accessor :ip,:country,:amount,:description,:currency,:order_no
 
-	 SPEC_PARAMS_COUNTRY=%w(de nl gb)
+	 SPEC_PARAMS_COUNTRY=%w(de nl gb at)
 	#PAY_PAYPAL_PARAMS=%w{amount currency success_url abort_url order_no description ip country}
 	def initialize(online_pay)
 		if !payparams_valid("paypal",online_pay) ||  !spec_payparams_valid(online_pay)
