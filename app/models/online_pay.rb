@@ -249,8 +249,11 @@ class OnlinePay < ActiveRecord::Base
 
 	def find_reconciliation()
 		rd=self.reconciliation_detail
-		Rails.logger.info("rd.blank? = #{rd.blank?}")
-		#rd=ReconciliationDetail.find_by_payway_and_paytype_and_transactionid(self.payway,self.paytype,self.reconciliation_id) if rd.blank?
+		Rails.logger.info("RD:self.reconciliation_detail.blank? = #{rd.blank?}")
+		if rd.blank?
+			rd=ReconciliationDetail.find_by_payway_and_paytype_and_transactionid(self.payway,self.paytype,self.reconciliation_id)
+			Rails.logger.info("RD:sfind_by_payway_and_paytype_and_transactionid.blank? = #{rd.blank?}")
+		end
 		rd
 	end
 
@@ -293,6 +296,7 @@ class OnlinePay < ActiveRecord::Base
 			pay_combine=payway+"_"+paytype
 		end
 		
+		ret_op=nil
 		begin
 			trade_no=''
 			if is_credit==true 	#spec  credit submit
@@ -340,21 +344,25 @@ class OnlinePay < ActiveRecord::Base
 			#OnlinePay.lock.find_by_payway_and_paytype_and_trade_no_and_status(payway,paytype,trade_no,'submit')
 			if status.blank?
 				if is_lock==true
-					OnlinePay.lock.find_by_payway_and_paytype_and_trade_no(payway,paytype,trade_no)
+					ret_op=OnlinePay.lock.find_by_payway_and_paytype_and_trade_no(payway,paytype,trade_no)
 				else
-					OnlinePay.find_by_payway_and_paytype_and_trade_no(payway,paytype,trade_no)
+					ret_op=OnlinePay.find_by_payway_and_paytype_and_trade_no(payway,paytype,trade_no)
 				end
 			else
 				if is_lock==true
-					OnlinePay.lock.find_by_payway_and_paytype_and_trade_no_and_status(payway,paytype,trade_no,status)
+					ret_op=OnlinePay.lock.find_by_payway_and_paytype_and_trade_no_and_status(payway,paytype,trade_no,status)
 				else
-					OnlinePay.find_by_payway_and_paytype_and_trade_no_and_status(payway,paytype,trade_no,status)
+					ret_op=OnlinePay.find_by_payway_and_paytype_and_trade_no_and_status(payway,paytype,trade_no,status)
 				end
 			end
+
+			logger.info("get online_pay:#{ret_op.order_no} - #{ret_op.id} end! lock?:#{is_lock}")
 		rescue=>e
 			logger.warn("get_online_pay_instance failure:#{e.message}")
 			nil
 		end
+
+		ret_op
 	end
 
 	private 

@@ -145,11 +145,10 @@ class OnlinePayController < ApplicationController
 			logger.info("ONLINE PAY SUBMIT LOCK USER START:#{user.username} - #{params['order_no']}")
 			user.with_lock do 				
 				online_pay=new_online_pay_params(user,params,request)
-				if(online_pay.status=='failure_submit')
-					logger.warn("no user:#{online_pay.userid} pay record save!")
-					render json:{},status:400 and return
-				end
-
+				# if(online_pay.status=='failure_submit')
+				# 	logger.warn("no user:#{online_pay.userid} pay record save!")
+				# 	render json:{},status:400 and return
+				# end
 				online_pay.save!
 			end
 			logger.info("ONLINE PAY SUBMIT LOCK USER END:#{user.username} - #{online_pay.order_no} - #{online_pay.id}")

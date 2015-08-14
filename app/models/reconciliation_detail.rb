@@ -5,6 +5,7 @@ class ReconciliationDetail < ActiveRecord::Base
 	validates :payway, :transactionid, :transaction_status,:batch_id,:transaction_date, presence: true
 	#validates :reconciliation_flag, inclusion: { in: %w{'0','1','2'},message: "%{value} is not a valid ReconciliationDetail.reconciliation_flag" }
 	before_save :set_confirm!
+	before_create :create_unique_valid
 
 	default_scope { order('payway,paytype asc,timestamp desc') }
 
@@ -203,4 +204,15 @@ class ReconciliationDetail < ActiveRecord::Base
 
 		#  hash
 	 # end
+	private 
+		def create_unique_valid
+			unless ReconciliationDetail.find_by_payway_and_paytype_and_transactionid(self.payway,self.paytype,self.reconciliation_id).blank?
+				Rails.logger.info("ReconciliationDetail UNIQUE VALID :fail")
+				errors.add(:base,"reconciliation_detail has exists")
+				return false
+			else
+				Rails.logger.info("ReconciliationDetail UNIQUE VALID :succ")
+				return true
+			end
+		end
 end
