@@ -77,6 +77,8 @@
          <%= text_field_tag(:score,50) %> </br>
          <%= label_tag(:label3,"please input init e_cash:") %> 
          <%= text_field_tag(:e_cash,88.8) %> </br>
+         <%= label_tag(:label4, "please select user_type:") %> 
+         <%= select_tag(:user_type,options_for_select([["电商","merchant"],["个人","personal"]],"merchant")) %> 
           <%= submit_tag("post") %>
         <% end %>
         </td>

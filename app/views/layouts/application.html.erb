@@ -88,7 +88,16 @@
  <% end %>
 	<div class="header">
 		<div class="stats">
-			<p class="stat"><span class="number">0</span>tasks</p>
+			<p class="stat">
+				<span class="number">
+					<% if isAuthority('12') %>
+					  <%= Notice.get_all_num %>
+					<% else %>
+					  0
+					<% end %>
+				</span>
+				<%=link_to 'tasks',notice_index_path(flag: '0') %>
+			</p>
 			<p class="stat"><span class="number">0</span>waiting</p>
 		</div>
 		<h1 class="page-title"><%=@page_title || 'title' %></h1>

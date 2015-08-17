@@ -162,7 +162,7 @@ describe FinanceWaterController do
 		end
 
 		it "success call water_obtain:get all" do
-			FinanceWater.create!({
+			users(:user_one).finance_water.create!({
 				'system'=>users(:user_one)['system'],
 				'channel'=>'web',
 				'userid'=>users(:user_one)['userid'],
@@ -193,7 +193,7 @@ describe FinanceWaterController do
 		end
 
 		it "success call water_obtain:get all" do
-			FinanceWater.create!({
+			users(:user_one).finance_water.create!({
 				'system'=>users(:user_one)['system'],
 				'channel'=>'web',
 				'userid'=>users(:user_one)['userid'],
@@ -204,7 +204,7 @@ describe FinanceWaterController do
 				'watertype'=>'score'
 				})
 
-			FinanceWater.create!({
+			users(:user_one).finance_water.create!({
 				'system'=>users(:user_one)['system'],
 				'channel'=>'web',
 				'userid'=>users(:user_one)['userid'],

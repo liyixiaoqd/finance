@@ -34,6 +34,7 @@ class UploadFileController < ApplicationController
 		rescue=>e
 			logger.info(e.message)
 			flash[:notice],flash[:error]="处理文件失败,请重试",e.message
+			File.delete(filename)
 		end
 
 		render upload_file_index_path

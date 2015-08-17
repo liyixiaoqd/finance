@@ -74,14 +74,30 @@ class FinanceWaterController < ApplicationController
 						user.score=finance_water.new_amount
 					elsif(finance_water.watertype=="e_cash")
 						user.e_cash=finance_water.new_amount
-					end
 
+						if !user.check_merchant()
+							raise "电商支付超出限额,请检查!"
+						end
+					end
+					logger.info("amount:#{finance_water.amount}")
 					finance_water.save
 					if finance_water.errors.any?
 						finance_water.errors.full_messages.each do |msg|
 							ret_hash['reasons']<<{'reason'=>msg}
 						end
 						raise "create finance_water failure"
+					end
+
+					notice=finance_water.set_notice_by_merchant('pay')
+					unless notice.blank?
+						notice.save
+
+						if notice.errors.any?
+							notice.errors.full_messages.each do |msg|
+								ret_hash['reasons']<<{'reason'=>msg}
+							end
+							raise "create finance_water - notice failure"
+						end				
 					end
 
 					online_pay=new_online_pay_each(user,finance_each,params)
@@ -387,6 +403,7 @@ class FinanceWaterController < ApplicationController
 			reconciliation_detail
 		end
 
+		#interface use
 		def new_finance_water_each(user,finance_each,params)
 			finance_water=user.finance_water.build()
 			finance_water.system=params["system"]
@@ -399,26 +416,29 @@ class FinanceWaterController < ApplicationController
 			finance_water.amount=finance_each["amount"]
 			finance_water.watertype=finance_each["watertype"]
 			finance_water.reason=finance_each["reason"]
-			
-			if(finance_water.watertype=='score')
-				finance_water.old_amount=user.score
-				if(finance_water.symbol=='Add')
-					finance_water.new_amount=user.score+finance_water.amount
-				elsif(finance_water.symbol=="Sub")
-					finance_water.new_amount=user.score-finance_water.amount
-				end
-			elsif(finance_water.watertype=='e_cash')
-				finance_water.old_amount=user.e_cash
-				if(finance_water.symbol=='Add')
-					finance_water.new_amount=user.e_cash+finance_water.amount
-				elsif(finance_water.symbol=="Sub")
-					finance_water.new_amount=user.e_cash-finance_water.amount
-				end
-			end
+			finance_water.confirm_flag="1"
+
+			finance_water.set_all_amount!(user.score,user.e_cash)
+			# if(finance_water.watertype=='score')
+			# 	finance_water.old_amount=user.score
+			# 	if(finance_water.symbol=='Add')
+			# 		finance_water.new_amount=user.score+finance_water.amount
+			# 	elsif(finance_water.symbol=="Sub")
+			# 		finance_water.new_amount=user.score-finance_water.amount
+			# 	end
+			# elsif(finance_water.watertype=='e_cash')
+			# 	finance_water.old_amount=user.e_cash
+			# 	if(finance_water.symbol=='Add')
+			# 		finance_water.new_amount=user.e_cash+finance_water.amount
+			# 	elsif(finance_water.symbol=="Sub")
+			# 		finance_water.new_amount=user.e_cash-finance_water.amount
+			# 	end
+			# end
 		
 			finance_water	
 		end
 
+		# web use
 		def new_finance_water_params(user,params)
 			finance_water=user.finance_water.build()
 			finance_water.system=params["system"]
@@ -433,22 +453,28 @@ class FinanceWaterController < ApplicationController
 			finance_water.amount=params["amount"]
 			finance_water.watertype=params["watertype"]
 			finance_water.reason=params["reason"]
-			
-			if(finance_water.watertype=='score')
-				finance_water.old_amount=user.score
-				if(finance_water.symbol=='Add')
-					finance_water.new_amount=user.score+finance_water.amount
-				elsif(finance_water.symbol=="Sub")
-					finance_water.new_amount=user.score-finance_water.amount
-				end
-			elsif(finance_water.watertype=='e_cash')
-				finance_water.old_amount=user.e_cash
-				if(finance_water.symbol=='Add')
-					finance_water.new_amount=user.e_cash+finance_water.amount
-				elsif(finance_water.symbol=="Sub")
-					finance_water.new_amount=user.e_cash-finance_water.amount
-				end
+			if user.isMerchant?
+				finance_water.confirm_flag="0"
+			else
+				finance_water.confirm_flag="1"
 			end
+
+			finance_water.set_all_amount!(user.score,user.e_cash)
+			# if(finance_water.watertype=='score')
+			# 	finance_water.old_amount=user.score
+			# 	if(finance_water.symbol=='Add')
+			# 		finance_water.new_amount=user.score+finance_water.amount
+			# 	elsif(finance_water.symbol=="Sub")
+			# 		finance_water.new_amount=user.score-finance_water.amount
+			# 	end
+			# elsif(finance_water.watertype=='e_cash')
+			# 	finance_water.old_amount=user.e_cash
+			# 	if(finance_water.symbol=='Add')
+			# 		finance_water.new_amount=user.e_cash+finance_water.amount
+			# 	elsif(finance_water.symbol=="Sub")
+			# 		finance_water.new_amount=user.e_cash-finance_water.amount
+			# 	end
+			# end
 			finance_water	
 		end
 end

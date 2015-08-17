@@ -26,7 +26,7 @@
 				<%= label_tag(:l2, "选择文件:") %>
 				<%= file_field_tag :file %>
 				 <div class="btn-toolbar">
-					 <%= submit_tag("上传",class: "btn btn-primary") %>
+					 <%= submit_tag("上传",class: "btn btn-primary",data: {disable_with: '上传中.'}) %>
 			          	</div>
 			<% end %>
 		</div>

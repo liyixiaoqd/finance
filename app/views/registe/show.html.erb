@@ -24,10 +24,29 @@
 						<td>用户名</td>
 						<td><%= @user.username %></td>
 					</tr>
-					<tr>
-						<td>邮箱</td>
-						<td><%= @user.email %></td>
-					</tr>
+					<% if @user.isMerchant? %>
+						<tr>
+							<td>注册地址</td>
+							<td><%= @user.address %></td>
+						</tr>	
+						<tr>
+							<td>增值税号</td>
+							<td><%= @user.vat_no %></td>
+						</tr>
+						<tr>
+							<td>结算方式</td>
+							<td><%= pay_type_mapping(@user.pay_type) %></td>
+						</tr>
+						<tr>
+							<td>结算限额</td>
+							<td><%= @user.pay_limit %></td>
+						</tr>
+					<% else %>
+						<tr>
+							<td>邮箱</td>
+							<td><%= @user.email %></td>
+						</tr>
+					<% end %>
 					<tr>
 						<td>电子现金</td>
 						<td><%= @user.e_cash %></td>

@@ -248,6 +248,13 @@ AccessAuthority.create!(:controller=>"ExpectionHandlingController",:action=>"rec
 			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'财务管理 - 交易查询 - 手动调用',:access_level=>11)
 
+AccessAuthority.create!(:controller=>"NoticeController",:action=>"index",
+			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
+			:describe=>'首页 - 登入界面 - 通知显示',:access_level=>12)
+AccessAuthority.create!(:controller=>"NoticeController",:action=>"handle",
+			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
+			:describe=>'首页 - 登入界面 - 通知处理',:access_level=>13)
+
 
 AdminAuthority.delete_all
 AdminManage.all.each do |am|

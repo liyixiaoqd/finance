@@ -44,6 +44,9 @@ Rails.application.routes.draw do
   post 'expection_handling/:online_pay_id/manual_payment' => 'expection_handling#manual_payment',as: :expection_handling_manual_payment
   post 'expection_handling/:online_pay_id/recall_notify' => 'expection_handling#recall_notify',as: :expection_handling_recall_notify
   
+  get 'notice/index' => 'notice#index'
+  post 'notice/:notice_id/handle' => 'notice#handle',as: :notice_handle
+
   #online_pay inteface use 
   post 'registe' => 'registe#create'
   get 'registe/:userid/obtain' => 'registe#obtain'

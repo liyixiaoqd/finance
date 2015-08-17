@@ -57,9 +57,10 @@ class SimulationController < ApplicationController
 		userid=params['userid']
 		score=params['score'].to_f
 		e_cash=params['e_cash'].to_f
+		user_type=params['user_type']
 
 		callpath="#{CALL_HOST}/registe"
-		registe_params=registe_params(userid,score,e_cash)
+		registe_params=registe_params(userid,score,e_cash,user_type)
 		logger.info("#{registe_params.inspect}")
 		response=method_url_call("post",callpath,"false",registe_params) 
 
@@ -241,22 +242,15 @@ class SimulationController < ApplicationController
 			}
 		end
 
-		def score_params(userid,score,sybmol,watertype)
+		def score_params(userid,score,symbol,watertype)
 			oper=[{
-					'symbol'=>"Add",
-					'amount'=>"100",
-					'reason'=>'score add 100',
-					'watertype'=>"score",
+					'symbol'=>symbol,
+					'amount'=>score,
+					'pay_amount'=>score,
+					'reason'=>"#{watertype} #{symbol} #{score}",
+					'watertype'=>watertype,
 					'is_pay'=>'N',
 					'order_no'=>''
-				},
-				{
-					'symbol'=>"Sub",
-					'amount'=>"22",
-					'reason'=>'score sub 22',
-					'watertype'=>"score",
-					'is_pay'=>'Y',
-					'order_no'=>'SCORE_PAY_ORDER_001'
 				}].to_json
 
 			{
@@ -269,7 +263,7 @@ class SimulationController < ApplicationController
 			}
 		end
 
-		def registe_params(userid,score,e_cash)
+		def registe_params(userid,score,e_cash,user_type)
 			{
 				'system'=>'mypost4u',
 				'channel'=>'web',
@@ -281,7 +275,12 @@ class SimulationController < ApplicationController
 				'scoreInitAmount'=>score,
 				'scoreInitReason'=>'init score',
 				'operator'=>'system',
-				'datetime'=>current_time_ymdHMS()
+				'datetime'=>current_time_ymdHMS(),
+				'user_type'=>user_type,
+				'address'=>'test_address',
+				'vat_no'=>'DE12345',
+				'pay_type'=>'monthly',
+				'pay_limit'=>'-10000'
 			}
 		end
 
