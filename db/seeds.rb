@@ -255,6 +255,18 @@ AccessAuthority.create!(:controller=>"NoticeController",:action=>"handle",
 			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'首页 - 登入界面 - 通知处理',:access_level=>13)
 
+AccessAuthority.create!(:controller=>"TransactionReconciliationController",:action=>"merchant_index",
+			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
+			:describe=>'财务管理 - 电商报表',:access_level=>14)
+AccessAuthority.create!(:controller=>"TransactionReconciliationController",:action=>"merchant_index_export",
+			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
+			:describe=>'电商汇总报表导出')
+AccessAuthority.create!(:controller=>"TransactionReconciliationController",:action=>"merchant_show",
+			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
+			:describe=>'电商汇总报表导出')
+AccessAuthority.create!(:controller=>"TransactionReconciliationController",:action=>"merchant_show_export",
+			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
+			:describe=>'单个电商明细报表导出')
 
 AdminAuthority.delete_all
 AdminManage.all.each do |am|

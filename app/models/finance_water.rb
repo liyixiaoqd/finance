@@ -80,4 +80,22 @@ class FinanceWater < ActiveRecord::Base
 			nil
 		end
 	end
+
+	def self.get_tj_num(result_sql,search_sql,search_params)
+		fw_tj=FinanceWater.unscoped().select("#{result_sql} as tj").where(search_sql,search_params)
+		if(fw_tj[0]['tj'].blank?)
+			0
+		else
+			fw_tj[0]['tj']
+		end
+	end
+
+	def self.get_first_record(search_sql,search_params,order_sql)
+		fws=FinanceWater.unscoped().where(search_sql,search_params).order(order_sql)
+		if fws.blank?
+			nil
+		else
+			fws[0]
+		end
+	end
 end

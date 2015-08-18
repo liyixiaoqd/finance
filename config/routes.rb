@@ -47,6 +47,11 @@ Rails.application.routes.draw do
   get 'notice/index' => 'notice#index'
   post 'notice/:notice_id/handle' => 'notice#handle',as: :notice_handle
 
+  get 'transaction_reconciliation/merchant_index' => 'transaction_reconciliation#merchant_index'
+  get 'transaction_reconciliation/merchant_index_export' => 'transaction_reconciliation#merchant_index_export'
+  get 'transaction_reconciliation/merchant_show' => 'transaction_reconciliation#merchant_show'
+  get 'transaction_reconciliation/merchant_show_export' => 'transaction_reconciliation#merchant_show_export'
+
   #online_pay inteface use 
   post 'registe' => 'registe#create'
   get 'registe/:userid/obtain' => 'registe#obtain'

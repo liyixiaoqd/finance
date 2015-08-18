@@ -1,0 +1,60 @@
+<div class="container-fluid">
+<% @page_title="电商报表" %>
+	<div class="row-fluid">
+		<div class="alert alert-info">
+			<button type="button" class="close" data-dismiss="alert">×</button>
+			<strong>提示:</strong> 请输入查询条件进行查询!
+		</div>
+		<div class="row-fluid">
+			<div class="well">
+				<%= form_tag transaction_reconciliation_merchant_index_path,method:"get",remote: :true,id: "index_and_export_form" do %>
+					 <%= label_tag(:l4, "注 册 系 统:",class:"label_inline") %>
+					 <%= select_tag(:system,options_for_select([["",""],["包裹网站","mypost4u"],["quaie","quaie"]])) %> 
+					 &nbsp;&nbsp;&nbsp;
+					 <%= label_tag(:l1, "电商客户号:",class:"label_inline") %>
+					 <%= text_field_tag(:merchant_id) %>
+					 </br>
+					 <%= label_tag(:l2, "结算日起始:",class:"label_inline") %> <%= datetime_field_tag(:start_time) %>
+					 &nbsp;&nbsp;&nbsp;
+					 <%= label_tag(:l3, "结算日终止:",class:"label_inline") %> <%= datetime_field_tag(:end_time) %>
+					 <div class="btn-toolbar">
+						 <%= submit_tag("查询",class: "btn btn-primary",id: "button_submit_time",data: {disable_with: '查询中.'}) %>
+						 <%= link_to "导出",transaction_reconciliation_merchant_index_export_path,class: "btn",method: "get",id: "link_to_export"%>
+					          	<%=button_tag("清除条件",type: 'button',class: "btn",id: "button_clear") %>
+				          	</div>
+				<% end %>	
+			</div>	
+		</div>
+	</div>
+
+	<div class="row-fluid">
+		<% unless flash[:notice].blank? %>
+			<div class="alert alert-info">
+				<button type="button" class="close" data-dismiss="alert">×</button>
+				<%=flash[:notice]%>
+			</div>
+		<% end %>
+
+		<div class="well">
+			<table class="table" id="merchant_details_table">
+				<thead>
+					<tr>
+						<th>用户ID</th>
+						<th>用户名</th>
+						<th>初始余额</th>
+						<th>收入</th>
+						<th>支出</th>
+						<th>期末余额</th>
+					</tr>
+				</thead>
+				<tbody>
+					<%= render partial: "merchant_index",collection: @merchants,as: :merchant %>
+				</tbody>
+			</table>
+
+			<div class="div_paginate">
+				<%= render partial: "layouts/paginate_replace_ajax",locals: {page_array: @users} %>
+			</div>
+		</div>
+	</div>
+</div>
