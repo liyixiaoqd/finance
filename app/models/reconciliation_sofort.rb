@@ -267,7 +267,27 @@ class ReconciliationSofort
 				j=j+1
 				next unless j==6 || j==8 || j==9 || j==26 || j==15
 				col.gsub!(/\t$/,"") if col.class.to_s=="String"
-				sofort_detail["amt"],sofort_detail['netamt']=col,col if j==8
+				if j==8
+					# 样例数据 小数点使用 逗号
+					if col.class.to_s=="String"
+						col_arr=col.split(",")
+						if col_arr.size>1 
+							col=""
+							tmp=1
+							col_arr.each do |c|
+								if tmp==col_arr.size
+									col+="."+c
+								else
+									col+=c
+								end
+
+								tmp+=1
+							end
+							col=col.to_f
+						end
+					end
+					sofort_detail["amt"],sofort_detail['netamt']=col,col
+				end
 				sofort_detail["currencycode"]=col if j==9
 				if j==6
 					sofort_detail['timestamp']=col[6,4]+"-"+col[3,2]+"-"+col[0,2] 
@@ -278,7 +298,6 @@ class ReconciliationSofort
 					sofort_detail['order_no']=col.split("+")[2].rstrip if col.split("+").size>2
 				end
 			end
-
 			if sofort_detail['order_no'].blank?
 				raise "第#{i}行:对账标识(订单号)为空!"
 			end
