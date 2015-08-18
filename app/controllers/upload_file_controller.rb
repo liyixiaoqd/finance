@@ -28,12 +28,18 @@ class UploadFileController < ApplicationController
 				flash[:notice],flash[:error]=reconciliation.valid_reconciliation_by_country("de",filename)
 
 				File.delete(filename)
-			else
+			elsif params['file_type']=="AT_STA_Bank"
+				filename=write_file(params['file'],"xlsx")
+				reconciliation=ReconciliationSofort.new()
+				flash[:notice],flash[:error]=reconciliation.valid_reconciliation_by_country("at",filename)
+				File.delete(filename)
+			else	
 				flash[:notice]="未定义的上传业务类型,请重新选择"
 			end
 		rescue=>e
 			logger.info(e.message)
 			flash[:notice],flash[:error]="处理文件失败,请重试",e.message
+			File.delete(filename) if File.exists?(filename)
 		end
 
 		render upload_file_index_path

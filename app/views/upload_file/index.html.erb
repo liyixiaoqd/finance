@@ -22,7 +22,7 @@
 		<div class="well">
 			<%= form_tag upload_file_upload_path,multipart:true do %>
 				<%= label_tag(:l1, "上传业务类型:") %>
-				<%= select_tag "file_type", options_for_select([ ["sofort对账明细","sofort_transaction"],["荷兰银行事务历史记录","NL_ABN_Bank"],["德国银行事务历史记录","DE_BOC_Bank"] ], "NL_ABN_Bank") %>
+				<%= select_tag "file_type", options_for_select([ ["sofort对账明细","sofort_transaction"],["荷兰银行事务历史记录","NL_ABN_Bank"],["德国银行事务历史记录","DE_BOC_Bank"],["奥地利银行事务历史记录","AT_STA_Bank"] ], "NL_ABN_Bank") %>
 				<%= label_tag(:l2, "选择文件:") %>
 				<%= file_field_tag :file %>
 				 <div class="btn-toolbar">
