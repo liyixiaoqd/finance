@@ -28,10 +28,21 @@ class UploadFileController < ApplicationController
 				flash[:notice],flash[:error]=reconciliation.valid_reconciliation_by_country("de",filename)
 
 				File.delete(filename)
-			elsif params['file_type']=="MERCHANT_DE_AT_CASH_IN_BANK"
+			elsif params['file_type']=="AT_STA_Bank"
 				filename=write_file(params['file'],"xlsx")
 				reconciliation=ReconciliationSofort.new()
-				flash[:notice],flash[:error]=reconciliation.merchant_cash_in_proc("de_at",filename)
+				a,b=reconciliation.valid_reconciliation_by_country("at",filename)
+				flash[:notice]="对账处理:"+a if a.present?
+				flash[:error]="对账处理:"+b if b.present?
+				# 合并处理 两种类型为同一个文件
+
+				# File.delete(filename)
+			# elsif params['file_type']=="MERCHANT_DE_AT_CASH_IN_BANK"
+			# 	filename=write_file(params['file'],"xlsx")
+			# 	reconciliation=ReconciliationSofort.new()
+				a,b=reconciliation.merchant_cash_in_proc("de_at",filename)
+				flash[:notice_2]="电商银行记录:"+a if a.present?
+				flash[:error_2]="电商银行记录:"+b if b.present?
 
 				File.delete(filename)
 			elsif params['file_type']=="MERCHANT_EN_CASH_IN_BANK"

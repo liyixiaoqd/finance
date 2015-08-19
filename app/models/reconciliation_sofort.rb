@@ -75,10 +75,16 @@ class ReconciliationSofort
 
 	def valid_reconciliation_by_country(country,filename)
 		skip_num=0
+		sheet_num=0
 		if country=="de"
 			skip_num=5
+			sheet_num=0
 		elsif country=="nl"
 			skip_num=2
+			sheet_num=0
+		elsif country=="at"
+			skip_num=3
+			sheet_num=2
 		else
 			raise "不支持的导入格式:#{country}"
 		end
@@ -93,7 +99,7 @@ class ReconciliationSofort
 		valid_rescue_num=0
 		valid_nosys_num=0
 
-		xlsx.sheet(0).each do |row|
+		xlsx.sheet(sheet_num).each do |row|
 			i =i+1
 			next if i<skip_num
 			begin
@@ -101,6 +107,7 @@ class ReconciliationSofort
 
 				rd=ReconciliationDetail.init( DE_BOC_Bank_to_hash_sofort(row,i) ) if country=="de"
 				rd=ReconciliationDetail.init( NL_ABN_Bank_to_hash_sofort(row,i) ) if country=="nl"
+				rd=ReconciliationDetail.init( AT_SAT_Bank_to_hash_sofort(row,i) ) if country=="at"
 				rd.valid_and_save!()
 
 				
@@ -144,11 +151,15 @@ class ReconciliationSofort
 	end
 
 	def merchant_cash_in_proc(country,filename)
+		sheet_num=0
 		skip_num=0
 		if country=="de_at"
+			skip_num=3
+			sheet_num=2
 		elsif country=="nl"
 		elsif country=="en"
 			skip_num=5
+			sheet_num=0
 		else
 			raise "不支持的导入格式:#{country}"
 		end
@@ -161,13 +172,14 @@ class ReconciliationSofort
 		valid_succ_num=0
 		valid_rescue_num=0
 
-		xlsx.sheet(0).each do |row|
+		xlsx.sheet(sheet_num).each do |row|
 			i =i+1
 			next if i<skip_num
 			begin
 				valid_all_num=valid_all_num+1
 
-				userid,amount,operdate=MERCHANT_NL_CASH_IN_BANK_get_field(row,i)
+				userid,amount,operdate=MERCHANT_EN_CASH_IN_BANK_get_field(row,i) if country=="en"
+				userid,amount,operdate=MERCHANT_DE_AT_CASH_IN_BANK_get_field(row,i) if country=="de_at"
 
 				fw=get_fw_merchant_cash_in(userid,amount,operdate,i)
 
@@ -307,7 +319,64 @@ class ReconciliationSofort
 			sofort_detail
 		end
 
-		def MERCHANT_NL_CASH_IN_BANK_get_field(row,i)
+
+		def AT_SAT_Bank_to_hash_sofort(row,i)
+			sofort_detail={
+				'transaction_status'=>'SUCC',
+				'payway'=>'sofort',
+				'feeamt'=>0.0,
+				'paytype'=>'',
+				'transaction_date'=>'',
+				'batch_id'=>"upload_file_at",
+				'reconciliation_flag'=>ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['INIT'],
+				'order_no'=>''
+			}
+			j=0
+			row.each do |col|
+				j=j+1
+				next unless j==6 || j==8 || j==9 || j==26 || j==15
+				col.gsub!(/\t$/,"") if col.class.to_s=="String"
+				if j==8
+					# 样例数据 小数点使用 逗号
+					if col.class.to_s=="String"
+						col_arr=col.split(",")
+						if col_arr.size>1 
+							col=""
+							tmp=1
+							col_arr.each do |c|
+								if tmp==col_arr.size
+									col+="."+c
+								else
+									col+=c
+								end
+
+								tmp+=1
+							end
+							col=col.to_f
+						end
+					end
+					sofort_detail["amt"],sofort_detail['netamt']=col,col
+				end
+				sofort_detail["currencycode"]=col if j==9
+				if j==6
+					sofort_detail['timestamp']=col[6,4]+"-"+col[3,2]+"-"+col[0,2] 
+					sofort_detail['transaction_date']=col[6,4]+"-"+col[3,2]+"-"+col[0,2] 
+				end
+				sofort_detail['name']=col if j==26
+				if j==15
+					sofort_detail['order_no']=col.split("+")[2].rstrip if col.split("+").size>2
+				end
+			end
+			if sofort_detail['order_no'].blank?
+				raise "第#{i}行:对账标识(订单号)为空!"
+			end
+			if sofort_detail['transaction_date'].blank?
+				raise "第#{i}行:对账日期(第6列)为空!"
+			end
+			sofort_detail
+		end
+
+		def MERCHANT_EN_CASH_IN_BANK_get_field(row,i)
 			userid=nil 
 			amount=0.0
 			operdate=nil
@@ -320,6 +389,47 @@ class ReconciliationSofort
 				amount=col if j==3
 				operdate=col[0,10].gsub("/","-") if j==6
 				if j==10
+					if col.present? && col[0]=="@"
+						userid=col.sub("@","")
+					end
+				end
+			end
+
+			[userid,amount,operdate]
+		end
+
+		def MERCHANT_DE_AT_CASH_IN_BANK_get_field(row,i)
+			userid=nil 
+			amount=0.0
+			operdate=nil
+
+			j=0
+			row.each do |col|
+				j=j+1
+				next unless j==15 || j==8|| j==6
+				operdate=col[6,4]+"-"+col[3,2]+"-"+col[0,2]  if j==6
+				if j==8
+					# 样例数据 小数点使用 逗号
+					if col.class.to_s=="String"
+						col_arr=col.split(",")
+						if col_arr.size>1 
+							col=""
+							tmp=1
+							col_arr.each do |c|
+								if tmp==col_arr.size
+									col+="."+c
+								else
+									col+=c
+								end
+
+								tmp+=1
+							end
+							col=col.to_f
+						end
+					end
+					amount=col
+				end
+				if j==15
 					if col.present? && col[0]=="@"
 						userid=col.sub("@","")
 					end
