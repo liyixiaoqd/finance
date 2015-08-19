@@ -59,6 +59,7 @@ Rails.application.routes.draw do
   post 'finance_water/:userid/modify' => 'finance_water#modify'
   get 'finance_water/:userid/water_obtain' => 'finance_water#water_obtain'
   post 'finance_water/refund' => 'finance_water#refund'
+  post 'finance_water/correct' => 'finance_water#correct'
 
   post 'pay/:userid/submit' => 'online_pay#submit'
   # post 'pay/:userid/submit_creditcard' => 'online_pay#submit_creditcard'

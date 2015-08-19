@@ -22,7 +22,7 @@ describe FinanceWaterController do
 	context "get modify web" do
 		it "failure html" do
 			expect{
-				post :modify_web,modify_web_params(999,"Sub","html")
+				post :modify_web,modify_web_params(999,"Sub","html","score")
 			}.to change(FinanceWater,:count).by(0)
 			expect(response.status).to eq 302
 			expect(response.body).to redirect_to new_user_finance_water_path(users(:user_one))
@@ -31,7 +31,7 @@ describe FinanceWaterController do
 
 		it "success html" do
 			expect{
-				post :modify_web,modify_web_params(1,"Sub","html")
+				post :modify_web,modify_web_params(1,"Sub","html","score")
 			}.to change(FinanceWater,:count).by(1)
 
 			expect(response.status).to eq 302
@@ -269,7 +269,49 @@ describe FinanceWaterController do
 		end
 	end
 
-	def modify_web_params(amount,symbol,format)
+	context "correct" do
+		it "success correct" do
+			oper=[
+				{'symbol'=>"Add",'amount'=>"1000",'reason'=>'e_cash add 1000','watertype'=>"e_cash",'is_pay'=>'N','order_no'=>''},
+				{'symbol'=>"Sub",'amount'=>"100",'reason'=>'e_cash sub 100','watertype'=>"e_cash",'is_pay'=>'N','order_no'=>''}
+			].to_json
+			expect{
+				post :modify,modify_interface_params(oper)
+			}.to change(FinanceWater,:count).by(2)
+
+			fw=FinanceWater.unscoped.all.order("id desc").limit(1)
+
+			user=User.find_by_userid(users(:user_one)['userid'])
+			new_e_cash=user.e_cash-(50-100)
+
+			params={
+				"system"=>"mypost4u",
+				"channel"=>"web",
+				"user_id"=> users(:user_one)['userid'],
+				"oper"=>[
+					"water_no"=>fw[0].id,
+					"order_no"=>"tmp",
+					"amount"=>50
+					].to_json
+			}
+
+			expect{
+				post :correct,params
+			}.to change(FinanceWater,:count).by(1)
+
+			user.reload
+			expect(user.e_cash).to eq new_e_cash
+
+			expect{
+				post :correct,params
+			}.to change(FinanceWater,:count).by(0)		
+
+			user.reload
+			expect(user.e_cash).to eq new_e_cash
+		end
+	end
+
+	def modify_web_params(amount,symbol,format,type)
 		{
 			'system' => 'mypost4u',
 			'channel'  => 'spec_fixtures',
@@ -277,9 +319,9 @@ describe FinanceWaterController do
 			'symbol'  => symbol,
 			'amount'  => amount,
 			'operator'  => 'spec_script',
-			'reason'  => 'test',
+			'reason'  => "rspec test:#{type}.#{symbol}  #{amount}",
 			'end_time'  => Time.now.strftime("%Y-%m-%d"),
-			'watertype' => 'score' ,
+			'watertype' => type ,
 			'format' => format
 		}
 	end

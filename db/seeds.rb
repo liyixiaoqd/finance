@@ -255,6 +255,7 @@ AccessAuthority.create!(:controller=>"NoticeController",:action=>"handle",
 			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'首页 - 登入界面 - 通知处理',:access_level=>13)
 
+# merchant add 
 AccessAuthority.create!(:controller=>"TransactionReconciliationController",:action=>"merchant_index",
 			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'财务管理 - 电商报表',:access_level=>14)
@@ -267,6 +268,9 @@ AccessAuthority.create!(:controller=>"TransactionReconciliationController",:acti
 AccessAuthority.create!(:controller=>"TransactionReconciliationController",:action=>"merchant_show_export",
 			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'单个电商明细报表导出')
+AccessAuthority.create!(:controller=>"FinanceWaterController",:action=>"correct",
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>true,
+			:describe=>'历史交易流水批量修正')
 
 AdminAuthority.delete_all
 AdminManage.all.each do |am|

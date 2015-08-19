@@ -305,6 +305,84 @@ class FinanceWaterController < ApplicationController
 		render json:ret_hash.to_json
 	end
 
+	def correct
+		unless params_valid("finance_water_correct",params)
+			render json:{'SYSTEM'=>'PARAMS WRONG!'},status:400 and return 
+		end
+
+		ret_hash={
+			'status'=>'failure',
+			'reasons'=>'',
+			'userid'=>params['user_id'],
+			'score'=>0.0,
+			'e_cash'=>0.0,
+			'waterno'=>[]
+		}
+
+		begin
+			ActiveRecord::Base.transaction do
+				datetime=OnlinePay.current_time_format()
+				user=User.lock().find_by_system_and_userid(params['system'],params['user_id'])
+				if(user.blank?)
+					ret_hash['reasons']="user is not exists!"
+					render json:ret_hash.to_json and return
+				end
+				   # {
+					# "water_no" :" 853422581"                       
+					# "order_no" :"TIME00001"			
+					# "amount " :500			
+				   # } 
+				finance_arrays=JSON.parse params['oper']
+				finance_arrays.each do |fa|
+					if fa['water_no'].blank?
+						raise "流水号不可为空!"
+					end
+
+					if FinanceWater.find_by_user_id_and_watertype_and_reason(user.id,"e_cash","电商交易流水调整:#{fa['water_no']}").present?
+						raise "流水记录#{fa['water_no']}已调整,不可重复操作!!"
+					end
+
+					old_fw=FinanceWater.find(fa['water_no'])
+					if old_fw.blank? || old_fw.user_id!=user.id || old_fw.watertype!='e_cash'
+						raise "此客户#{user.user_id},无此交易流水#{fa['water_no']} !"
+					end
+
+					amount=fa['amount'].to_f
+
+					if old_fw.amount!=amount
+						params1={"system"=>old_fw.system,"channel"=>old_fw.channel,
+							"userid"=>old_fw.userid,"operator"=>"correct","datetime"=>datetime}
+						params2={"watertype"=>old_fw.watertype,"reason"=>"电商交易流水调整:#{fa['water_no']}"}
+						if old_fw.amount < amount
+							params2["symbol"]="Sub"
+							params2["amount"]=amount-old_fw.amount
+						else
+							params2["symbol"]="Add"
+							params2["amount"]=old_fw.amount-amount
+						end
+						fw=new_finance_water_each(user,params2,params1)
+						logger.info(fw.inspect)
+						user.update_attributes!({"e_cash"=>fw.new_amount}) 
+						fw.save!()
+						ret_hash['waterno']<<fw.id
+					else
+						logger.info("#{fa['water_no']}交易金额相同,无需调整")
+					end
+				end
+
+				ret_hash['status']='success'
+				ret_hash['score']=user.score
+				ret_hash['e_cash']=user.e_cash
+			end
+		rescue=>e
+			ret_hash['reasons']=e.message
+			ret_hash['waterno']=[]
+		end
+
+		logger.info("FINANCE_WATER.CORRECT RET_HASH:#{ret_hash}")
+		render json:ret_hash.to_json and return
+	end
+
 	private
 		def new_online_pay_each(user,finance_each,params)
 			if finance_each['is_pay']=="Y"
@@ -453,7 +531,7 @@ class FinanceWaterController < ApplicationController
 			finance_water.amount=params["amount"]
 			finance_water.watertype=params["watertype"]
 			finance_water.reason=params["reason"]
-			if user.isMerchant?
+			if user.isMerchant? && finance_water.watertype=='e_cash'
 				finance_water.confirm_flag="0"
 			else
 				finance_water.confirm_flag="1"

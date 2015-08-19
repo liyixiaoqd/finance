@@ -143,6 +143,70 @@ class ReconciliationSofort
 		[outmsg,errmsg]
 	end
 
+	def merchant_cash_in_proc(country,filename)
+		skip_num=0
+		if country=="de_at"
+		elsif country=="nl"
+		elsif country=="en"
+			skip_num=5
+		else
+			raise "不支持的导入格式:#{country}"
+		end
+
+		errmsg=""
+		xlsx=Roo::Spreadsheet.open(filename,extension: filename.to_s.split(".").last.to_sym)
+
+		i=0
+		valid_all_num=0
+		valid_succ_num=0
+		valid_rescue_num=0
+
+		xlsx.sheet(0).each do |row|
+			i =i+1
+			next if i<skip_num
+			begin
+				valid_all_num=valid_all_num+1
+
+				userid,amount,operdate=MERCHANT_NL_CASH_IN_BANK_get_field(row,i)
+
+				fw=get_fw_merchant_cash_in(userid,amount,operdate,i)
+
+				if fw.blank?
+					next
+				end
+
+				fw.update_attributes!({'confirm_flag'=>'1'})
+				valid_succ_num=valid_succ_num+1
+			rescue => e
+				Rails.logger.info("交易记录处理异常:"+e.message)
+
+				if e.message.blank? || e.message.length>50
+					tmpmsg="第#{i}行:处理出错!"
+				else
+					tmpmsg=e.message
+				end
+
+				if valid_rescue_num==0
+					errmsg=tmpmsg
+				elsif valid_rescue_num<5
+					errmsg+=";"+tmpmsg
+				elsif valid_rescue_num==5
+					errmsg+="..."
+				end
+
+				valid_rescue_num=valid_rescue_num+1
+			end
+		end
+
+		outmsg="文件总比数:#{valid_all_num},匹配成功比数:#{valid_succ_num},异常比数:#{valid_rescue_num} "
+		
+		if errmsg.length>200
+			Rails.logger.info("full errmsg:#{errmsg}")
+			errmsg=errmsg[0,200]+"..."
+		end
+		[outmsg,errmsg]
+	end
+
 	private 
 		def array_to_hash_sofort(sofort_detail,reconciliation_date,batch_id)
 			raise "Row Analytical failure: size #{sofort_detail.size} !=#{COLUMN_NUM}" if sofort_detail.size!=COLUMN_NUM
@@ -241,5 +305,53 @@ class ReconciliationSofort
 				raise "第#{i}行:对账日期(第4列)错误!"
 			end
 			sofort_detail
+		end
+
+		def MERCHANT_NL_CASH_IN_BANK_get_field(row,i)
+			userid=nil 
+			amount=0.0
+			operdate=nil
+
+			j=0
+			row.each do |col|
+				j=j+1
+				next unless j==3 || j==6|| j==10
+				col.gsub!(/\t$/,"") if col.class.to_s=="String"
+				amount=col if j==3
+				operdate=col[0,10].gsub("/","-") if j==6
+				if j==10
+					if col.present? && col[0]=="@"
+						userid=col.sub("@","")
+					end
+				end
+			end
+
+			[userid,amount,operdate]
+		end
+
+		def get_fw_merchant_cash_in(userid,amount,operdate,i)
+			fw=nil
+			return fw if userid.blank?
+
+			users=User.where("userid=? and user_type='merchant'",userid)
+			if users.blank?
+				return fw
+			end
+
+			 if users.size>1
+			 	raise "第#{i}行:#{userid}存在多条记录,请确认!"
+			 end
+
+			 fws=FinanceWater.where("user_id=? and watertype='e_cash' \
+			 	and symbol='Add' and confirm_flag='0' and amount=? \ 
+			 	and left(operdate,10)=? ",users[0].id,amount,operdate)
+
+			if fws.blank?
+				raise "第#{i}行:无#{userid}充值记录-[#{amount}]"
+			else
+				fw=fws[0]
+			end
+
+			fw
 		end
 end
