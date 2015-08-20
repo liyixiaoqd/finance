@@ -271,6 +271,9 @@ AccessAuthority.create!(:controller=>"TransactionReconciliationController",:acti
 AccessAuthority.create!(:controller=>"FinanceWaterController",:action=>"correct",
 			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>true,
 			:describe=>'历史交易流水批量修正')
+AccessAuthority.create!(:controller=>"FinanceWaterController",:action=>"invoice_merchant",
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>true,
+			:describe=>'电商发票批量同步')
 
 AdminAuthority.delete_all
 AdminManage.all.each do |am|

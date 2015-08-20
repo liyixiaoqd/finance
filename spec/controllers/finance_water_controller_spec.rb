@@ -192,7 +192,7 @@ describe FinanceWaterController do
 			expect(res_result['water'][2]['new_amount']).to eq "52.2"
 		end
 
-		it "success call water_obtain:get all" do
+		it "success call water_obtain:get waterno" do
 			users(:user_one).finance_water.create!({
 				'system'=>users(:user_one)['system'],
 				'channel'=>'web',
@@ -271,23 +271,30 @@ describe FinanceWaterController do
 
 	context "correct" do
 		it "success correct" do
-			oper=[
-				{'symbol'=>"Add",'amount'=>"1000",'reason'=>'e_cash add 1000','watertype'=>"e_cash",'is_pay'=>'N','order_no'=>''},
-				{'symbol'=>"Sub",'amount'=>"100",'reason'=>'e_cash sub 100','watertype'=>"e_cash",'is_pay'=>'N','order_no'=>''}
-			].to_json
+			params={
+				'system' => 'mypost4u',
+				'channel'  => 'spec_fixtures',
+				'userid'  => users(:user_two)['userid'],
+				'operator'  => 'spec_script',
+				'datetime'  => Time.now.strftime("%Y-%m-%d %H:%M:%S"),
+				'oper'=>[
+					{'symbol'=>"Add",'amount'=>"1000",'reason'=>'e_cash add 1000','watertype'=>"e_cash",'is_pay'=>'N','order_no'=>''},
+					{'symbol'=>"Sub",'amount'=>"100",'reason'=>'e_cash sub 100','watertype'=>"e_cash",'is_pay'=>'N','order_no'=>''}
+				].to_json
+			}
 			expect{
-				post :modify,modify_interface_params(oper)
+				post :modify,params
 			}.to change(FinanceWater,:count).by(2)
 
 			fw=FinanceWater.unscoped.all.order("id desc").limit(1)
 
-			user=User.find_by_userid(users(:user_one)['userid'])
+			user=User.find_by_userid(users(:user_two)['userid'])
 			new_e_cash=user.e_cash-(50-100)
 
 			params={
 				"system"=>"mypost4u",
 				"channel"=>"web",
-				"user_id"=> users(:user_one)['userid'],
+				"user_id"=> users(:user_two)['userid'],
 				"oper"=>[
 					"water_no"=>fw[0].id,
 					"order_no"=>"tmp",
@@ -308,6 +315,60 @@ describe FinanceWaterController do
 
 			user.reload
 			expect(user.e_cash).to eq new_e_cash
+		end
+	end
+
+	context "invoice_merchant" do
+		it "success invoice" do
+			Invoice.where("userid=?",users(:user_two)['userid']).delete_all
+			params={
+				'system' => 'mypost4u',
+				'channel'  => 'spec_fixtures',
+				'userid'  => users(:user_two)['userid'],
+				'operator'  => 'spec_script',
+				'datetime'  => Time.now.strftime("%Y-%m-%d %H:%M:%S"),
+				'oper'=>[
+					{'symbol'=>"Add",'amount'=>"1000",'reason'=>'e_cash add 1000','watertype'=>"e_cash",'is_pay'=>'N','order_no'=>''},
+					{'symbol'=>"Sub",'amount'=>"100",'reason'=>'e_cash sub 100','watertype'=>"e_cash",'is_pay'=>'N','order_no'=>''},
+					{'symbol'=>"Sub",'amount'=>"666",'reason'=>'e_cash sub 666','watertype'=>"e_cash",'is_pay'=>'N','order_no'=>''}
+				].to_json
+			}
+			expect{
+				post :modify,params
+			}.to change(FinanceWater,:count).by(3)
+			
+			fw_in=FinanceWater.find_by_userid_and_watertype_and_symbol_and_amount(users(:user_two)['userid'],'e_cash','Add',1000)
+			fw_out_1=FinanceWater.find_by_userid_and_watertype_and_symbol_and_amount(users(:user_two)['userid'],'e_cash','Sub',100)
+			fw_out_2=FinanceWater.find_by_userid_and_watertype_and_symbol_and_amount(users(:user_two)['userid'],'e_cash','Sub',666)
+			params={
+				"system"=>"mypost4u",
+				"channel"=>"web",
+				"user_id"=> users(:user_two)['userid'],
+				"oper"=>[
+				                {
+						"invoice_no"=>"DEIN000001",
+						"water_no" => [fw_in.id],
+						"amount" =>fw_in.amount,
+						"desc" => "充值发票",
+						"operdate" =>Time.now.strftime("%Y-%m-%d"),
+						"begdate" => fw_in.operdate.strftime("%Y-%m-%d"),
+						"enddate" =>Time.now.strftime("%Y-%m-%d")
+				                } ,
+					{
+						"invoice_no"=>"DEOUT00001",
+						"water_no" =>[fw_out_1.id,fw_out_2.id],	
+						"amount"=> (-1)*(fw_out_1.amount+fw_out_2.amount),
+						"desc" => "8-1到8-15号国际运费",
+						"operdate"=>Time.now.strftime("%Y-%m-%d"),
+						"begdate" => fw_out_1.operdate.strftime("%Y-%m-%d"),
+						"enddate" => Time.now.strftime("%Y-%m-%d")
+					}
+				].to_json
+			}
+
+			expect{
+				post :invoice_merchant,params
+			}.to change(Invoice,:count).by(2)
 		end
 	end
 

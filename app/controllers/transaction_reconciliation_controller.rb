@@ -317,18 +317,71 @@ class TransactionReconciliationController < ApplicationController
 	end
 
 	def merchant_show
+		@user_attr={}
 		user=User.find(params[:merchant_id])
 		if user.blank?
 			flash[:notice]="查询异常"
 			redirect_to transaction_reconciliation_merchant_index_path and return
 		end
 
-		fws=FinanceWater.where("").page(params[:page]).each do |fw|
-			
-		end
+		@user_attr['system']=user.system
+		@user_attr['id']=user.userid
+		@user_attr['name']=user.username
+		@user_attr['address']=user.address
+		@user_attr['vat_no']=user.vat_no
+		@user_attr['start_time']=params[:start_time]
+		@user_attr['end_time']=params[:end_time]
+		@user_attr['opening_bal']=params[:opening_bal]
+		@user_attr['closing_bal']=params[:closing_bal]
+
+		@invoices=Invoice.where("user_id=? and operdate>? and operdate<=?",user.id,params[:start_time],params[:end_time]).page(params[:page])
 	end
 
 	def merchant_show_export
+		if params[:start_time].present? && params[:end_time].present? && params[:merchant_id].present? && params[:system].present?
+			id=params[:merchant_id]
+			system=params[:system]
+
+			user=User.find_by_system_and_userid(params[:system],params[:merchant_id])
+			if user.blank?
+				flash[:notice]="查询异常"
+				redirect_to transaction_reconciliation_merchant_index_path and return
+			end
+
+
+			csv_string = CSV.generate do |csv|
+				csv << ["注册系统",SYSTEM_MAPPING_TO_DISPLAY[user.system]]
+				csv << ["寄送国家","ALL"]
+				csv << ["电商客户号",user.userid]
+				csv << ["结算日起始",params[:start_time],"结算日终止",params[:end_time]]
+				csv << []
+				csv << ["Transaction Details","","","","#{params[:start_time]} to #{params[:end_time]}"]
+				csv << []
+				csv << ["Customer Ref. No.",user.userid]
+				csv << ["Customer",user.username]
+				csv << ["Registered Address",user.address]
+				csv << ["VAT No.",user.vat_no]
+				csv << []
+				csv << ["","","","Opening Balance as at #{params[:start_time]}","",params['opening_bal']]
+				csv << []
+				csv << ["日期","发票号","描述","","期间","金额"]
+
+				Invoice.where("user_id=? and operdate>? and operdate<=?",user.id,params[:start_time],params[:end_time]).each do |invoice|
+					out_arr=[invoice.operdate,invoice.invoice_no,invoice.description,"",get_period(invoice),invoice.amount]
+
+					csv << out_arr
+				end
+
+				csv << []
+				csv << ["","","","Closing Balance as at #{params[:end_time]}","",params['closing_bal']]
+			end
+
+			send_data csv_string,:type => 'text/csv ',:disposition => "filename=电商明细报表_#{OnlinePay.current_time_format("%Y%m%d%H%M%S")}.csv"
+		else
+			flash[:notice]="导出异常!"
+			logger.info("merchant_show_export.params:#{params.inspect}")
+			redirect_to transaction_reconciliation_merchant_index_path and return
+		end
 	end
 
 

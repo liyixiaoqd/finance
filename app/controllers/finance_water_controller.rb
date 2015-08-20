@@ -282,7 +282,7 @@ class FinanceWaterController < ApplicationController
 		}
 
 		if params[:water_no].blank?
-			finance_waters=FinanceWater.unscoped().order("id asc")
+			finance_waters=FinanceWater.unscoped().where("system=:system and userid=:userid",params).order("id asc")
 		else
 			finance_waters=FinanceWater.unscoped().where("system=:system and userid=:userid and id>:water_no",
 				params).order("id asc")
@@ -321,8 +321,7 @@ class FinanceWaterController < ApplicationController
 
 		begin
 			ActiveRecord::Base.transaction do
-				datetime=OnlinePay.current_time_format()
-				user=User.lock().find_by_system_and_userid(params['system'],params['user_id'])
+				user=User.lock().find_by_system_and_userid_and_user_type(params['system'],params['user_id'],'merchant')
 				if(user.blank?)
 					ret_hash['reasons']="user is not exists!"
 					render json:ret_hash.to_json and return
@@ -350,8 +349,9 @@ class FinanceWaterController < ApplicationController
 					amount=fa['amount'].to_f
 
 					if old_fw.amount!=amount
+						#operdate 使用历史交易发生日期
 						params1={"system"=>old_fw.system,"channel"=>old_fw.channel,
-							"userid"=>old_fw.userid,"operator"=>"correct","datetime"=>datetime}
+							"userid"=>old_fw.userid,"operator"=>"correct","datetime"=>old_fw.operdate}
 						params2={"watertype"=>old_fw.watertype,"reason"=>"电商交易流水调整:#{fa['water_no']}"}
 						if old_fw.amount < amount
 							params2["symbol"]="Sub"
@@ -380,6 +380,69 @@ class FinanceWaterController < ApplicationController
 		end
 
 		logger.info("FINANCE_WATER.CORRECT RET_HASH:#{ret_hash}")
+		render json:ret_hash.to_json and return
+	end
+
+	def invoice_merchant
+		unless params_valid("finance_water_invoice_merchant",params)
+			render json:{'SYSTEM'=>'PARAMS WRONG!'},status:400 and return 
+		end
+
+		ret_hash={
+			'status'=>'failure',
+			'reasons'=>''
+		}
+
+		begin
+			ActiveRecord::Base.transaction do
+				user=User.lock().find_by_system_and_userid_and_user_type(params['system'],params['user_id'],'merchant')
+				if(user.blank?)
+					ret_hash['reasons']="user is not exists!"
+					render json:ret_hash.to_json and return
+				end
+
+				invoice_arrays=JSON.parse params['oper']
+				invoice_arrays.each do |invoice|
+					invoice['amount']=invoice['amount'].to_f
+					if (invoice['begdate']>invoice['enddate'] ||
+						invoice['operdate']>invoice['enddate'] ||
+						invoice['operdate']<invoice['begdate'] )
+						logger.info("INVOICE DATE: #{invoice['operdate']} <=> #{invoice['begdate']} <=> #{invoice['enddate']}")
+						raise "#{invoice['invoice_no']}发票日期数据异常"
+					end
+
+					invoice['water_no'].each do |fw_id|
+						fw=FinanceWater.find(fw_id)
+						if fw.blank? || fw.user_id != user.id || fw.watertype!='e_cash'
+							logger.info("ID NOT MATCH: #{ fw.user_id} <=> #{user.id}  TYPE:#{fw.watertype}") unless fw.blank?
+							raise "#{invoice['invoice_no']}财务流水#{fw_id}用户匹配错误!"
+						end
+
+						fw_operdate=fw.operdate.strftime("%Y-%m-%d")
+						if fw_operdate>invoice['enddate'] || fw_operdate<invoice['begdate']
+							logger.info("DATE NOT MATCH: #{ fw_operdate } <=> #{invoice['begdate']} - #{invoice['enddate']}")
+							raise "#{invoice['invoice_no']}财务流水#{fw_id}日期匹配错误!"
+						end
+
+						#金额匹配
+						if  (invoice['amount']>0 && fw.symbol=="Sub") ||
+							(invoice['amount']<0 && fw.symbol=="Add")
+							logger.info("AMOUNT NOT MATCH: #{ invoice['amount'] } <=> #{fw.symbol}")
+							raise "#{invoice['invoice_no']}财务流水#{fw_id}金额匹配错误!"
+						end
+					end
+
+					new_invoice_each(user,invoice).save!()
+				end
+
+				ret_hash['status']='success'
+			end
+		rescue=>e
+			ret_hash['reasons']=e.message
+		end
+
+		logger.info("FINANCE_WATER.INVOICE_MERCHANT RET_HASH:#{ret_hash}")
+
 		render json:ret_hash.to_json and return
 	end
 
@@ -554,5 +617,23 @@ class FinanceWaterController < ApplicationController
 			# 	end
 			# end
 			finance_water	
+		end
+
+		def new_invoice_each(user,params)
+			invoice=Invoice.new
+			invoice.user_id=user.id
+			invoice.userid=user.userid
+			invoice.system=user.system
+
+			invoice.invoice_no=params['invoice_no']
+			invoice.water_no=params['water_no'].join(",")
+    			invoice.amount=params['amount']
+    			invoice.description=params['desc']
+    			invoice.operdate=params['operdate']
+    			invoice.operdate=params['operdate']
+    			invoice.begdate=params['begdate']
+    			invoice.enddate=params['enddate']
+
+    			invoice
 		end
 end

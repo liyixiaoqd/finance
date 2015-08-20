@@ -10,4 +10,11 @@ module TransactionReconciliationHelper
 		RECONCILIATIONDETAIL_FLAG_MAPPING[reconciliation_flag.to_s]
 	end
 
+	def get_period(invoice)
+		if invoice.amount<0 # && invoice.begdate!=invoice.enddate
+			"#{invoice.begdate} to #{invoice.enddate}"
+		else
+			""
+		end
+	end
 end

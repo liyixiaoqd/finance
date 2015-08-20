@@ -1,0 +1,64 @@
+<div class="container-fluid">
+<% @page_title="电商报表" %>
+	<div class="row-fluid">
+		<div class="alert alert-info">
+			<button type="button" class="close" data-dismiss="alert">×</button>
+			<strong>提示:</strong> 如金额不匹配,可能为发票数据未全部同步导致
+		</div>
+
+
+	<div class="row-fluid">
+		<div class="well">
+			<%= form_tag transaction_reconciliation_merchant_show_export_path,method: "get" do %>
+				 <%= label_tag(:l1, "注 册 系 统:",class:"label_inline") %>
+				 <%= select_tag(:system_dis,options_for_select([["",""],["包裹网站","mypost4u"],["quaie","quaie"]],@user_attr['system']),disabled: true) %> 
+				 &nbsp;&nbsp;&nbsp;
+				 <%= label_tag(:l1, "电商客户号:",class:"label_inline") %>
+				 <%= text_field_tag(:merchant_id_dis,@user_attr['id'],disabled: true) %>
+				 </br>
+				 <%= label_tag(:l2, "结算日起始:",class:"label_inline") %> <%= datetime_field_tag(:start_time_dis,@user_attr['start_time'],disabled: true) %>
+				 &nbsp;&nbsp;&nbsp;
+				 <%= label_tag(:l3, "结算日终止:",class:"label_inline") %> <%= datetime_field_tag(:end_time_dis,@user_attr['end_time'],disabled: true) %>
+				 </br>
+				 <%= label_tag(:l4, "初 始 结 余:",class:"label_inline") %>
+				 <%= text_field_tag(:opening_bal_dis,@user_attr['opening_bal'],disabled: true) %>
+				 &nbsp;&nbsp;&nbsp;
+				 <%= label_tag(:l5, "期 末 结 余:",class:"label_inline") %>
+				 <%= text_field_tag(:closing_bal_dis,@user_attr['closing_bal'],disabled: true) %>
+
+
+				 <%= hidden_field_tag(:system,@user_attr['system']) %>
+				 <%= hidden_field_tag(:merchant_id,@user_attr['id']) %>
+				 <%= hidden_field_tag(:start_time,@user_attr['start_time']) %>
+				 <%= hidden_field_tag(:end_time,@user_attr['end_time']) %>
+				 <%= hidden_field_tag(:opening_bal,@user_attr['opening_bal']) %>
+				 <%= hidden_field_tag(:closing_bal,@user_attr['closing_bal']) %>
+
+				 <div class="btn-toolbar">
+					 <%= submit_tag("导出",class: "btn") %>
+			          	</div>
+			<% end %>	
+		</div>
+
+		<div class="well">
+			<table class="table" id="merchant_invoice_details_table">
+				<thead>
+					<tr>
+						<th>日期</th>
+						<th>发票号</th>
+						<th>描述</th>
+						<th>期间</th>
+						<th>金额</th>
+					</tr>
+				</thead>
+				<tbody>
+					<%= render partial: "merchant_show",collection: @invoices,as: :invoice %>
+				</tbody>
+			</table>
+
+			<div class="div_paginate">
+				<%= render partial: "layouts/paginate_replace_ajax",locals: {page_array: @invoices} %>
+			</div>
+		</div>
+	</div>
+</div>

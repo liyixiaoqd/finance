@@ -8,3 +8,19 @@ user_one:
   score: 22.2
   operator: spec_script
   operdate: 2015-05-15 14:26:00
+
+user_two:
+  system: mypost4u
+  channel: spec_fixtures
+  userid: 552b461202d0f099ec000034
+  username: spec_username_2
+  email: spec_username_2@test.com
+  e_cash: 999.9
+  score: 0.0
+  operator: spec_script
+  operdate: 2015-05-15 14:26:00
+  user_type: 'merchant'
+  address: 'shanghai pufaguangchang'
+  vat_no: 'sh00001'
+  pay_type: 'normal'
+  pay_limit: -10000

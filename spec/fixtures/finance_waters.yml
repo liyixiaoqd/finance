@@ -25,3 +25,17 @@ fw_two:
   old_amount: 0.0
   new_amount: 11.1
   user: user_one
+
+fw_three:
+  system: mypost4u
+  channel: spec_fixtures
+  userid: 552b461202d0f099ec000034
+  symbol: Add
+  amount: 999.9
+  operator: spec_script
+  operdate: 2015-05-15 14:26:00
+  watertype: e_cash
+  reason: init
+  old_amount: 0.0
+  new_amount: 999.9
+  user: user_two
