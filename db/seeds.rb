@@ -31,6 +31,7 @@ BasicData.create!(:basic_type=>"00A",:desc=>"financial reconciliation interface 
 	                   :basic_sub_type=>"002",:sub_desc=>"time interval frequency - hour",
 	                   :payway=>"alipay",:paytype=>"oversea",:value=>"24")
 
+
 AdminManage.delete_all
 passwd=Digest::MD5.hexdigest("passwd")
 AdminManage.create!(:admin_name=>'admin',:admin_passwd=>Digest::MD5.hexdigest("#{passwd}#{Settings.admin.passwd_key}"),

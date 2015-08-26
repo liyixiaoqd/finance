@@ -4,7 +4,7 @@ namespace :notice do
 	desc "电商充值"
 	task :merchant_recharge =>[:environment] do 
 		logger=init_logger("merchant_recharge.log")
-		diffday=0
+		diffday=BasicData.get_value("00B","001","notice","").to_i
 		FinanceWater.unscoped().includes(:user).
 			where("datediff(now(),finance_waters.operdate)>=? \
 				and finance_waters.watertype='e_cash' \
@@ -22,6 +22,7 @@ namespace :notice do
 				logger.warn("#{fw.user.username},#{fw.id} - 产生充值待处理任务异常:#{e.message}")
 			end
 		end
+		logger.info("NOTICE::MERCHANT_RECHARGE END")
 		logger.close
 	end
 
@@ -33,6 +34,7 @@ namespace :notice do
 			"[#{datetime}] :#{msg}\n"
 		}
 
+		interface_logger.info("NOTICE::MERCHANT_RECHARGE START")
 		interface_logger
 	end
 end
