@@ -357,7 +357,7 @@ class OnlinePay < ActiveRecord::Base
 			# 		ret_op=OnlinePay.find_by_payway_and_paytype_and_trade_no_and_status(payway,paytype,trade_no,status)
 			# 	end
 			# end
-			lock_online_pay_by_trade_no(status,is_lock,payway,paytype,trade_no)
+			ret_op=lock_online_pay_by_trade_no(status,is_lock,payway,paytype,trade_no)
 
 			#重复提交的情况,进行特殊处理  sofort maybe
 			if ret_op.blank?
