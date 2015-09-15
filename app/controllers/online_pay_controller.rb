@@ -170,6 +170,13 @@ class OnlinePayController < ApplicationController
 			end
 			online_pay.update_attributes!({})
 
+			OrderNoToTradeNo.create!({
+				payway: online_pay.payway,
+				paytype: online_pay.paytype,
+				order_no: online_pay.order_no,
+				trade_no: online_pay.trade_no
+			}) unless online_pay.trade_no.blank?
+
 			ret_hash['redirect_url']=CGI.escape(online_pay.redirect_url)
 			ret_hash['trade_no']=online_pay.trade_no
 			ret_hash['is_credit']=online_pay.is_credit

@@ -344,6 +344,45 @@ class OnlinePay < ActiveRecord::Base
 
 			#use lock !!
 			#OnlinePay.lock.find_by_payway_and_paytype_and_trade_no_and_status(payway,paytype,trade_no,'submit')
+			# if status.blank?
+			# 	if is_lock==true
+			# 		ret_op=OnlinePay.lock.find_by_payway_and_paytype_and_trade_no(payway,paytype,trade_no)
+			# 	else
+			# 		ret_op=OnlinePay.find_by_payway_and_paytype_and_trade_no(payway,paytype,trade_no)
+			# 	end
+			# else
+			# 	if is_lock==true
+			# 		ret_op=OnlinePay.lock.find_by_payway_and_paytype_and_trade_no_and_status(payway,paytype,trade_no,status)
+			# 	else
+			# 		ret_op=OnlinePay.find_by_payway_and_paytype_and_trade_no_and_status(payway,paytype,trade_no,status)
+			# 	end
+			# end
+			lock_online_pay_by_trade_no(status,is_lock,payway,paytype,trade_no)
+
+			#重复提交的情况,进行特殊处理  sofort maybe
+			if ret_op.blank?
+				Rails.logger.info("use OrderNoToTradeNo get online_pay")
+				onttn=OrderNoToTradeNo.find_by_payway_and_paytype_and_trade_no(payway,paytype,trade_no)
+				unless onttn.blank?
+					ret_op=lock_online_pay_by_order_no(status,is_lock,payway,paytype,onttn.order_no) 
+					unless ret_op.blank?
+						Rails.logger.info("TRADE_NO CHANGE [#{ret_op.trade_no}] => [#{onttn.trade_no}]")
+						ret_op.trade_no=onttn.trade_no
+					end
+				end
+			end
+			logger.info("get online_pay:#{ret_op.order_no} - #{ret_op.id} end! lock?:#{is_lock}")
+		rescue=>e
+			logger.warn("get_online_pay_instance failure:#{e.message}")
+			nil
+		end
+
+		ret_op
+	end
+
+	private 
+		def self.lock_online_pay_by_trade_no(status,is_lock,payway,paytype,trade_no)
+			ret_op=nil
 			if status.blank?
 				if is_lock==true
 					ret_op=OnlinePay.lock.find_by_payway_and_paytype_and_trade_no(payway,paytype,trade_no)
@@ -358,16 +397,28 @@ class OnlinePay < ActiveRecord::Base
 				end
 			end
 
-			logger.info("get online_pay:#{ret_op.order_no} - #{ret_op.id} end! lock?:#{is_lock}")
-		rescue=>e
-			logger.warn("get_online_pay_instance failure:#{e.message}")
-			nil
+			ret_op
 		end
 
-		ret_op
-	end
+		def self.lock_online_pay_by_order_no(status,is_lock,payway,paytype,order_no)
+			ret_op=nil
+			if status.blank?
+				if is_lock==true
+					ret_op=OnlinePay.lock.find_by_payway_and_paytype_and_order_no(payway,paytype,order_no)
+				else
+					ret_op=OnlinePay.find_by_payway_and_paytype_and_order_no(payway,paytype,order_no)
+				end
+			else
+				if is_lock==true
+					ret_op=OnlinePay.lock.find_by_payway_and_paytype_and_order_no_and_status(payway,paytype,order_no,status)
+				else
+					ret_op=OnlinePay.find_by_payway_and_paytype_and_order_no_and_status(payway,paytype,order_no,status)
+				end
+			end
 
-	private 
+			ret_op
+		end
+
 		def create_unique_valid
 			unless self.class.find_by_system_and_payway_and_paytype_and_order_no(self.system,self.payway,self.paytype,self.order_no).blank?
 				Rails.logger.info("ONLINE_PAY UNIQUE VALID :fail")

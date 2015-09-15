@@ -266,7 +266,7 @@ class FinanceWaterController < ApplicationController
 		}
 
 		if params[:water_no].blank?
-			finance_waters=FinanceWater.unscoped().order("id asc")
+			finance_waters=FinanceWater.unscoped().where("system=:system and userid=:userid",params).order("id asc")
 		else
 			finance_waters=FinanceWater.unscoped().where("system=:system and userid=:userid and id>:water_no",
 				params).order("id asc")
