@@ -1,5 +1,11 @@
 <tr class="tr_relpace">
-	<td class="td_nowrap"><%=link_to  online_pay.user.username,registe_index_path(system: online_pay.user.system,username: online_pay.user.username),method: :get,title: online_pay.user.username%></td>
+	<td class="td_nowrap">
+		<% if online_pay.user.blank? %>
+			用户信息缺失
+		<% else %>
+			<%=link_to  online_pay.user.username,registe_index_path(system: online_pay.user.system,username: online_pay.user.username),method: :get,title: online_pay.user.username%>
+		<% end %>
+	</td>
 	<td class="td_nowrap">
 		<span title="<%= online_pay.reconciliation_id %>">
 			<%= online_pay.reconciliation_id %>
