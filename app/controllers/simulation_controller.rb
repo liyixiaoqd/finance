@@ -144,13 +144,19 @@ class SimulationController < ApplicationController
 	end
 
 	def callback_notify
-		@params=params
+		begin
+			@params=JSON.parse request.body.read
+			logger.info("CALLBACK_NOTIFY JSON_PARSE: #{@params}")
+		rescue=>e
+			@params=params
+			logger.info("CALLBACK_NOTIFY NOT JSON_PARSE #{e.message}: #{@params}")
+		end
 
 		@params.each do |k,v|
 			logger.info("#{k} = #{v}")
 		end
 
-		render :text=>'success'
+		render json:{status: "success"}
 	end
 
 	def simulate_get

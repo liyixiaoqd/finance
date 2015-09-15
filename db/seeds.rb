@@ -276,6 +276,10 @@ AccessAuthority.create!(:controller=>"FinanceWaterController",:action=>"invoice_
 			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>true,
 			:describe=>'电商发票批量同步')
 
+BasicData.create!(:basic_type=>"00B",:desc=>"notice configuration",
+	                   :basic_sub_type=>"001",:sub_desc=>"recharge notice warning - day",
+	                   :payway=>"notice",:paytype=>"",:value=>"3")
+
 AdminAuthority.delete_all
 AdminManage.all.each do |am|
 	AccessAuthority.where("access_level is not null and is_interface=false and is_sign_in=true").each do |aca|
