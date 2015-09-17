@@ -284,7 +284,7 @@ class OnlinePay < ActiveRecord::Base
 
 	#return pay_detail instance
 	def self.get_instance_pay_detail(online_pay)
-		logger.info ("#{online_pay.payway.camelize}#{online_pay.paytype.camelize}Detail.new(online_pay)")
+		# logger.info ("#{online_pay.payway.camelize}#{online_pay.paytype.camelize}Detail.new(online_pay)")
 		eval("#{online_pay.payway.camelize}#{online_pay.paytype.camelize}Detail.new(online_pay)")
 	end
 

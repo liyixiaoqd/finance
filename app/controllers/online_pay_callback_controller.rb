@@ -168,16 +168,19 @@ class OnlinePayCallbackController < ApplicationController
 
 
 	def paypal_return
-		ActiveRecord::Base.transaction do
-			render_text="failure"
-			online_pay=OnlinePay.get_online_pay_instance("paypal","",params,"",false,true)
-			render text: "#{render_text}" and return if (online_pay.blank? || online_pay.success_url.blank?)
+		render_text="failure"
+		online_pay=OnlinePay.get_online_pay_instance("paypal","",params,"",false,true)
+		render text: "#{render_text}" and return if (online_pay.blank? || online_pay.success_url.blank?)
 
-			# check is status has updated!
-			if online_pay.status=="success_notify" || online_pay.status=="failure_notify_third"
-				render :text=>'success' and return 
-			end
-			
+		# check is status has updated!
+		if online_pay.status=="success_notify" || online_pay.status=="failure_notify_third"
+			render :text=>'success' and return 
+		end
+		online_pay.with_lock do
+			online_pay.update_attributes(status: "intermediate_notify")
+		end
+
+		ActiveRecord::Base.transaction do
 			begin
 				#online_pay.callback_status,rollback_callback_status=rollback_callback_status,online_pay.callback_status
 

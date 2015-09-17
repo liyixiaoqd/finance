@@ -268,7 +268,7 @@ class OnlinePayController < ApplicationController
 
 	private 
 		def exists_online_pay(params)
-			ol_p=OnlinePay.find_by_system_and_payway_and_paytype_and_order_no(params['system'],params['payway'],params['paytype'],params['order_no'])
+			ol_p=OnlinePay.lock.find_by_system_and_payway_and_paytype_and_order_no(params['system'],params['payway'],params['paytype'],params['order_no'])
 			if(ol_p.blank?)
 				nil
 			else

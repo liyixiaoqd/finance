@@ -65,20 +65,27 @@ class PaypalDetail
 	end
 
 	def get_pay_details!(online_pay)
-		if online_pay.country == "de"
-			details=EXPRESS_GATEWAY_DE.details_for(online_pay.trade_no)
-		elsif online_pay.country == "nl"
-			details=EXPRESS_GATEWAY_NL.details_for(online_pay.trade_no)
-		elsif online_pay.country == "gb"
-			details=EXPRESS_GATEWAY_GB.details_for(online_pay.trade_no)
-		elsif online_pay.country == "at"
-			details=EXPRESS_GATEWAY_AT.details_for(online_pay.trade_no)
+		begin
+			details=''
+			Timeout::timeout(12){
+				if online_pay.country == "de"
+					details=EXPRESS_GATEWAY_DE.details_for(online_pay.trade_no)
+				elsif online_pay.country == "nl"
+					details=EXPRESS_GATEWAY_NL.details_for(online_pay.trade_no)
+				elsif online_pay.country == "gb"
+					details=EXPRESS_GATEWAY_GB.details_for(online_pay.trade_no)
+				elsif online_pay.country == "at"
+					details=EXPRESS_GATEWAY_AT.details_for(online_pay.trade_no)
+				end
+			}
+			Rails.logger.info("get_pay_details:#{online_pay.country}:#{details.payer_id}")
+			
+			online_pay.credit_pay_id = details.payer_id
+			online_pay.credit_first_name = details.params["first_name"]
+			online_pay.credit_last_name = details.params["last_name"]
+		rescue=>e
+			raise "paypal_details_for TIME OUT!:#{e.message}"
 		end
-		Rails.logger.info("get_pay_details:#{online_pay.country}:#{details.payer_id}")
-		
-		online_pay.credit_pay_id = details.payer_id
-		online_pay.credit_first_name = details.params["first_name"]
-		online_pay.credit_last_name = details.params["last_name"]
 	end
 
 	def valid_credit_require(online_pay,request)
@@ -91,35 +98,43 @@ class PaypalDetail
 	end
 
 	def process_purchase(online_pay)
-		if online_pay.country == "de"
-			response=EXPRESS_GATEWAY_DE.purchase(price_in_cents(online_pay.amount), express_purchase_options(online_pay,"EUR"))
-		elsif online_pay.country == "nl"
-			response=EXPRESS_GATEWAY_NL.purchase(price_in_cents(online_pay.amount), express_purchase_options(online_pay,"EUR"))
-		elsif online_pay.country == "gb"
-			response=EXPRESS_GATEWAY_GB.purchase(price_in_cents(online_pay.amount), express_purchase_options(online_pay,"GBP"))
-		elsif online_pay.country == "at"
-			response=EXPRESS_GATEWAY_AT.purchase(price_in_cents(online_pay.amount), express_purchase_options(online_pay,"EUR"))
+		begin
+			response=''
+			Timeout::timeout(12){
+				if online_pay.country == "de"
+					response=EXPRESS_GATEWAY_DE.purchase(price_in_cents(online_pay.amount), express_purchase_options(online_pay,"EUR"))
+				elsif online_pay.country == "nl"
+					response=EXPRESS_GATEWAY_NL.purchase(price_in_cents(online_pay.amount), express_purchase_options(online_pay,"EUR"))
+				elsif online_pay.country == "gb"
+					response=EXPRESS_GATEWAY_GB.purchase(price_in_cents(online_pay.amount), express_purchase_options(online_pay,"GBP"))
+				elsif online_pay.country == "at"
+					response=EXPRESS_GATEWAY_AT.purchase(price_in_cents(online_pay.amount), express_purchase_options(online_pay,"EUR"))
+				end
+			}
 
-		end
+			# Rails.logger.info("#{response.success?} , #{response.message}")
+			#get reconciliation_id
 
-		# Rails.logger.info("#{response.success?} , #{response.message}")
-		#get reconciliation_id
+			transactionid=nil
+			transactionstatus=nil
 
-		transactionid=nil
-		transactionstatus=nil
-
-		if response.success?
-			begin
-				transactionid=response.params["PaymentInfo"]["TransactionID"]
-				transactionstatus=response.params["PaymentInfo"]["PaymentStatus"]
-			rescue => e
-				Rails.logger.info("get_transactionid_from_response failure #{e.message}")
-				transactionid=nil
-				transactionstatus=nil
+			if response.success?
+				begin
+					transactionid=response.params["PaymentInfo"]["TransactionID"]
+					transactionstatus=response.params["PaymentInfo"]["PaymentStatus"]
+				rescue => e
+					Rails.logger.info("get_transactionid_from_response failure #{e.message}")
+					transactionid=nil
+					transactionstatus=nil
+				end
 			end
-		end
 
-		[response.success?,response.message,transactionid,transactionstatus]
+			Rails.logger.info("process_purchase:#{transactionid}:#{transactionstatus}")
+			[response.success?,response.message,transactionid,transactionstatus]
+		rescue=>e
+			Rails.logger.info("process_purchase expection: #{e.message}")
+			[false,e.message,nil,nil]
+		end
 	end
 
 	private 
