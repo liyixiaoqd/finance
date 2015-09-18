@@ -139,11 +139,23 @@ class ReconciliationPaypal
 		"batch_id [ #{@batch_id} ] : </br> {all_num:#{valid_all_num} = complete_num:#{valid_complete_num} + rescue_num:#{valid_rescue_num}</br> complete_num:#{valid_complete_num} = succ_num:#{valid_succ_num} + fail_num:#{valid_fail_num} }</br>"
 	end
 
-	def has_pay_order(email,currencycode,amt)
+	def has_pay_order(email,amt)
 		flag=false
 		message='no record found'
 		reconciliation_id=''
 		callback_status=''
+
+		if @country == "de"
+			currencycode="EUR"
+		elsif @country == "nl"
+			currencycode="EUR"
+		elsif @country == "gb"
+			currencycode="GBP"
+		elsif @country == "at"
+			currencycode="EUR"
+		else
+			currencycode="EUR"
+		end
 
 		begin
 			params={
