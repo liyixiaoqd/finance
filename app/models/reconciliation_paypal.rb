@@ -139,6 +139,51 @@ class ReconciliationPaypal
 		"batch_id [ #{@batch_id} ] : </br> {all_num:#{valid_all_num} = complete_num:#{valid_complete_num} + rescue_num:#{valid_rescue_num}</br> complete_num:#{valid_complete_num} = succ_num:#{valid_succ_num} + fail_num:#{valid_fail_num} }</br>"
 	end
 
+	def has_pay_order(email,currencycode,amt)
+		flag=false
+		message='no record found'
+		reconciliation_id=''
+		callback_status=''
+
+		begin
+			params={
+				"EMAIL"=>email,
+				"CURRENCYCODE"=>currencycode
+				"AMT"=>amt
+			}
+			response=''
+			Timeout::timeout(12){
+				response=rp.get_reconciliation((Time.now-60).gmtime.strftime("%Y-%m-%dT%H:%M:%SZ"),
+					Time.now.gmtime.strftime("%Y-%m-%dT%H:%M:%SZ"),
+					params)
+			}
+
+			response_to_hash_paypal!(response)
+			if @paypal_reconciliation_hash.blank?
+				raise "no pay record get"
+			end
+
+			for i in (0...@paypal_reconciliation_hash['l_transactionid'].size)
+				srh=get_single_reconciliation_hash(i)
+				if ReconciliationDetail.find_by_transactionid(srh['transactionid']).blank?
+					flag=true
+					message=''
+					reconciliation_id=srh['transactionid']
+					callback_status==srh['l_status']
+
+					break
+				end
+			end
+		rescue=>e
+			Rails.logger.info("has_pay_order failure!! :#{e.message}")
+			message=e.message
+			flag=false
+		end
+
+		Rails.logger.info("has_pay_order:#{flag}:#{reconciliation_id},#{callback_status},#{message}")
+		[flag,message,reconciliation_id,callback_status]
+	end
+
 	private	 
 		def response_to_hash_paypal!(response)
 			return nil unless response.code=="200"

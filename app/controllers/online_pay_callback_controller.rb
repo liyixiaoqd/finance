@@ -187,16 +187,30 @@ class OnlinePayCallbackController < ApplicationController
 				pay_detail=OnlinePay.get_instance_pay_detail(online_pay)
 				ret_hash=init_return_ret_hash(online_pay)
 				
-				pay_detail.get_pay_details!(online_pay)
+				pay_id_details=pay_detail.get_pay_details(online_pay)
+				if pay_id_details.blank?
+					logger.info("PAYPAL get_pay_details FAILURE")
+					raise "PAYPAL get_pay_details FAILURE"
+				else	
+					online_pay.credit_pay_id = pay_id_details.payer_id
+					online_pay.credit_first_name = pay_id_details.params["first_name"]
+					online_pay.credit_last_name = pay_id_details.params["last_name"]
+				end
 
 				flag,message,online_pay.reconciliation_id,online_pay.callback_status=pay_detail.process_purchase(online_pay)
 
 				if flag==false
 					#超时 调用对账程序获取状态
-					if e.message=="execution expired"
+					if message=="execution expired"
 						logger.info("TIME_OUT and RETRY GET #{online_pay.order_no}")
+						rp=ReconciliationPaypal.new("TransactionSearch",online_pay.country)
+						flag,message,online_pay.reconciliation_id,online_pay.callback_status=rp.has_pay_order(pay_detail.country)
+						if flag==false
+							logger.info("RETRY GET failure:#{e.message}")
+							raise message
+						end
 					else
-						raise "#{message}"
+						raise message
 					end
 				end
 				online_pay.set_status!("success_notify","")

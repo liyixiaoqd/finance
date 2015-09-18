@@ -64,29 +64,27 @@ class PaypalDetail
 		end
 	end
 
-	def get_pay_details!(online_pay)
+	def get_pay_details(online_pay)
+		details=''
 		begin
-			details=''
 			Timeout::timeout(12){
-				if online_pay.country == "de"
-					details=EXPRESS_GATEWAY_DE.details_for(online_pay.trade_no)
-				elsif online_pay.country == "nl"
-					details=EXPRESS_GATEWAY_NL.details_for(online_pay.trade_no)
-				elsif online_pay.country == "gb"
-					details=EXPRESS_GATEWAY_GB.details_for(online_pay.trade_no)
-				elsif online_pay.country == "at"
-					details=EXPRESS_GATEWAY_AT.details_for(online_pay.trade_no)
+				if @country == "de"
+					details=EXPRESS_GATEWAY_DE.details_for(@trade_no)
+				elsif @country == "nl"
+					details=EXPRESS_GATEWAY_NL.details_for(@trade_no)
+				elsif @country == "gb"
+					details=EXPRESS_GATEWAY_GB.details_for(@trade_no)
+				elsif @country == "at"
+					details=EXPRESS_GATEWAY_AT.details_for(@trade_no)
 				end
 			}
-			Rails.logger.info("get_pay_details:#{online_pay.country}:#{details.payer_id}")
+			Rails.logger.info("get_pay_details:#{@country} - #{@trade_no}:#{details.payer_id}")
 			Rails.logger.info("#{details.inspect}")
-			
-			online_pay.credit_pay_id = details.payer_id
-			online_pay.credit_first_name = details.params["first_name"]
-			online_pay.credit_last_name = details.params["last_name"]
 		rescue=>e
 			raise "paypal_details_for TIME OUT!:#{e.message}"
 		end
+
+		details
 	end
 
 	def valid_credit_require(online_pay,request)
@@ -101,7 +99,7 @@ class PaypalDetail
 	def process_purchase(online_pay)
 		begin
 			response=''
-			Timeout::timeout(12){
+			Timeout::timeout(1){
 				if online_pay.country == "de"
 					response=EXPRESS_GATEWAY_DE.purchase(price_in_cents(online_pay.amount), express_purchase_options(online_pay,"EUR"))
 				elsif online_pay.country == "nl"
