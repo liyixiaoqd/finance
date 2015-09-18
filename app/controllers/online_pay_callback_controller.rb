@@ -204,7 +204,7 @@ class OnlinePayCallbackController < ApplicationController
 					if message=="execution expired"
 						logger.info("TIME_OUT and RETRY GET #{online_pay.order_no}")
 						rp=ReconciliationPaypal.new("TransactionSearch",online_pay.country)
-						flag,message,online_pay.reconciliation_id,online_pay.callback_status=rp.has_pay_order(pay_id_details.payer,online_pay.amount)
+						flag,message,online_pay.reconciliation_id,online_pay.callback_status=rp.has_pay_order(pay_id_details.params['payer'],online_pay.amount)
 						if flag==false
 							logger.info("RETRY GET failure:#{e.message}")
 							raise message
