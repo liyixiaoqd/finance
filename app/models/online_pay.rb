@@ -361,7 +361,7 @@ class OnlinePay < ActiveRecord::Base
 
 			#重复提交的情况,进行特殊处理  sofort maybe
 			if ret_op.blank?
-				Rails.logger.info("use OrderNoToTradeNo get online_pay")
+				Rails.logger.info("[MONITOR]: use OrderNoToTradeNo get online_pay")
 				onttn=OrderNoToTradeNo.find_by_payway_and_paytype_and_trade_no(payway,paytype,trade_no)
 				unless onttn.blank?
 					ret_op=lock_online_pay_by_order_no(status,is_lock,payway,paytype,onttn.order_no) 

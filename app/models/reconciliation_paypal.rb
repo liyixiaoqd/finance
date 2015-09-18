@@ -162,7 +162,7 @@ class ReconciliationPaypal
 			params={
 				"EMAIL"=>email,
 				"CURRENCYCODE"=>currencycode,
-				"AMT"=>amt
+				"AMT"=>amt.to_s
 			}
 			response=''
 			Timeout::timeout(12){
