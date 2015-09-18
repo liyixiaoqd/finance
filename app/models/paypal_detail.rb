@@ -67,7 +67,7 @@ class PaypalDetail
 	def get_pay_details(trade_no)
 		details=''
 		begin
-			Timeout::timeout(12){
+			Timeout::timeout(22){
 				if @country == "de"
 					details=EXPRESS_GATEWAY_DE.details_for(trade_no)
 				elsif @country == "nl"
@@ -99,7 +99,7 @@ class PaypalDetail
 	def process_purchase(online_pay)
 		begin
 			response=''
-			Timeout::timeout(1){
+			Timeout::timeout(22){
 				if online_pay.country == "de"
 					response=EXPRESS_GATEWAY_DE.purchase(price_in_cents(online_pay.amount), express_purchase_options(online_pay,"EUR"))
 				elsif online_pay.country == "nl"
@@ -109,8 +109,6 @@ class PaypalDetail
 				elsif online_pay.country == "at"
 					response=EXPRESS_GATEWAY_AT.purchase(price_in_cents(online_pay.amount), express_purchase_options(online_pay,"EUR"))
 				end
-
-				sleep 3
 			}
 
 			# Rails.logger.info("#{response.success?} , #{response.message}")
