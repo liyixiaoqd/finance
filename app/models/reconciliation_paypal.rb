@@ -165,7 +165,7 @@ class ReconciliationPaypal
 			}
 			response=''
 			Timeout::timeout(12){
-				response=rp.get_reconciliation((Time.now-60).gmtime.strftime("%Y-%m-%dT%H:%M:%SZ"),
+				response=get_reconciliation((Time.now-60).gmtime.strftime("%Y-%m-%dT%H:%M:%SZ"),
 					Time.now.gmtime.strftime("%Y-%m-%dT%H:%M:%SZ"),
 					params)
 			}
