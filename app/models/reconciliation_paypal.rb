@@ -178,13 +178,16 @@ class ReconciliationPaypal
 
 			for i in (0...@paypal_reconciliation_hash['l_transactionid'].size)
 				srh=get_single_reconciliation_hash(i)
-				if ReconciliationDetail.find_by_transactionid(srh['transactionid']).blank?
+				rd=ReconciliationDetail.find_by_transactionid(srh['transactionid'])
+				if rd.blank?
 					flag=true
 					message=''
 					reconciliation_id=srh['transactionid']
 					callback_status==srh['l_status']
 
 					break
+				else
+					Rails.logger.info("repeat onlinepay [ #{i} ]:#{rd.order_no},#{rd.transaction_id}")
 				end
 			end
 		rescue=>e
