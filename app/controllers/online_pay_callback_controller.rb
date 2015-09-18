@@ -192,7 +192,12 @@ class OnlinePayCallbackController < ApplicationController
 				flag,message,online_pay.reconciliation_id,online_pay.callback_status=pay_detail.process_purchase(online_pay)
 
 				if flag==false
-					raise "#{message}"
+					#超时 调用对账程序获取状态
+					if e.message=="execution expired"
+						logger.info("TIME_OUT and RETRY GET #{online_pay.order_no}")
+					else
+						raise "#{message}"
+					end
 				end
 				online_pay.set_status!("success_notify","")
 				online_pay.save!()

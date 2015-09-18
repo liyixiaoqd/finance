@@ -31,7 +31,7 @@ class ReconciliationPaypal
 		Rails.logger.info("TRANSACTION SEARCH : #{@startdate} -- #{@enddate}")
 	end
 
-	def get_reconciliation(startdate,enddate)
+	def get_reconciliation(startdate,enddate,options_hash={})
 		options={
 			'METHOD' => self.service,
 			'VERSION' => Settings.paypal.paypal_api_other_version,
@@ -39,7 +39,7 @@ class ReconciliationPaypal
 			# 'CURRENCYCODE' => 'EUR',
 			# 'AMT' => 105,
 			'ENDDATE' => enddate
-		}
+		}.merge(options_hash)
 
 		if @country=="de"
 			options['USER']=Settings.paypal.login_de
@@ -78,7 +78,7 @@ class ReconciliationPaypal
 			tmp_end =  (@startdate+ ((h+1)*hour_step).hour).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 			Rails.logger.info("#{h}: #{tmp_start} - #{tmp_end}")
-			message=message+valid_reconciliation(get_reconciliation(tmp_start,tmp_end))
+			message=message+valid_reconciliation(get_reconciliation(tmp_start,tmp_end,{}))
 
 			@batch_id=@batch_id+1
 			@paypal_reconciliation_hash=init_paypal_reconciliation_hash()

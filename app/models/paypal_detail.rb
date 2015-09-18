@@ -79,6 +79,7 @@ class PaypalDetail
 				end
 			}
 			Rails.logger.info("get_pay_details:#{online_pay.country}:#{details.payer_id}")
+			Rails.logger.info("#{details.inspect}")
 			
 			online_pay.credit_pay_id = details.payer_id
 			online_pay.credit_first_name = details.params["first_name"]
