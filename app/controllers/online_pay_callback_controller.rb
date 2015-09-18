@@ -203,6 +203,7 @@ class OnlinePayCallbackController < ApplicationController
 					#超时 调用对账程序获取状态
 					if message=="execution expired"
 						logger.info("[MONITOR]: TIME_OUT and RETRY GET #{online_pay.order_no}")
+						sleep 5
 						rp=ReconciliationPaypal.new("TransactionSearch",online_pay.country)
 						flag,message,online_pay.reconciliation_id,online_pay.callback_status=rp.has_pay_order(pay_id_details.params['payer'],online_pay.amount)
 						if flag==false
