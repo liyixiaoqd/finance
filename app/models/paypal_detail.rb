@@ -64,21 +64,21 @@ class PaypalDetail
 		end
 	end
 
-	def get_pay_details(online_pay)
+	def get_pay_details(trade_no)
 		details=''
 		begin
 			Timeout::timeout(12){
 				if @country == "de"
-					details=EXPRESS_GATEWAY_DE.details_for(@trade_no)
+					details=EXPRESS_GATEWAY_DE.details_for(trade_no)
 				elsif @country == "nl"
-					details=EXPRESS_GATEWAY_NL.details_for(@trade_no)
+					details=EXPRESS_GATEWAY_NL.details_for(trade_no)
 				elsif @country == "gb"
-					details=EXPRESS_GATEWAY_GB.details_for(@trade_no)
+					details=EXPRESS_GATEWAY_GB.details_for(trade_no)
 				elsif @country == "at"
-					details=EXPRESS_GATEWAY_AT.details_for(@trade_no)
+					details=EXPRESS_GATEWAY_AT.details_for(trade_no)
 				end
 			}
-			Rails.logger.info("get_pay_details:#{@country} - #{@trade_no}:#{details.payer_id}")
+			Rails.logger.info("get_pay_details:#{@country} - #{trade_no}:#{details.payer_id}")
 			Rails.logger.info("#{details.inspect}")
 		rescue=>e
 			raise "paypal_details_for TIME OUT!:#{e.message}"

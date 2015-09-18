@@ -1,5 +1,5 @@
 module PayDetailable extend ActiveSupport::Concern
-	PAY_PAYPAL_PARAMS=%w{amount currency success_url abort_url order_no description ip country notification_url trade_no}
+	PAY_PAYPAL_PARAMS=%w{amount currency success_url abort_url order_no description ip country notification_url}
 	PAY_SOFORT_PARAMS=%w{country currency order_no amount success_url notification_url abort_url timeout_url}
 	PAY_ALIPAY_OVERSEA_PARAMS=%w{system amount description currency order_no success_url notification_url}
 	PAY_ALIPAY_TRANSACTION_PARAMS=%w{system quantity amount logistics_name description order_no success_url notification_url}

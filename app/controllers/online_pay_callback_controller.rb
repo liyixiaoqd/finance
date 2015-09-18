@@ -187,7 +187,7 @@ class OnlinePayCallbackController < ApplicationController
 				pay_detail=OnlinePay.get_instance_pay_detail(online_pay)
 				ret_hash=init_return_ret_hash(online_pay)
 				
-				pay_id_details=pay_detail.get_pay_details(online_pay)
+				pay_id_details=pay_detail.get_pay_details(online_pay.trade_no)
 				if pay_id_details.blank?
 					logger.info("PAYPAL get_pay_details FAILURE")
 					raise "PAYPAL get_pay_details FAILURE"
