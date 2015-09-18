@@ -148,7 +148,7 @@ class ReconciliationPaypal
 		begin
 			params={
 				"EMAIL"=>email,
-				"CURRENCYCODE"=>currencycode
+				"CURRENCYCODE"=>currencycode,
 				"AMT"=>amt
 			}
 			response=''

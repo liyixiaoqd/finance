@@ -79,7 +79,7 @@ class PaypalDetail
 				end
 			}
 			Rails.logger.info("get_pay_details:#{@country} - #{trade_no}:#{details.payer_id}")
-			Rails.logger.info("#{details.inspect}")
+			#Rails.logger.info("#{details.inspect}")
 		rescue=>e
 			raise "paypal_details_for TIME OUT!:#{e.message}"
 		end
