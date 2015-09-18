@@ -40,6 +40,7 @@ class ReconciliationPaypal
 			# 'AMT' => 105,
 			'ENDDATE' => enddate
 		}.merge(options_hash)
+		Rails.logger.info("get_reconciliation:#{options}")
 
 		if @country=="de"
 			options['USER']=Settings.paypal.login_de
@@ -169,7 +170,7 @@ class ReconciliationPaypal
 					Time.now.gmtime.strftime("%Y-%m-%dT%H:%M:%SZ"),
 					params)
 			}
-
+			Rails.logger.info(response.body)
 			response_to_hash_paypal!(response)
 			if @paypal_reconciliation_hash.blank?
 				raise "no pay record get"

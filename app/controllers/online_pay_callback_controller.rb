@@ -206,8 +206,10 @@ class OnlinePayCallbackController < ApplicationController
 						rp=ReconciliationPaypal.new("TransactionSearch",online_pay.country)
 						flag,message,online_pay.reconciliation_id,online_pay.callback_status=rp.has_pay_order(pay_id_details.params['payer'],online_pay.amount)
 						if flag==false
-							logger.info("RETRY GET failure:#{e.message}")
+							logger.info("RETRY GET failure:#{message}")
 							raise message
+						else
+							logger.info("RETRY GET SUCCESS")
 						end
 					else
 						raise message
