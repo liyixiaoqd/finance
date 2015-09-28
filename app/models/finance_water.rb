@@ -1,4 +1,6 @@
 class FinanceWater < ActiveRecord::Base
+	include PayDetailable
+	
 	belongs_to :user
 	validates :system, :channel, :userid, presence: true
 	validates :new_amount,:old_amount, numericality:{:greater_than_or_equal_to=>0.00},if: "!self.user.isMerchant?"

@@ -204,9 +204,40 @@ class FinanceWaterController < ApplicationController
 					ret_hash['waterno']=finance_water.id
 					ret_hash['status']='success'
 				end
+
+				if finance_water.watertype=="e_cash" && user.isMerchant?
+					logger.info("push and send recharge information:#{user.username},#{finance_water.amount}")
+					amount= finance_water.symbol=="Sub" ? (-1)*finance_water.amount : finance_water.amount
+					
+					push_params={
+						'waterNumber'=>finance_water.id,
+						'financialType'=>"recharging",
+						'usage'=>"account-recharging",
+						'referredParcelNo'=>"",
+						'amount'=>amount,
+						'currentBalance'=>finance_water.new_amount,
+						'paidAt'=>finance_water.operdate,
+						"paymentMethod"=>"eft",
+						"memo"=>finance_water.reason,
+						'sign'=>Digest::MD5.hexdigest("#{finance_water.id}:#{finance_water.operdate}#{Settings.authenticate.signkey}")
+					}
+
+					push_url=Settings.push_notification.merchant_recharge_url.sub(":merchant_id",user.userid)
+					logger.info("push_url:#{push_url}")
+
+					unless finance_water.method_url_success?("post",push_url,false,push_params)
+						ret_hash['reasons']<<{'reason'=>'电商充值推送消息失败,请重新操作'}
+
+						raise "push failure!"
+					end
+				end
 			end
 		rescue => e
 			logger.info("create finance_water failure! : #{e.message}")
+			ret_hash['score']=0.0,
+			ret_hash['e_cash']=0.0,
+			ret_hash['waterno']=''
+			ret_hash['status']='failure'
 			ret_hash['reasons']<<{'reason'=>e.message} if ret_hash['reasons'].blank?
 			logger.info("FINANCE.MODIFY_WEB RET HASH:#{ret_hash}")
 		end
