@@ -117,9 +117,9 @@ describe FinanceWaterController do
 			oper=[
 				{'symbol'=>"Add",'amount'=>"100",'pay_amount'=>'0','currency'=>'','reason'=>'score add 100','watertype'=>"score",'is_pay'=>'N','order_no'=>''},
 				{'symbol'=>"Add",'amount'=>"50",'pay_amount'=>'0','currency'=>'','reason'=>'score add 50','watertype'=>"score",'is_pay'=>'N','order_no'=>''},
-				{'symbol'=>"Sub",'amount'=>"119",'pay_amount'=>'1.19','currency'=>'RMB','send_country'=>'nl','reason'=>'score sub 119','watertype'=>"score",'is_pay'=>'Y','order_no'=>'QD15000000730523|QD15000000740525|QD15000001041415|QD15000001061413|QD15000001081416|QD15000001281817|QD15000001291840|QD15000001311221|QD15000001321743|'},
+				{'symbol'=>"Sub",'amount'=>"119",'pay_amount'=>'1.19','currency'=>'RMB','send_country'=>'nl','reason'=>'score sub 119','watertype'=>"score",'is_pay'=>'Y','order_no'=>'testQD15000000730523|QD15000000740525|QD15000001041415|QD15000001061413|QD15000001081416|QD15000001281817|QD15000001291840|QD15000001311221|QD15000001321743|QD15000000730523|QD15000000740525|QD15000001041415|QD15000001061413|QD15000001081416|QD15000001281817|QD15000001291840|QD15000001311221|QD15000001321743|QD15000000730523|QD15000000740525|QD15000001041415|QD15000001061413|QD15000001081416|QD15000001281817|QD15000001291840|QD15000001311221|QD15000001321743|QD15000001291840|QD15000001311221|QD15000001321743|'},
 				{'symbol'=>"Add",'amount'=>"19",'pay_amount'=>'0','currency'=>'','reason'=>'e_cash add 19','watertype'=>"e_cash",'is_pay'=>'N','order_no'=>''},
-				{'symbol'=>"Sub",'amount'=>"19",'pay_amount'=>'0.19','currency'=>'EUR','send_country'=>'at','reason'=>'e_cash sub 19','watertype'=>"e_cash",'is_pay'=>'Y','order_no'=>'QD15000000730523|QD15000000740525|QD15000001041415|QD15000001061413|QD15000001081416|QD15000001281817|QD15000001291840|QD15000001311221|QD15000001321744|'},
+				{'symbol'=>"Sub",'amount'=>"19",'pay_amount'=>'0.19','currency'=>'EUR','send_country'=>'at','reason'=>'e_cash sub 19','watertype'=>"e_cash",'is_pay'=>'Y','order_no'=>'testQD15000000730523|QD15000000740525|QD15000001041415|QD15000001061413|QD15000001081416|QD15000001281817|QD15000001291840|QD15000001311221|QD15000001321744|'},
 			].to_json
 			expect{
 				post :modify,modify_interface_params(oper)
@@ -129,7 +129,7 @@ describe FinanceWaterController do
 			# p response.body
 			expect(response.body).to match (/userid.*status.*reasons.*score.*e_cash.*waterno/)
 			reconciliation_detail=ReconciliationDetail.unscoped.last
-			expect(reconciliation_detail.online_pay.order_no).to eq "QD15000000730523|QD15000000740525|QD15000001041415|QD15000001061413|QD15000001081416|QD15000001281817|QD15000001291840|QD15000001311221|QD15000001321744|"
+			expect(reconciliation_detail.online_pay.order_no).to eq "testQD15000000730523|QD15000000740525|QD15000001041415|QD15000001061413|QD15000001081416|QD15000001281817|QD15000001291840|QD15000001311221|QD15000001321744|"
 			expect(reconciliation_detail.amt.to_f).to eq 0.19
 			expect(reconciliation_detail.reconciliation_flag).to eq "2"
 		end
