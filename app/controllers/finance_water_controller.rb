@@ -299,9 +299,14 @@ class FinanceWaterController < ApplicationController
 					raise "支付交易操作符只能为减"
 				end
 
-				unless OnlinePay.find_by_system_and_payway_and_paytype_and_order_no(params['system'],finance_each["watertype"],'',finance_each["order_no"]).blank?
-					raise "已存在此支付记录#{finance_each["order_no"]},不可重复操作!"
+				OnlinePay.where("system='#{params['system']}' and order_no='#{finance_each["order_no"]}'").each do |exist_op|
+					if exist_op.status=="success" || exist_op.watertype==finance_each["watertype"]
+						raise "已存在此支付记录#{finance_each["order_no"]},不可重复操作!"
+					end
 				end
+				# unless OnlinePay.find_by_system_and_payway_and_paytype_and_order_no(params['system'],finance_each["watertype"],'',finance_each["order_no"]).blank?
+				# 	raise "已存在此支付记录#{finance_each["order_no"]},不可重复操作!"
+				# end
 
 				online_pay=user.online_pay.build()
 				online_pay.system=params['system']
