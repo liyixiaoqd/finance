@@ -300,7 +300,7 @@ class FinanceWaterController < ApplicationController
 				end
 
 				OnlinePay.where("system='#{params['system']}' and order_no='#{finance_each["order_no"]}'").each do |exist_op|
-					if exist_op.status=="success" || exist_op.status=="failure_notify_third" 
+					if exist_op.status[0,7]=="success" || exist_op.status=="failure_notify_third" 
 						raise "已存在此支付记录#{finance_each["order_no"]},不可重复操作!"
 					else
 						logger.info("has exists online_pay record #{exist_op.payway} but not success: #{exist_op.status}")
