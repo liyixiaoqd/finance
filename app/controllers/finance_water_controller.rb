@@ -299,7 +299,7 @@ class FinanceWaterController < ApplicationController
 					raise "支付交易操作符只能为减"
 				end
 
-				OnlinePay.where("system='#{params['system']}' and order_no='#{finance_each["order_no"]}'").each do |exist_op|
+				OnlinePay.lock().where("system='#{params['system']}' and order_no='#{finance_each["order_no"]}'").each do |exist_op|
 					if exist_op.status[0,7]=="success" || exist_op.status=="failure_notify_third" 
 						raise "已存在此支付记录#{finance_each["order_no"]},不可重复操作!"
 					else
