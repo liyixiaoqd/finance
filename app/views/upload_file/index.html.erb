@@ -15,6 +15,21 @@
 			</div>
 		<% end %>
 
+		<% unless flash[:notice_2].blank? %>
+			<div class="alert alert-info">
+				<button type="button" class="close" data-dismiss="alert">×</button>
+				<%=flash[:notice_2]%>
+			</div>
+		<% end %>
+
+		<% unless flash[:error_2].blank? %>
+			<div class="alert alert-info">
+				<button type="button" class="close" data-dismiss="alert">×</button>
+				<%=flash[:error_2]%>
+			</div>
+		<% end %>
+
+
 		<div class="alert alert-info">
 			<button type="button" class="close" data-dismiss="alert">×</button>
 			<strong>提示:</strong> 请选择业务类型并上传文件!
@@ -22,11 +37,18 @@
 		<div class="well">
 			<%= form_tag upload_file_upload_path,multipart:true do %>
 				<%= label_tag(:l1, "上传业务类型:") %>
-				<%= select_tag "file_type", options_for_select([ ["sofort对账明细","sofort_transaction"],["荷兰银行事务历史记录","NL_ABN_Bank"],["德国银行事务历史记录","DE_BOC_Bank"],["奥地利银行事务历史记录","AT_STA_Bank"] ], "NL_ABN_Bank") %>
+				<%= select_tag "file_type", options_for_select([ 
+						["sofort对账明细","sofort_transaction"],
+						["荷兰银行事务历史记录","NL_ABN_Bank"],
+						["德国银行事务历史记录","DE_BOC_Bank"],
+						["奥地利银行事务历史记录","AT_STA_Bank"],
+						["电商-英国银行交易记录上传","MERCHANT_EN_CASH_IN_BANK"],
+						["电商-荷兰银行交易记录上传","MERCHANT_NL_CASH_IN_BANK"] 
+					], "NL_ABN_Bank") %>
 				<%= label_tag(:l2, "选择文件:") %>
 				<%= file_field_tag :file %>
 				 <div class="btn-toolbar">
-					 <%= submit_tag("上传",class: "btn btn-primary") %>
+					 <%= submit_tag("上传",class: "btn btn-primary",data: {disable_with: '上传中.'}) %>
 			          	</div>
 			<% end %>
 		</div>

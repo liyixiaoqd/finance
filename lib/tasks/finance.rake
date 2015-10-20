@@ -6,7 +6,7 @@ namespace :finance do
 		@interface_logger = Logger.new("log/reconciliation.log")
 		@interface_logger.level=Logger::INFO
 		@interface_logger.datetime_format="%Y-%m-%d %H:%M:%S"
-		@interface_formatter=proc{|severity,datetime,progname,msg|
+		@interface_logger.formatter=proc{|severity,datetime,progname,msg|
 			"[#{datetime}] :#{msg}\n"
 		}
 

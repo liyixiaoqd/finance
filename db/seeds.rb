@@ -31,6 +31,7 @@ BasicData.create!(:basic_type=>"00A",:desc=>"financial reconciliation interface 
 	                   :basic_sub_type=>"002",:sub_desc=>"time interval frequency - hour",
 	                   :payway=>"alipay",:paytype=>"oversea",:value=>"24")
 
+
 AdminManage.delete_all
 passwd=Digest::MD5.hexdigest("passwd")
 AdminManage.create!(:admin_name=>'admin',:admin_passwd=>Digest::MD5.hexdigest("#{passwd}#{Settings.admin.passwd_key}"),
@@ -248,6 +249,36 @@ AccessAuthority.create!(:controller=>"ExpectionHandlingController",:action=>"rec
 			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
 			:describe=>'财务管理 - 交易查询 - 手动调用',:access_level=>11)
 
+AccessAuthority.create!(:controller=>"NoticeController",:action=>"index",
+			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
+			:describe=>'首页 - 登入界面 - 通知显示',:access_level=>12)
+AccessAuthority.create!(:controller=>"NoticeController",:action=>"handle",
+			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
+			:describe=>'首页 - 登入界面 - 通知处理',:access_level=>13)
+
+# merchant add 
+AccessAuthority.create!(:controller=>"TransactionReconciliationController",:action=>"merchant_index",
+			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
+			:describe=>'财务管理 - 电商报表',:access_level=>14)
+AccessAuthority.create!(:controller=>"TransactionReconciliationController",:action=>"merchant_index_export",
+			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
+			:describe=>'电商汇总报表导出')
+AccessAuthority.create!(:controller=>"TransactionReconciliationController",:action=>"merchant_show",
+			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
+			:describe=>'电商汇总报表导出')
+AccessAuthority.create!(:controller=>"TransactionReconciliationController",:action=>"merchant_show_export",
+			:is_sign_in=>true,:is_interface=>false,:is_digest_auth=>true,
+			:describe=>'单个电商明细报表导出')
+AccessAuthority.create!(:controller=>"FinanceWaterController",:action=>"correct",
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>true,
+			:describe=>'历史交易流水批量修正')
+AccessAuthority.create!(:controller=>"FinanceWaterController",:action=>"invoice_merchant",
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>true,
+			:describe=>'电商发票批量同步')
+
+BasicData.create!(:basic_type=>"00B",:desc=>"notice configuration",
+	                   :basic_sub_type=>"001",:sub_desc=>"recharge notice warning - day",
+	                   :payway=>"notice",:paytype=>"",:value=>"3")
 
 AdminAuthority.delete_all
 AdminManage.all.each do |am|

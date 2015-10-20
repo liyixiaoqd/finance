@@ -44,6 +44,14 @@ Rails.application.routes.draw do
   post 'expection_handling/:online_pay_id/manual_payment' => 'expection_handling#manual_payment',as: :expection_handling_manual_payment
   post 'expection_handling/:online_pay_id/recall_notify' => 'expection_handling#recall_notify',as: :expection_handling_recall_notify
   
+  get 'notice/index' => 'notice#index'
+  post 'notice/:notice_id/handle' => 'notice#handle',as: :notice_handle
+
+  get 'transaction_reconciliation/merchant_index' => 'transaction_reconciliation#merchant_index'
+  get 'transaction_reconciliation/merchant_index_export' => 'transaction_reconciliation#merchant_index_export'
+  get 'transaction_reconciliation/merchant_show' => 'transaction_reconciliation#merchant_show'
+  get 'transaction_reconciliation/merchant_show_export' => 'transaction_reconciliation#merchant_show_export'
+
   #online_pay inteface use 
   post 'registe' => 'registe#create'
   get 'registe/:userid/obtain' => 'registe#obtain'
@@ -51,6 +59,8 @@ Rails.application.routes.draw do
   post 'finance_water/:userid/modify' => 'finance_water#modify'
   get 'finance_water/:userid/water_obtain' => 'finance_water#water_obtain'
   post 'finance_water/refund' => 'finance_water#refund'
+  post 'finance_water/correct' => 'finance_water#correct'
+  post 'finance_water/invoice_merchant' => 'finance_water#invoice_merchant'
 
   post 'pay/:userid/submit' => 'online_pay#submit'
   # post 'pay/:userid/submit_creditcard' => 'online_pay#submit_creditcard'

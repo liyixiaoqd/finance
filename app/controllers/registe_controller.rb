@@ -122,7 +122,15 @@ class RegisteController < ApplicationController
 			user.score=params["scoreInitAmount"]
 			user.operator=params["operator"]
 			user.operdate=params["datetime"]
-		
+			
+			if params["user_type"].present?
+				user.user_type=params["user_type"]
+				user.address=params["address"]
+				user.vat_no=params["vat_no"]
+				user.pay_type=params["pay_type"]
+				user.pay_limit=params["pay_limit"]
+			end
+
 			user
 		end
 

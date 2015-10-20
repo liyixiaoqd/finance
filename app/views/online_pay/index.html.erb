@@ -41,7 +41,7 @@
 					 &nbsp;&nbsp;&nbsp;
 					 <%= label_tag(:l10, "交易发起止期:",class:"label_inline") %> <%= datetime_field_tag(:end_time) %>
 					 <div class="btn-toolbar">
-						 <%= submit_tag("查询",class: "btn btn-primary",id: "button_submit_time") %>
+						 <%= submit_tag("查询",class: "btn btn-primary",id: "button_submit_time",data: {disable_with: '查询中.'}) %>
 						 <%= link_to "导出",export_index_online_pay_path,class: "btn",method: "get",id: "link_to_export"%>
 					          	<%=button_tag("清除条件",type: 'button',class: "btn",id: "button_clear") %>
 				          	</div>

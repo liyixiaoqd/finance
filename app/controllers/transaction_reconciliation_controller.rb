@@ -262,6 +262,129 @@ class TransactionReconciliationController < ApplicationController
 		redirect_to transaction_reconciliation_confirm_search_path
 	end
 
+	def merchant_index
+		if params[:start_time].present? && params[:end_time].present?
+			id=params[:merchant_id]
+			system=params[:system]
+
+			user_sql="user_type='merchant'"
+			user_sql+=" and system='#{system}'" unless system.blank?
+			user_sql+=" and userid='#{id}'" unless id.blank?
+
+			@merchants=[]
+			@users=User.where(user_sql).page(params[:page])
+			@users.each do |u|
+				merchant=get_merchant(u,params[:start_time],params[:end_time])
+					
+				@merchants<<merchant
+			end
+		end
+	end
+
+	def merchant_index_export
+		if params[:start_time].present? && params[:end_time].present?
+			id=params[:merchant_id]
+			system=params[:system]
+
+			user_sql="user_type='merchant'"
+			user_sql+=" and system='#{system}'" unless system.blank?
+			user_sql+=" and userid='#{id}'" unless id.blank?
+
+			csv_string = CSV.generate do |csv|
+				csv << ["注册系统",SYSTEM_MAPPING_TO_DISPLAY[system]]
+				csv << ["寄送国家","ALL"]
+				csv << ["电商客户号",id]
+				csv << ["结算日起始",params[:start_time],"结算日终止",params[:end_time]]
+				csv << []
+				csv << ["List of Receipt in Advance","","","","","#{params[:start_time]} to #{params[:end_time]}"]
+				csv << []
+				csv << ["Customer Ref. No.","Customer","Opening Bal.","Cash In","Invoiced Trx.","Closing Bal."]
+
+				User.where(user_sql).each do |u|
+					merchant=get_merchant(u,params[:start_time],params[:end_time])
+
+					out_arr=[u.userid,u.username,merchant['opening_bal'],merchant['cash_in'],merchant['cash_out'],merchant['closing_bal']]
+
+					csv << out_arr
+				end
+			end
+
+			send_data csv_string,:type => 'text/csv ',:disposition => "filename=电商汇总报表_#{OnlinePay.current_time_format("%Y%m%d%H%M%S")}.csv"
+		else
+			flash[:notice]="请输入查询条件!"
+			redirect_to transaction_reconciliation_merchant_index_path and return
+		end		
+	end
+
+	def merchant_show
+		@user_attr={}
+		user=User.find(params[:merchant_id])
+		if user.blank?
+			flash[:notice]="查询异常"
+			redirect_to transaction_reconciliation_merchant_index_path and return
+		end
+
+		@user_attr['system']=user.system
+		@user_attr['id']=user.userid
+		@user_attr['name']=user.username
+		@user_attr['address']=user.address
+		@user_attr['vat_no']=user.vat_no
+		@user_attr['start_time']=params[:start_time]
+		@user_attr['end_time']=params[:end_time]
+		@user_attr['opening_bal']=params[:opening_bal]
+		@user_attr['closing_bal']=params[:closing_bal]
+
+		@invoices=Invoice.where("user_id=? and operdate>? and operdate<=?",user.id,params[:start_time],params[:end_time]).page(params[:page])
+	end
+
+	def merchant_show_export
+		if params[:start_time].present? && params[:end_time].present? && params[:merchant_id].present? && params[:system].present?
+			id=params[:merchant_id]
+			system=params[:system]
+
+			user=User.find_by_system_and_userid(params[:system],params[:merchant_id])
+			if user.blank?
+				flash[:notice]="查询异常"
+				redirect_to transaction_reconciliation_merchant_index_path and return
+			end
+
+
+			csv_string = CSV.generate do |csv|
+				csv << ["注册系统",SYSTEM_MAPPING_TO_DISPLAY[user.system]]
+				csv << ["寄送国家","ALL"]
+				csv << ["电商客户号",user.userid]
+				csv << ["结算日起始",params[:start_time],"结算日终止",params[:end_time]]
+				csv << []
+				csv << ["Transaction Details","","","","#{params[:start_time]} to #{params[:end_time]}"]
+				csv << []
+				csv << ["Customer Ref. No.",user.userid]
+				csv << ["Customer",user.username]
+				csv << ["Registered Address",user.address]
+				csv << ["VAT No.",user.vat_no]
+				csv << []
+				csv << ["","","","Opening Balance as at #{params[:start_time]}","",params['opening_bal']]
+				csv << []
+				csv << ["日期","发票号","描述","","期间","金额"]
+
+				Invoice.where("user_id=? and operdate>? and operdate<=?",user.id,params[:start_time],params[:end_time]).each do |invoice|
+					out_arr=[invoice.operdate,invoice.invoice_no,invoice.description,"",get_period(invoice),invoice.amount]
+
+					csv << out_arr
+				end
+
+				csv << []
+				csv << ["","","","Closing Balance as at #{params[:end_time]}","",params['closing_bal']]
+			end
+
+			send_data csv_string,:type => 'text/csv ',:disposition => "filename=电商明细报表_#{OnlinePay.current_time_format("%Y%m%d%H%M%S")}.csv"
+		else
+			flash[:notice]="导出异常!"
+			logger.info("merchant_show_export.params:#{params.inspect}")
+			redirect_to transaction_reconciliation_merchant_index_path and return
+		end
+	end
+
+
 	private 
 		def sql_from_condition_filter(params)
 			sql="reconciliation_flag<>#{ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['NON_SYSTEM']}"
@@ -284,5 +407,33 @@ class TransactionReconciliationController < ApplicationController
 			end
 
 			sql
+		end
+
+		def get_merchant(u,start_time,end_time)
+			merchant={}
+			merchant['id']=u.userid
+			merchant['name']=u.username
+			merchant['merchant_id']=u.id
+			merchant['start_time']=start_time
+			merchant['end_time']=end_time
+
+			merchant['cash_in']=FinanceWater.get_tj_num("sum(amount)","user_id='#{u.id}' and watertype='e_cash' and symbol='Add' and left(operdate,10)>'#{start_time}' and left(operdate,10)<='#{end_time}'",nil)
+			merchant['cash_out']=FinanceWater.get_tj_num("sum(amount)","user_id='#{u.id}' and watertype='e_cash' and symbol='Sub' and left(operdate,10)>'#{start_time}' and left(operdate,10)<='#{end_time}'",nil)
+			
+			fw=FinanceWater.get_first_record("user_id='#{u.id}' and watertype='e_cash' and left(operdate,10)<='#{start_time}'",nil,"id desc")
+			if fw.blank?
+				merchant['opening_bal']=0.0
+			else
+				merchant['opening_bal']=fw.new_amount
+			end
+
+			fw=FinanceWater.get_first_record("user_id='#{u.id}' and watertype='e_cash' and left(operdate,10)<='#{end_time}'",nil,"id desc")
+			if fw.blank?
+				merchant['closing_bal']=0.0
+			else
+				merchant['closing_bal']=fw.new_amount
+			end
+
+			merchant
 		end
 end

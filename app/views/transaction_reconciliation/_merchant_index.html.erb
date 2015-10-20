@@ -1,0 +1,9 @@
+<tr class="tr_relpace">
+	<td>
+	<%=link_to merchant['id'],transaction_reconciliation_merchant_show_path(merchant_id: merchant['merchant_id'],start_time: merchant['start_time'],end_time: merchant['end_time'],opening_bal: merchant['opening_bal'],closing_bal: merchant['closing_bal']),method: :get %></td>
+	<td><%= merchant['name'] %></td>
+	<td><%= merchant['opening_bal'] %></td>
+	<td><%= merchant['cash_in'] %></td>
+	<td><%= merchant['cash_out'] %></td>
+	<td><%= merchant['closing_bal'] %></td>
+</tr>

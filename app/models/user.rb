@@ -1,8 +1,14 @@
 class User < ActiveRecord::Base
+	
+	USER_USER_TYPE_ENUM=%w{personal merchant}
+
 	has_many :finance_water
 	has_many :online_pay
 	validates :system, :channel, :userid, :username, presence: true
-	validates :e_cash,:score,numericality:{:greater_than_or_equal_to=>0.00}
+	validates :score, numericality:{:greater_than_or_equal_to=>0.00}
+	validates :e_cash,numericality:{:greater_than_or_equal_to=>0.00},if: "!isMerchant?"
+	validates :user_type, inclusion: { in: USER_USER_TYPE_ENUM,message: "%{value} is not a valid user.user_type" }
+	validates :address,:vat_no,:pay_type,:pay_limit, presence: true,if: "isMerchant?"
 		
 	before_create :create_userid_unique_valid
 	#after_create :create_init_score     can't rollback !!
@@ -12,11 +18,11 @@ class User < ActiveRecord::Base
 
 	def create_init_finance(score_reason,e_cash_reason)
 		begin
-			if self.score>0 then 
+			if self.score!=0 then 
 				create_init_watertype("score",score_reason)
 			end
 
-			if self.e_cash>0 then		
+			if self.e_cash!=0 then		
 				create_init_watertype("e_cash",e_cash_reason)
 			end
 		rescue => e
@@ -39,15 +45,33 @@ class User < ActiveRecord::Base
 			'amount'=>amount
 		}
 
-		if(watertype=="score")
-			finance_water_params['old_amount']=self.score
-			finance_water_params['new_amount']=self.score+amount
-		elsif(watertype=="e_cash")
-			finance_water_params['old_amount']=self.e_cash
-			finance_water_params['new_amount']=self.e_cash+amount
+		# if(watertype=="score")
+		# 	finance_water_params['old_amount']=self.score
+		# 	finance_water_params['new_amount']=self.score+amount
+		# elsif(watertype=="e_cash")
+		# 	finance_water_params['old_amount']=self.e_cash
+		# 	finance_water_params['new_amount']=self.e_cash+amount
+		# end
+
+		fw=self.finance_water.new(finance_water_params)
+		fw.set_all_amount!(self.score,self.e_cash)
+		fw.save!()
+	end
+
+	def isMerchant?
+		self.user_type=="merchant"
+	end
+
+	def check_merchant
+		check_flag=true
+
+		if isMerchant?
+			if self.e_cash<self.pay_limit
+				check_flag=false
+			end
 		end
 
-		self.finance_water.create!(finance_water_params)
+		check_flag
 	end
 
 	private 
@@ -73,12 +97,18 @@ class User < ActiveRecord::Base
 
 			if(watertype=="score")
 				finance_water_params['amount']=self.score
-				finance_water_params['new_amount']=self.score
+				#finance_water_params['new_amount']=self.score
 			elsif(watertype=="e_cash")
 				finance_water_params['amount']=self.e_cash
-				finance_water_params['new_amount']=self.e_cash
+				#finance_water_params['new_amount']=self.e_cash
 			end
+			
+			fw=self.finance_water.new(finance_water_params)
 
-			self.finance_water.create!(finance_water_params)
+			fw.set_all_amount!(0,0)
+			fw.save!()
+
+
+			# self.finance_water.create!(finance_water_params)
 		end
 end

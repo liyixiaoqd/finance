@@ -16,29 +16,49 @@
 		<div class="block">
 			<a href="#sign-stats" class="block-heading" data-toggle="collapse">昨日在线交易统计</a>
 			<div id="sign-stats" class="block-body collapse in">
-
-			<table class="table">
-				<thead>
-					<tr>
-						<th>总比数</th>
-						<th>成功比数</th>
-						<th>总金额</th>
-						<th>成功金额</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td><%=@finance_summary.total_num%></td>
-						<td>
-							<%=@finance_summary.succ_num + @finance_summary.succ_execption_num%>
-						</td>
-						<td><%=@finance_summary.total_amount%></td>
-						<td>
-							<%=@finance_summary.succ_amount + @finance_summary.succ_execption_amount%>
-						</td>
-					</tr>
-				</tbody>
-			</table>
+				<table class="table">
+					<thead>
+						<tr>
+							<th>总比数</th>
+							<th>成功比数</th>
+							<th>总金额</th>
+							<th>成功金额</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><%=@finance_summary.total_num%></td>
+							<td>
+								<%=@finance_summary.succ_num + @finance_summary.succ_execption_num%>
+							</td>
+							<td><%=@finance_summary.total_amount%></td>
+							<td>
+								<%=@finance_summary.succ_amount + @finance_summary.succ_execption_amount%>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 		</div>
+
+		<% if @notices.present?  %>
+			<div class="block">
+				<a href="#notice-stats" class="block-heading" data-toggle="collapse">
+					待处理任务 (点击右上角tasks进入处理)
+				</a>
+				<div id="notice-stats" class="block-body collapse in">
+					<table class="table">
+						<tbody>
+							<% @notices.each do |notice| %>
+								<tr>
+									<td><%=notice.opertime%></td>
+									<td class="td_nowrap"><%=notice.title%></td>
+								</tr>
+							<% end %>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		<% end %>
 	</div>
 </div>

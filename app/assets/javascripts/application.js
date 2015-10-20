@@ -103,6 +103,7 @@ $(document).ready(function(){
 	}
 	else{
 		document.getElementById("passwd").value=hex_md5(dom_passwd.value)
+		this.disabled=true
 		form1.submit()
 	}
   });
@@ -130,10 +131,12 @@ $(document).ready(function(){
 		}
 		else{
 			document.getElementById("passwd").value=hex_md5(dom_passwd.value)
+			this.disabled=true
 			form1.submit()
 		}
 	}
 	else{
+		this.disabled=true
 		form1.submit()
 	}
   });

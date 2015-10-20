@@ -1,0 +1,11 @@
+<tr class="tr_relpace">
+	<td><%= invoice.operdate %></td>
+	<td><%= invoice.invoice_no %></td>
+	<td class="td_nowrap">
+		<span title="<%= invoice.description %>">
+			<%= invoice.description %>
+		</span>
+	</td>
+	<td><%= get_period(invoice) %></td>
+	<td><%= invoice.amount %></td>
+</tr>

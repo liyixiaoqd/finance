@@ -74,14 +74,30 @@ class FinanceWaterController < ApplicationController
 						user.score=finance_water.new_amount
 					elsif(finance_water.watertype=="e_cash")
 						user.e_cash=finance_water.new_amount
-					end
 
+						if !user.check_merchant()
+							raise "电商支付超出限额,请检查!"
+						end
+					end
+					logger.info("amount:#{finance_water.amount}")
 					finance_water.save
 					if finance_water.errors.any?
 						finance_water.errors.full_messages.each do |msg|
 							ret_hash['reasons']<<{'reason'=>msg}
 						end
 						raise "create finance_water failure"
+					end
+
+					notice=finance_water.set_notice_by_merchant('pay')
+					unless notice.blank?
+						notice.save
+
+						if notice.errors.any?
+							notice.errors.full_messages.each do |msg|
+								ret_hash['reasons']<<{'reason'=>msg}
+							end
+							raise "create finance_water - notice failure"
+						end				
 					end
 
 					online_pay=new_online_pay_each(user,finance_each,params)
@@ -188,9 +204,40 @@ class FinanceWaterController < ApplicationController
 					ret_hash['waterno']=finance_water.id
 					ret_hash['status']='success'
 				end
+
+				if finance_water.watertype=="e_cash" && user.isMerchant?
+					logger.info("push and send recharge information:#{user.username},#{finance_water.amount}")
+					amount= finance_water.symbol=="Sub" ? (-1)*finance_water.amount : finance_water.amount
+					
+					push_params={
+						'waterNumber'=>finance_water.id,
+						'financialType'=>"recharging",
+						'usage'=>"account-recharging",
+						'referredParcelNo'=>"",
+						'amount'=>amount,
+						'currentBalance'=>finance_water.new_amount,
+						'paidAt'=>finance_water.operdate,
+						"paymentMethod"=>"eft",
+						"memo"=>finance_water.reason,
+						'sign'=>Digest::MD5.hexdigest("#{finance_water.id}:#{finance_water.operdate}#{Settings.authenticate.signkey}")
+					}
+
+					push_url=Settings.push_notification.merchant_recharge_url.sub(":merchant_id",user.userid)
+					logger.info("push_url:#{push_url}")
+
+					unless finance_water.method_url_success?("post",push_url,false,push_params)
+						ret_hash['reasons']<<{'reason'=>'电商充值推送消息失败,请重新操作'}
+
+						raise "push failure!"
+					end
+				end
 			end
 		rescue => e
 			logger.info("create finance_water failure! : #{e.message}")
+			ret_hash['score']=0.0,
+			ret_hash['e_cash']=0.0,
+			ret_hash['waterno']=''
+			ret_hash['status']='failure'
 			ret_hash['reasons']<<{'reason'=>e.message} if ret_hash['reasons'].blank?
 			logger.info("FINANCE.MODIFY_WEB RET HASH:#{ret_hash}")
 		end
@@ -287,6 +334,147 @@ class FinanceWaterController < ApplicationController
 		end
 
 		render json:ret_hash.to_json
+	end
+
+	def correct
+		unless params_valid("finance_water_correct",params)
+			render json:{'SYSTEM'=>'PARAMS WRONG!'},status:400 and return 
+		end
+
+		ret_hash={
+			'status'=>'failure',
+			'reasons'=>'',
+			'userid'=>params['user_id'],
+			'score'=>0.0,
+			'e_cash'=>0.0,
+			'waterno'=>[]
+		}
+
+		begin
+			ActiveRecord::Base.transaction do
+				user=User.lock().find_by_system_and_userid_and_user_type(params['system'],params['user_id'],'merchant')
+				if(user.blank?)
+					ret_hash['reasons']="user is not exists!"
+					render json:ret_hash.to_json and return
+				end
+				   # {
+					# "water_no" :" 853422581"                       
+					# "order_no" :"TIME00001"			
+					# "amount " :500			
+				   # } 
+				finance_arrays=JSON.parse params['oper']
+				finance_arrays.each do |fa|
+					if fa['water_no'].blank?
+						raise "流水号不可为空!"
+					end
+
+					if FinanceWater.find_by_user_id_and_watertype_and_reason(user.id,"e_cash","电商交易流水调整:#{fa['water_no']}").present?
+						raise "流水记录#{fa['water_no']}已调整,不可重复操作!!"
+					end
+
+					old_fw=FinanceWater.find(fa['water_no'])
+					if old_fw.blank? || old_fw.user_id!=user.id || old_fw.watertype!='e_cash'
+						raise "此客户#{user.user_id},无此交易流水#{fa['water_no']} !"
+					end
+
+					amount=fa['amount'].to_f
+
+					if old_fw.amount!=amount
+						#operdate 使用历史交易发生日期
+						params1={"system"=>old_fw.system,"channel"=>old_fw.channel,
+							"userid"=>old_fw.userid,"operator"=>"correct","datetime"=>old_fw.operdate}
+						params2={"watertype"=>old_fw.watertype,"reason"=>"电商交易流水调整:#{fa['water_no']}"}
+						if old_fw.amount < amount
+							params2["symbol"]="Sub"
+							params2["amount"]=amount-old_fw.amount
+						else
+							params2["symbol"]="Add"
+							params2["amount"]=old_fw.amount-amount
+						end
+						fw=new_finance_water_each(user,params2,params1)
+						logger.info(fw.inspect)
+						user.update_attributes!({"e_cash"=>fw.new_amount}) 
+						fw.save!()
+						ret_hash['waterno']<<fw.id
+					else
+						logger.info("#{fa['water_no']}交易金额相同,无需调整")
+					end
+				end
+
+				ret_hash['status']='success'
+				ret_hash['score']=user.score
+				ret_hash['e_cash']=user.e_cash
+			end
+		rescue=>e
+			ret_hash['reasons']=e.message
+			ret_hash['waterno']=[]
+		end
+
+		logger.info("FINANCE_WATER.CORRECT RET_HASH:#{ret_hash}")
+		render json:ret_hash.to_json and return
+	end
+
+	def invoice_merchant
+		unless params_valid("finance_water_invoice_merchant",params)
+			render json:{'SYSTEM'=>'PARAMS WRONG!'},status:400 and return 
+		end
+
+		ret_hash={
+			'status'=>'failure',
+			'reasons'=>''
+		}
+
+		begin
+			ActiveRecord::Base.transaction do
+				user=User.lock().find_by_system_and_userid_and_user_type(params['system'],params['user_id'],'merchant')
+				if(user.blank?)
+					ret_hash['reasons']="user is not exists!"
+					render json:ret_hash.to_json and return
+				end
+
+				invoice_arrays=JSON.parse params['oper']
+				invoice_arrays.each do |invoice|
+					invoice['amount']=invoice['amount'].to_f
+					if (invoice['begdate']>invoice['enddate'] ||
+						invoice['operdate']>invoice['enddate'] ||
+						invoice['operdate']<invoice['begdate'] )
+						logger.info("INVOICE DATE: #{invoice['operdate']} <=> #{invoice['begdate']} <=> #{invoice['enddate']}")
+						raise "#{invoice['invoice_no']}发票日期数据异常"
+					end
+
+					invoice['water_no'].each do |fw_id|
+						fw=FinanceWater.find(fw_id)
+						if fw.blank? || fw.user_id != user.id || fw.watertype!='e_cash'
+							logger.info("ID NOT MATCH: #{ fw.user_id} <=> #{user.id}  TYPE:#{fw.watertype}") unless fw.blank?
+							raise "#{invoice['invoice_no']}财务流水#{fw_id}用户匹配错误!"
+						end
+
+						fw_operdate=fw.operdate.strftime("%Y-%m-%d")
+						if fw_operdate>invoice['enddate'] || fw_operdate<invoice['begdate']
+							logger.info("DATE NOT MATCH: #{ fw_operdate } <=> #{invoice['begdate']} - #{invoice['enddate']}")
+							raise "#{invoice['invoice_no']}财务流水#{fw_id}日期匹配错误!"
+						end
+
+						#金额匹配
+						if  (invoice['amount']>0 && fw.symbol=="Sub") ||
+							(invoice['amount']<0 && fw.symbol=="Add")
+							logger.info("AMOUNT NOT MATCH: #{ invoice['amount'] } <=> #{fw.symbol}")
+							raise "#{invoice['invoice_no']}财务流水#{fw_id}金额匹配错误!"
+						end
+					end
+
+					new_invoice_each(user,invoice).save!()
+				end
+
+				ret_hash['status']='success'
+			end
+		rescue=>e
+			ret_hash['reasons']=e.message
+		end
+
+		logger.info("FINANCE_WATER.INVOICE_MERCHANT RET_HASH:#{ret_hash}")
+
+		render json:ret_hash.to_json and return
 	end
 
 	private
@@ -394,6 +582,7 @@ class FinanceWaterController < ApplicationController
 			reconciliation_detail
 		end
 
+		#interface use
 		def new_finance_water_each(user,finance_each,params)
 			finance_water=user.finance_water.build()
 			finance_water.system=params["system"]
@@ -406,26 +595,29 @@ class FinanceWaterController < ApplicationController
 			finance_water.amount=finance_each["amount"]
 			finance_water.watertype=finance_each["watertype"]
 			finance_water.reason=finance_each["reason"]
-			
-			if(finance_water.watertype=='score')
-				finance_water.old_amount=user.score
-				if(finance_water.symbol=='Add')
-					finance_water.new_amount=user.score+finance_water.amount
-				elsif(finance_water.symbol=="Sub")
-					finance_water.new_amount=user.score-finance_water.amount
-				end
-			elsif(finance_water.watertype=='e_cash')
-				finance_water.old_amount=user.e_cash
-				if(finance_water.symbol=='Add')
-					finance_water.new_amount=user.e_cash+finance_water.amount
-				elsif(finance_water.symbol=="Sub")
-					finance_water.new_amount=user.e_cash-finance_water.amount
-				end
-			end
+			finance_water.confirm_flag="1"
+
+			finance_water.set_all_amount!(user.score,user.e_cash)
+			# if(finance_water.watertype=='score')
+			# 	finance_water.old_amount=user.score
+			# 	if(finance_water.symbol=='Add')
+			# 		finance_water.new_amount=user.score+finance_water.amount
+			# 	elsif(finance_water.symbol=="Sub")
+			# 		finance_water.new_amount=user.score-finance_water.amount
+			# 	end
+			# elsif(finance_water.watertype=='e_cash')
+			# 	finance_water.old_amount=user.e_cash
+			# 	if(finance_water.symbol=='Add')
+			# 		finance_water.new_amount=user.e_cash+finance_water.amount
+			# 	elsif(finance_water.symbol=="Sub")
+			# 		finance_water.new_amount=user.e_cash-finance_water.amount
+			# 	end
+			# end
 		
 			finance_water	
 		end
 
+		# web use
 		def new_finance_water_params(user,params)
 			finance_water=user.finance_water.build()
 			finance_water.system=params["system"]
@@ -440,22 +632,46 @@ class FinanceWaterController < ApplicationController
 			finance_water.amount=params["amount"]
 			finance_water.watertype=params["watertype"]
 			finance_water.reason=params["reason"]
-			
-			if(finance_water.watertype=='score')
-				finance_water.old_amount=user.score
-				if(finance_water.symbol=='Add')
-					finance_water.new_amount=user.score+finance_water.amount
-				elsif(finance_water.symbol=="Sub")
-					finance_water.new_amount=user.score-finance_water.amount
-				end
-			elsif(finance_water.watertype=='e_cash')
-				finance_water.old_amount=user.e_cash
-				if(finance_water.symbol=='Add')
-					finance_water.new_amount=user.e_cash+finance_water.amount
-				elsif(finance_water.symbol=="Sub")
-					finance_water.new_amount=user.e_cash-finance_water.amount
-				end
+			if user.isMerchant? && finance_water.watertype=='e_cash'
+				finance_water.confirm_flag="0"
+			else
+				finance_water.confirm_flag="1"
 			end
+
+			finance_water.set_all_amount!(user.score,user.e_cash)
+			# if(finance_water.watertype=='score')
+			# 	finance_water.old_amount=user.score
+			# 	if(finance_water.symbol=='Add')
+			# 		finance_water.new_amount=user.score+finance_water.amount
+			# 	elsif(finance_water.symbol=="Sub")
+			# 		finance_water.new_amount=user.score-finance_water.amount
+			# 	end
+			# elsif(finance_water.watertype=='e_cash')
+			# 	finance_water.old_amount=user.e_cash
+			# 	if(finance_water.symbol=='Add')
+			# 		finance_water.new_amount=user.e_cash+finance_water.amount
+			# 	elsif(finance_water.symbol=="Sub")
+			# 		finance_water.new_amount=user.e_cash-finance_water.amount
+			# 	end
+			# end
 			finance_water	
+		end
+
+		def new_invoice_each(user,params)
+			invoice=Invoice.new
+			invoice.user_id=user.id
+			invoice.userid=user.userid
+			invoice.system=user.system
+
+			invoice.invoice_no=params['invoice_no']
+			invoice.water_no=params['water_no'].join(",")
+    			invoice.amount=params['amount']
+    			invoice.description=params['desc']
+    			invoice.operdate=params['operdate']
+    			invoice.operdate=params['operdate']
+    			invoice.begdate=params['begdate']
+    			invoice.enddate=params['enddate']
+
+    			invoice
 		end
 end

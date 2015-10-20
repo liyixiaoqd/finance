@@ -30,10 +30,34 @@ class UploadFileController < ApplicationController
 				File.delete(filename)
 			elsif params['file_type']=="AT_STA_Bank"
 				filename=write_file(params['file'],"xlsx")
-				reconciliation=ReconciliationSofort.new()
-				flash[:notice],flash[:error]=reconciliation.valid_reconciliation_by_country("at",filename)
+				reconciliation=ReconciliationSofort
+				a,b=reconciliation.valid_reconciliation_by_country("at",filename)
+				flash[:notice]="对账处理:"+a if a.present?
+				flash[:error]="对账处理:"+b if b.present?
+				# 合并处理 两种类型为同一个文件
+
+				# File.delete(filename)
+			# elsif params['file_type']=="MERCHANT_DE_AT_CASH_IN_BANK"
+			# 	filename=write_file(params['file'],"xlsx")
+			# 	reconciliation=ReconciliationSofort.new()
+				a,b=reconciliation.merchant_cash_in_proc("de_at",filename)
+				flash[:notice_2]="电商银行记录:"+a if a.present?
+				flash[:error_2]="电商银行记录:"+b if b.present?
+
 				File.delete(filename)
-			else	
+			elsif params['file_type']=="MERCHANT_EN_CASH_IN_BANK"
+				filename=write_file(params['file'],"xlsx")
+				reconciliation=ReconciliationSofort.new()
+				flash[:notice],flash[:error]=reconciliation.merchant_cash_in_proc("en",filename)
+
+				File.delete(filename)
+			elsif params['file_type']=="MERCHANT_NL_CASH_IN_BANK"
+				filename=write_file(params['file'],"xlsx")
+				reconciliation=ReconciliationSofort.new()
+				flash[:notice],flash[:error]=reconciliation.merchant_cash_in_proc("nl",filename)
+
+				File.delete(filename)
+			else
 				flash[:notice]="未定义的上传业务类型,请重新选择"
 			end
 		rescue=>e
