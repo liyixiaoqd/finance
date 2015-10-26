@@ -2,7 +2,7 @@ require 'nokogiri'
 
 class SofortDetail
 	include PayDetailable
-	attr_accessor :country,:amount,:description,:currency,:order_no,:success_url
+	attr_accessor :country,:amount,:description,:currency,:order_no,:success_url,:abort_url,:timeout_url
 
 	SPEC_PARAMS_COUNTRY=%w(de nl at)
 	#PAY_SOFORT_PARAMS=%w{country currency order_no amount success_url notification_url abort_url timeout_url}
@@ -35,8 +35,13 @@ class SofortDetail
 			#xbuilder.success_url Settings.sofort.success_url
 			xbuilder.success_url @success_url
 			xbuilder.success_link_redirect "true"
-			xbuilder.abort_url Settings.sofort.abort_url
-			xbuilder.timeout_url Settings.sofort.timeout_url
+			
+			# self.webpage
+			xbuilder.abort_url @abort_url
+			xbuilder.timeout_url @timeout_url
+
+			# xbuilder.abort_url Settings.sofort.abort_url
+			# xbuilder.timeout_url Settings.sofort.timeout_url
 			if !Settings.sofort.notification_url.blank?
 				xbuilder.notification_urls {
 					xbuilder.notification_url Settings.sofort.notification_url

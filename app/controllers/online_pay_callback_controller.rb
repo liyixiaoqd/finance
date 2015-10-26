@@ -361,6 +361,7 @@ class OnlinePayCallbackController < ApplicationController
 	end
 	
 	def sofort_abort
+		#sofort abort no params!   no use this interface!
 		ActiveRecord::Base.transaction do
 			render_text="failure"
 			online_pay=OnlinePay.get_online_pay_instance("sofort","",params,"",false,true)
