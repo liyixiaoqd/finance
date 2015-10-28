@@ -193,6 +193,7 @@ class OnlinePayCallbackController < ApplicationController
 				#online_pay.callback_status,rollback_callback_status=rollback_callback_status,online_pay.callback_status
 
 				logger.info("paypal return transaction second start")
+				logger.info("paypal return 0")
 				pay_detail=OnlinePay.get_instance_pay_detail(online_pay)
 				logger.info("paypal return 1")
 				ret_hash=init_return_ret_hash(online_pay)
