@@ -178,6 +178,7 @@ class OnlinePayCallbackController < ApplicationController
 
 			# check is status has updated!
 			if online_pay.status=="success_notify" || online_pay.status=="failure_notify_third" || online_pay.status=="intermediate_notify"
+				logger.info("paypal return has call:#{online_pay.status}")
 				render :text=>'success' and return 
 			end
 			
