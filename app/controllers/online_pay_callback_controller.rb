@@ -172,6 +172,7 @@ class OnlinePayCallbackController < ApplicationController
 		#第一次锁订单数据 更新状态为正在处理
 		#1. 防止paypal调用多次同步接口,导致数据覆盖
 		#2. 防止订单再次调用支付接口,形成重复数据
+		online_pay=''
 		ActiveRecord::Base.transaction do
 			online_pay=OnlinePay.get_online_pay_instance("paypal","",params,"",false,true)
 			render text: "#{render_text}" and return if (online_pay.blank? || online_pay.success_url.blank?)
@@ -186,21 +187,16 @@ class OnlinePayCallbackController < ApplicationController
 			online_pay.update_attributes(status: "intermediate_notify")
 			#end
 		end
-		logger.info("paypal return transaction first end")
+		
 		#第二次保持事务
 		ActiveRecord::Base.transaction do
 			begin
 				#online_pay.callback_status,rollback_callback_status=rollback_callback_status,online_pay.callback_status
 
-				logger.info("paypal return transaction second start")
-				logger.info("paypal return 0")
 				pay_detail=OnlinePay.get_instance_pay_detail(online_pay)
-				logger.info("paypal return 1")
 				ret_hash=init_return_ret_hash(online_pay)
-				logger.info("paypal return 2")
 				
 				pay_id_details=pay_detail.get_pay_details(online_pay.trade_no)
-				logger.info("paypal return 3")
 				if pay_id_details.blank?
 					logger.info("PAYPAL get_pay_details FAILURE")
 					raise "PAYPAL get_pay_details FAILURE"
@@ -210,7 +206,6 @@ class OnlinePayCallbackController < ApplicationController
 					online_pay.credit_last_name = pay_id_details.params["last_name"]
 				end
 
-				logger.info("paypal return 4")
 				flag,message,online_pay.reconciliation_id,online_pay.callback_status=pay_detail.process_purchase(online_pay)
 
 				if flag==false
