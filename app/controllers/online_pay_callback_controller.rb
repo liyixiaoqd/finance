@@ -243,6 +243,7 @@ class OnlinePayCallbackController < ApplicationController
 				unless (online_pay.blank?)
 					online_pay.update_attributes(:status=>"failure_credit",:reason=>e.message)
 				end
+				logger.info("paypal return rescue:#{e.message}")
 			end
 			# ret_hash['credit_pay_id'] = online_pay.credit_pay_id
 			# ret_hash['credit_first'] = online_pay.credit_first_name
