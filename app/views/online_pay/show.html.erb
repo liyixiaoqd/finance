@@ -12,6 +12,7 @@
 		<div class="row-fluid">
 			<div class="btn-toolbar">
 				<%= button_to "导出",export_user_online_pay_path(@user),class: "btn",method: "get" %>
+				<%= link_to '流水明细',show_user_finance_water_path(@user),method: :get,class:"btn pull-right" %>
 			</div>
 
 			<table class="table" id="online_pay_details_table">
@@ -19,7 +20,7 @@
 				<%= render partial: "online_pay_detail_content",collection: @online_pays,as: :online_pay %>
 			</table>
 			<div class="div_paginate">
-				<%= render partial: "layouts/paginate_replace_ajax",locals: {page_array: @online_pays} %>
+				<%= paginate @online_pays %>
 			</div>
 		</div>
 	</div>

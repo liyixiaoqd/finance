@@ -15,6 +15,7 @@
 					<%= button_to "新增",new_user_finance_water_path(@user),class: "btn btn-primary",method: "get" %>
 				<% end %>
 				<%= button_to "导出",export_user_finance_water_path(@user),class: "btn",method: "get" %>
+				<%= link_to '支付明细',show_user_online_pay_path(@user),method: :get,class:"btn pull-right" %>
 			</div>
 
 			<table class="table">
