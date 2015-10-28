@@ -181,7 +181,7 @@ class OnlinePayCallbackController < ApplicationController
 			if online_pay.status=="success_notify" || online_pay.status=="failure_notify_third" || online_pay.status=="intermediate_notify"
 				redirect_url=OnlinePay.redirect_url_replace("get",online_pay.abort_url,{})
 				logger.info("paypal return has call:#{online_pay.status} and redirect_to #{redirect_url}")
-				redirect_to redirect_url
+				redirect_to redirect_url and return
 			end
 			
 			#online_pay.with_lock do
