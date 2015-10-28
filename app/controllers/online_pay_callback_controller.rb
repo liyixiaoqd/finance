@@ -169,17 +169,24 @@ class OnlinePayCallbackController < ApplicationController
 
 	def paypal_return
 		render_text="failure"
-		online_pay=OnlinePay.get_online_pay_instance("paypal","",params,"",false,true)
-		render text: "#{render_text}" and return if (online_pay.blank? || online_pay.success_url.blank?)
+		#第一次锁订单数据 更新状态为正在处理
+		#1. 防止paypal调用多次同步接口,导致数据覆盖
+		#2. 防止订单再次调用支付接口,形成重复数据
+		ActiveRecord::Base.transaction do
+			online_pay=OnlinePay.get_online_pay_instance("paypal","",params,"",false,true)
+			render text: "#{render_text}" and return if (online_pay.blank? || online_pay.success_url.blank?)
 
-		# check is status has updated!
-		if online_pay.status=="success_notify" || online_pay.status=="failure_notify_third"
-			render :text=>'success' and return 
-		end
-		online_pay.with_lock do
+			# check is status has updated!
+			if online_pay.status=="success_notify" || online_pay.status=="failure_notify_third" || online_pay.status=="intermediate_notify"
+				render :text=>'success' and return 
+			end
+			
+			#online_pay.with_lock do
 			online_pay.update_attributes(status: "intermediate_notify")
+			#end
 		end
 
+		#第二次保持事务
 		ActiveRecord::Base.transaction do
 			begin
 				#online_pay.callback_status,rollback_callback_status=rollback_callback_status,online_pay.callback_status
