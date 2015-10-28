@@ -186,12 +186,13 @@ class OnlinePayCallbackController < ApplicationController
 			online_pay.update_attributes(status: "intermediate_notify")
 			#end
 		end
-
+		logger.info("paypal return transaction first end")
 		#第二次保持事务
 		ActiveRecord::Base.transaction do
 			begin
 				#online_pay.callback_status,rollback_callback_status=rollback_callback_status,online_pay.callback_status
 
+				logger.info("paypal return transaction second start")
 				pay_detail=OnlinePay.get_instance_pay_detail(online_pay)
 				ret_hash=init_return_ret_hash(online_pay)
 				
