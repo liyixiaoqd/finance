@@ -54,7 +54,22 @@ class ReconciliationDetail < ActiveRecord::Base
 		if find_params['transactionid'].blank? && find_params['order_no'].blank?
 			raise "transactionid与order_no不可都为空"
 		end
-		rd=ReconciliationDetail.find_or_initialize_by(find_params)
+		#
+		#rd=ReconciliationDetail.find_or_initialize_by(find_params)
+		rd=nil
+		ReconciliationDetail.where(find_params).each do |rd_find|
+			if rd_find.batch_id[0,7]=="refund_"
+				Rails.logger.info("#{rd_find.order_no}:退费数据过滤")
+				next
+			end
+			rd=rd_find
+			break
+		end
+
+		if rd.blank?
+			rd=ReconciliationDetail.new(find_params)
+		end
+
 		rd.assign_attributes(other_params)
 		#Rails.logger.info(rd.attributes)
 		rd
