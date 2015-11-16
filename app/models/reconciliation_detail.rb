@@ -89,15 +89,26 @@ class ReconciliationDetail < ActiveRecord::Base
 		set_params_by_transactionid!()
 
 		if self.online_pay_id.blank?
+			#特殊判断如mypost4u_TIME20140
 			if self.transactionid.present? && self.transactionid.include?("_")
 				system=self.transactionid.sub(/_.*/,"")
 				if system.present? && SYSTEM_MAPPING_TO_DISPLAY.include?(system)
 					set_flag!(RECONCILIATIONDETAIL_FLAG['FAIL'],"获取对应在线支付记录失败:#{self.transactionid}")
 				else
-					set_flag!(RECONCILIATIONDETAIL_FLAG['NON_SYSTEM'],"获取对应在线支付记录失败:#{self.transactionid}")
+					#判断是否系统交易记录
+					if isOnlinePayRecord?(self.order_no)
+						set_flag!(RECONCILIATIONDETAIL_FLAG['FAIL'],"获取对应在线支付记录失败:#{self.transactionid}")
+					else
+						set_flag!(RECONCILIATIONDETAIL_FLAG['NON_SYSTEM'],"获取对应在线支付记录失败:#{self.transactionid}")
+					end
 				end
 			else
-				set_flag!(RECONCILIATIONDETAIL_FLAG['NON_SYSTEM'],"获取对应在线支付记录失败:#{self.transactionid}")
+				#判断是否系统交易记录
+				if isOnlinePayRecord?(self.order_no)
+					set_flag!(RECONCILIATIONDETAIL_FLAG['FAIL'],"获取对应在线支付记录失败:#{self.transactionid}")
+				else
+					set_flag!(RECONCILIATIONDETAIL_FLAG['NON_SYSTEM'],"获取对应在线支付记录失败:#{self.transactionid}")
+				end
 			end
 		else
 			set_flag_by_status_and_amount!()
@@ -218,4 +229,17 @@ class ReconciliationDetail < ActiveRecord::Base
 
 		#  hash
 	 # end
+
+	 def isOnlinePayRecord?(order_no)
+	 	isflag=false
+	 	if order_no.present?
+	 		if order_no[0,4]=="TIME" && order_no.length==13
+	 			isflag=true
+	 		elsif order_no[0,1]=="X" && order_no.length==14
+	 			isflag=true
+	 		end 
+	 	end
+
+	 	isflag
+	 end
 end
