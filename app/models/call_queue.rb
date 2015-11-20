@@ -50,6 +50,7 @@ class CallQueue < ActiveRecord::Base
 						raise "no online_pay record #{cq.reference_id} get!!"
 					end
 
+					cq.run_batch=""
 					if online_pay.is_success_self?
 						cq.online_pay_is_succ_set()
 						next
@@ -57,7 +58,6 @@ class CallQueue < ActiveRecord::Base
 
 					pay_detail=OnlinePay.get_instance_pay_detail(online_pay)
 
-					cp.run_batch=""
 					cq.tried_amount+=1
 					cq.last_callback_time=Time.now
 					flag,message,reconciliation_id,callback_status=pay_detail.is_succ_pay_by_call?(online_pay,cq.start_call_time)
@@ -76,21 +76,22 @@ class CallQueue < ActiveRecord::Base
 							online_pay.update_attributes!({})
 						end
 
-						cp.status="success"
-						cp.last_callback_result="获取第三方支付系统验证交易成功"
+						cq.status="success"
+						cq.last_callback_result="获取第三方支付系统验证交易成功"
 					else
-						cp.status="end"
-						cp.last_callback_result="未缴费"
+						cq.status="end"
+						cq.last_callback_result="未缴费"
 
-						cp.save
+						cq.save
 					end
 				rescue=>e
-					cp.status="failure"
-					cp.last_callback_result=e.message
-					cp.save
+					cq.status="failure"
+					cq.last_callback_result=e.message
+					cq.save
 					Rails.logger.info("failure: #{e.message}")
 				end
 			end
+			Rails.logger.info("#{cq.reference_id} process: #{cq.status}")
 		end
 	end
 
