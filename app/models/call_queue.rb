@@ -29,7 +29,7 @@ class CallQueue < ActiveRecord::Base
 	end
 
 	def online_pay_is_succ_set()
-		cq.update_attributes({:status=>"success",:last_callback_result=>"正常调用修改待处理任务状态"})
+		update_attributes({:status=>"success",:last_callback_result=>"正常调用修改待处理任务状态"})
 	end
 
 	def self.polling(callback_interface,reference_id="")
