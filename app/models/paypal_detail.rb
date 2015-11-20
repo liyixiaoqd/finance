@@ -136,6 +136,15 @@ class PaypalDetail
 		end
 	end
 
+	def is_succ_pay_by_call?(online_pay,call_time)
+		starttime=((call_time+" UTC").to_time-5*60-60).strftime("%Y-%m-%dT%H:%M:%SZ")
+		endtime=((call_time+" UTC").to_time+60).strftime("%Y-%m-%dT%H:%M:%SZ")
+		rp=ReconciliationPaypal.new("TransactionSearch",online_pay.country)
+		flag,message,reconciliation_id,callback_status=rp.has_pay_order(online_pay.credit_email,online_pay.amount,starttime,endtime)
+
+		[flag,message,reconciliation_id,callback_status]
+	end
+
 	private 
 		def spec_payparams_valid(online_pay)
 			errmsg=''

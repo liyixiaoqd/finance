@@ -43,6 +43,7 @@ class OnlinePayCallbackController < ApplicationController
 					online_pay.rate_amount=params[:total_fee]
 					online_pay.set_status_by_callback!()
 					online_pay.reconciliation_id=params[:out_trade_no]
+					online_pay.thirdno=params[:trade_no]
 					ret_hash['status']=online_pay.status
 					ret_hash['status_reason']=online_pay.callback_status
 
@@ -115,6 +116,7 @@ class OnlinePayCallbackController < ApplicationController
 					online_pay.callback_status=params[:trade_status]
 					online_pay.set_status_by_callback!()
 					online_pay.reconciliation_id=params[:trade_no]
+					online_pay.thirdno=params[:trade_no]
 					ret_hash['status']=online_pay.status
 					ret_hash['status_reason']=online_pay.callback_status
 					ret_hash['buyer_email'] = params[:buyer_email]
@@ -173,10 +175,11 @@ class OnlinePayCallbackController < ApplicationController
 		#1. 防止paypal调用多次同步接口,导致数据覆盖
 		#2. 防止订单再次调用支付接口,形成重复数据
 		online_pay=''
+		cq=''
 		ActiveRecord::Base.transaction do
 			online_pay=OnlinePay.get_online_pay_instance("paypal","",params,"",false,true)
 			render text: "#{render_text}" and return if (online_pay.blank? || online_pay.success_url.blank?)
-
+			cq=CallQueue.online_pay_is_succ_record(online_pay.id)
 			# check is status has updated!
 			if online_pay.status=="success_notify" || online_pay.status=="failure_notify_third" || online_pay.status=="intermediate_notify"
 				redirect_url=OnlinePay.redirect_url_replace("get",online_pay.abort_url,{})
@@ -205,31 +208,36 @@ class OnlinePayCallbackController < ApplicationController
 					online_pay.credit_pay_id = pay_id_details.payer_id
 					online_pay.credit_first_name = pay_id_details.params["first_name"]
 					online_pay.credit_last_name = pay_id_details.params["last_name"]
+					online_pay.credit_email = pay_id_details.params["payer"]
 				end
 
 				flag,message,online_pay.reconciliation_id,online_pay.callback_status=pay_detail.process_purchase(online_pay)
 
 				if flag==false
+					raise message
+					#CallQuene中进行调用
+					
 					#超时 调用对账程序获取状态
-					if message=="execution expired"
-						logger.info("[MONITOR]: TIME_OUT and RETRY GET #{online_pay.order_no}")
-						sleep 5
-						rp=ReconciliationPaypal.new("TransactionSearch",online_pay.country)
-						flag,message,online_pay.reconciliation_id,online_pay.callback_status=rp.has_pay_order(pay_id_details.params['payer'],online_pay.amount)
-						if flag==false
-							logger.info("RETRY GET failure:#{message}")
-							raise message
-						else
-							logger.info("RETRY GET SUCCESS")
-						end
-					else
-						raise message
-					end
+					# if message=="execution expired"
+					# 	logger.info("[MONITOR]: TIME_OUT and RETRY GET #{online_pay.order_no}")
+					# 	sleep 5
+					# 	rp=ReconciliationPaypal.new("TransactionSearch",online_pay.country)
+					# 	flag,message,online_pay.reconciliation_id,online_pay.callback_status=rp.has_pay_order(online_pay.credit_email,online_pay.amount)
+					# 	if flag==false
+					# 		logger.info("RETRY GET failure:#{message}")
+					# 		raise message
+					# 	else
+					# 		logger.info("RETRY GET SUCCESS")
+					# 	end
+					# else
+					# 	raise message
+					# end
 				end
 				online_pay.set_status!("success_notify","")
 				online_pay.save!()
 				if online_pay.is_success?() && online_pay.find_reconciliation().blank?
 					online_pay.set_reconciliation.save!()
+					cq.online_pay_is_succ_set() unless cq.blank?
 				end
 
 				ret_hash['status']="success_notify"
@@ -325,6 +333,7 @@ class OnlinePayCallbackController < ApplicationController
 			render_text="failure"
 			online_pay=OnlinePay.get_online_pay_instance("sofort","",params,"",false,true)
 			render :text=>"#{render_text}" and return if (online_pay.blank? || online_pay.notification_url.blank?)
+			cq=CallQueue.online_pay_is_succ_record(online_pay.id)
 
 			pay_detail=OnlinePay.get_instance_pay_detail(online_pay)
 			
@@ -349,6 +358,7 @@ class OnlinePayCallbackController < ApplicationController
 				online_pay.save!()
 				if online_pay.is_success?() && online_pay.find_reconciliation().blank?
 					online_pay.set_reconciliation.save!()
+					cq.online_pay_is_succ_set() unless cq.blank?
 				end
 				# response_code=online_pay.method_url_response_code("post",redirect_url,false,ret_hash)
 				# unless response_code=="200"

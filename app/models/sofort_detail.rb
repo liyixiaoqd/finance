@@ -133,10 +133,20 @@ class SofortDetail
 		[identify_status,identify_status_reason] 
 	end
 
+	def is_succ_pay_by_call?(online_pay,call_time)
+		# starttime=((call_time+" UTC").to_time-5*60-60).strftime("%Y-%m-%dT%H:%M:%SZ")
+		# endtime=((call_time+" UTC").to_time+60).strftime("%Y-%m-%dT%H:%M:%SZ")
+		# rp=ReconciliationPaypal.new("TransactionSearch",online_pay.country)
+		# flag,message,reconciliation_id,callback_status=rp.has_pay_order(online_pay.credit_email,online_pay.amount,starttime,endtime)
+
+		# [flag,message,reconciliation_id,callback_status]
+	end
+
 	def self.getStatusFromXml(body)
 		doc = Nokogiri::XML(body.force_encoding("UTF-8"))
 		{'status_notification'=>{'transaction'=>doc.xpath("//status_notification/transaction").text}}
 	end
+
 
 	private 
 		def spec_payparams_valid(online_pay)

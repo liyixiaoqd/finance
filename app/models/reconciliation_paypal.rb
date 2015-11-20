@@ -140,7 +140,7 @@ class ReconciliationPaypal
 		"batch_id [ #{@batch_id} ] : </br> {all_num:#{valid_all_num} = complete_num:#{valid_complete_num} + rescue_num:#{valid_rescue_num}</br> complete_num:#{valid_complete_num} = succ_num:#{valid_succ_num} + fail_num:#{valid_fail_num} }</br>"
 	end
 
-	def has_pay_order(email,amt)
+	def has_pay_order(email,amt,starttime,endtime)
 		flag=false
 		message='no record found'
 		reconciliation_id=''
@@ -166,9 +166,10 @@ class ReconciliationPaypal
 			}
 			response=''
 			Timeout::timeout(22){
-				response=get_reconciliation((Time.now-60).gmtime.strftime("%Y-%m-%dT%H:%M:%SZ"),
-					(Time.now+60).gmtime.strftime("%Y-%m-%dT%H:%M:%SZ"),
-					params)
+				# response=get_reconciliation((Time.now-60).gmtime.strftime("%Y-%m-%dT%H:%M:%SZ"),
+				# 	(Time.now+60).gmtime.strftime("%Y-%m-%dT%H:%M:%SZ"),
+				# 	params)
+				response=get_reconciliation(starttime,endtime,params)
 			}
 			Rails.logger.info(response.body)
 			response_to_hash_paypal!(response)

@@ -207,6 +207,10 @@ class OnlinePay < ActiveRecord::Base
 		self.status[0,7]=='success'
 	end
 
+	def is_success_self?()
+		is_success? || self.status=="failure_notify_third"
+	end
+	
 	def get_transaction_timestamp()
 		rd=self.reconciliation_detail
 		if rd.present? && rd.reconciliation_flag!=ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['INIT']
