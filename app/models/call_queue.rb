@@ -56,6 +56,13 @@ class CallQueue < ActiveRecord::Base
 						next
 					end
 
+					unless online_pay.payway=="paypal"
+						cq.status="wait"
+						cq.last_callback_result="尚不支持交易#{online_pay.payway}判断是否成功"
+						cq.save
+						next
+					end
+
 					pay_detail=OnlinePay.get_instance_pay_detail(online_pay)
 
 					cq.tried_amount+=1
@@ -91,7 +98,7 @@ class CallQueue < ActiveRecord::Base
 					Rails.logger.info("failure: #{e.message}")
 				end
 			end
-			Rails.logger.info("#{cq.reference_id} process: #{cq.status}")
+			Rails.logger.info("#{cq.reference_id} process: #{cq.status},#{cq.last_callback_result}")
 		end
 	end
 
