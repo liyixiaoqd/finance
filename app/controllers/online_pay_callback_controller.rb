@@ -299,9 +299,11 @@ class OnlinePayCallbackController < ApplicationController
 
 
 	def sofort_return
-		#sofort return no params!   no use this interface!
+		###sofort return no params!   no use this interface!
+		#sofort return url: /system/order_no
 		render_text="failure"
-		online_pay=OnlinePay.get_online_pay_instance("sofort","",params,"",false,false)
+		#online_pay=OnlinePay.get_online_pay_instance("sofort","",params,"",false,false)
+		online_pay=OnlinePay.find_by_system_and_payway_and_order_no(params['system'],"sofort",params['order_no'])
 		render text: "#{render_text}" and return if (online_pay.blank? || online_pay.success_url.blank?)
 
 		ret_hash=init_return_ret_hash(online_pay)
@@ -382,10 +384,13 @@ class OnlinePayCallbackController < ApplicationController
 	end
 	
 	def sofort_abort
-		#sofort abort no params!   no use this interface!
+		###sofort return no params!   no use this interface!
+		#sofort return url: /system/order_no
 		ActiveRecord::Base.transaction do
 			render_text="failure"
-			online_pay=OnlinePay.get_online_pay_instance("sofort","",params,"",false,true)
+
+			online_pay=OnlinePay.lock.find_by_system_and_payway_and_order_no(params['system'],"sofort",params['order_no'])
+			#online_pay=OnlinePay.get_online_pay_instance("sofort","",params,"",false,true)
 			render text: "#{render_text}" and return if (online_pay.blank? || online_pay.abort_url.blank?)
 
 			redirect_url=OnlinePay.redirect_url_replace("get",online_pay.abort_url,{})

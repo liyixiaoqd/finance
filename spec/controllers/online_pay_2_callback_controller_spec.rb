@@ -61,7 +61,7 @@ describe OnlinePayCallbackController do
 			rollback_status=op.status
 			rollback_callback_status=op.callback_status
 			
-			get :sofort_abort,:status_notification=>{"transaction"=>sofort_trade_no, "time"=>"2015-05-12T07:50:14+02:00"}
+			get :sofort_abort,:system=>op.system,:order_no=>op.order_no
 			op.reload
 			expect(response.status).to eq(302)
 			expect(response['Location']).to match(op['abort_url'])
@@ -79,7 +79,7 @@ describe OnlinePayCallbackController do
 			op=OnlinePay.where(payway: 'sofort',status: 'submit').last
 			expect(op).not_to eq nil
 
-			get :sofort_return,:status_notification=>{"transaction"=>sofort_trade_no, "time"=>"2015-05-12T07:50:14+02:00"}
+			get :sofort_return,:system=>op.system,:order_no=>op.order_no
 			op.reload
 			expect(response.status).to eq(302)
 			expect(response['Location']).to match(op['success_url'])

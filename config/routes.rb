@@ -74,8 +74,8 @@ Rails.application.routes.draw do
   get 'pay/callback/paypal_return' => 'online_pay_callback#paypal_return'
   get 'pay/callback/paypal_abort' => 'online_pay_callback#paypal_abort'
 
-  get 'pay/callback/sofort_return' => 'online_pay_callback#sofort_return'
-  get 'pay/callback/sofort_abort' => 'online_pay_callback#sofort_abort'
+  get 'pay/callback/sofort_return/:system/:order_no' => 'online_pay_callback#sofort_return'
+  get 'pay/callback/sofort_abort/:system/:order_no' => 'online_pay_callback#sofort_abort'
   post 'pay/callback/sofort_notify' => 'online_pay_callback#sofort_notify'
 
   #reconciliation inteface use 
