@@ -71,6 +71,7 @@ class CallQueue < ActiveRecord::Base
 
 					if flag
 						online_pay.set_status!("success_notify","")
+						online_pay.reconciliation_id=reconciliation_id
 						online_pay.save!()
 						online_pay.set_reconciliation.save!()
 
