@@ -233,6 +233,12 @@ class OnlinePayCallbackController < ApplicationController
 					# 	raise message
 					# end
 				end
+
+				if online_pay.callback_status!="Completed"
+					Logger.info("MONITOR : PAYPAL CALLBACK_STATUS:"+online_pay.callback_status)
+					raise "PaymentStatus failure: #{online_pay.callback_status}"
+				end
+
 				online_pay.set_status!("success_notify","")
 				online_pay.save!()
 				if online_pay.is_success?() && online_pay.find_reconciliation().blank?
