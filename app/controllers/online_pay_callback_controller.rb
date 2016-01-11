@@ -234,7 +234,7 @@ class OnlinePayCallbackController < ApplicationController
 					# end
 				end
 
-				if online_pay.callback_status!="Completed"
+				if  online_pay.callback_status.blank? || !Settings.paypal.success_callback_status.include? online_pay.callback_status
 					logger.info("MONITOR : PAYPAL CALLBACK_STATUS:"+online_pay.callback_status)
 					raise "PaymentStatus failure: #{online_pay.callback_status}"
 				end
