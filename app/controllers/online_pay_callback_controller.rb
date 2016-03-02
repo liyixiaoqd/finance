@@ -149,10 +149,13 @@ class OnlinePayCallbackController < ApplicationController
 
 					online_pay.save!()
 					if online_pay.is_success?() && online_pay.find_reconciliation().blank?
-						if (online_pay.callback_status=="WAIT_BUYER_CONFIRM_GOODS" ||
-						       ( (online_pay.callback_status=="TRADE_FINISHED" ||online_pay.callback_status=="TRADE_SUCCESS")
-						         && 
-						         rollback_callback_status!="WAIT_BUYER_CONFIRM_GOODS"))
+						reconciliation_flag=false
+						reconciliation_flag=true if online_pay.callback_status=="WAIT_BUYER_CONFIRM_GOODS"
+						if rollback_callback_status!="WAIT_BUYER_CONFIRM_GOODS"
+							reconciliation_flag=true if online_pay.callback_status=="TRADE_FINISHED" ||online_pay.callback_status=="TRADE_SUCCESS"
+						end
+						
+						if reconciliation_flag==true
 							logger.info("#{online_pay.order_no},#{online_pay.callback_status} alipay transaction insert into reconciliation!!")
 							online_pay.set_reconciliation.save!()
 							fw=FinanceWater.save_by_online_pay(online_pay)
