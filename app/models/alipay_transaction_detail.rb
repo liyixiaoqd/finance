@@ -75,6 +75,38 @@ class AlipayTransactionDetail
 		message
 	end
 
+	def submit_direct
+		#import!!   quantity must be  integer  not  string
+		options = {
+			'service' => 'create_direct_pay_by_user',
+			'_input_charset' => 'utf-8',
+			'payment_type' => '1',
+			'logistics_type' => 'DIRECT',
+			'logistics_fee' => '0',
+			'logistics_payment' => 'SELLER_PAY',
+			'partner' => Settings.alipay_transaction.pid_direct,
+			'seller_email' => Settings.alipay_transaction.seller_email_direct,
+			'description' => @logistics_name,
+			'out_trade_no' => "#{@system}_#{@order_no}",
+			'subject' => @description,
+			'price' => @amount,
+			#'price' => 0.10,
+			'quantity' => @quantity.to_i,
+			#'discount' => '0.00',
+			'return_url' => Settings.alipay_transaction.return_url,
+			'notify_url' => Settings.alipay_transaction.notify_url
+		}
+
+		redirect_url="#{Settings.alipay_transaction.alipay_transaction_api_ur}?#{query_string(options,Settings.alipay_transaction.secret_direct)}"
+		response_code=method_url_response_code("get",redirect_url,true)
+		if(response_code=="200" || response_code=="302")
+			["success",redirect_url,"","false",""]
+		else
+			Rails.logger.info(redirect_url)
+			["failure","","","","get alipay url failure,code:#{response_code}"]
+		end
+	end
+
 	private 
 		def spec_payparams_valid(online_pay)
 			errmsg=''
