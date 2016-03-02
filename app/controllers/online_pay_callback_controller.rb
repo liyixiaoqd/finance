@@ -79,12 +79,19 @@ class OnlinePayCallbackController < ApplicationController
 		online_pay=OnlinePay.get_online_pay_instance("alipay","transaction",params,"",false,false)
 		render :text=>"#{render_text}" and return if (online_pay.blank? || online_pay.success_url.blank?)
 
+
+		if params['seller_email']==Settings.alipay_transaction.seller_email_direct
+			pid,secret=Settings.alipay_transaction.pid_direct,Settings.alipay_transaction.secret_direct
+		else
+			pid,secret=Settings.alipay_transaction.pid,Settings.alipay_transaction.secret
+		end
+
 		pay_detail=OnlinePay.get_instance_pay_detail(online_pay)
 		#delete request params
 		notify_params = params.except(*request.path_parameters.keys)
 		#valid reques is right
 
-		if(pay_detail.notify_verify?(notify_params,Settings.alipay_transaction.pid,Settings.alipay_transaction.secret))	
+		if(pay_detail.notify_verify?(notify_params,pid,secret))	
 			ret_hash=init_return_ret_hash(online_pay)
 			redirect_url=OnlinePay.redirect_url_replace("get",online_pay.success_url,ret_hash)
 			logger.info("alipay_transaction_return:#{redirect_url}")
@@ -105,11 +112,17 @@ class OnlinePayCallbackController < ApplicationController
 			#check is status has updated
 			render :text=>'success' and return if online_pay.check_has_updated?(params[:trade_status])
 
+			if params['seller_email']==Settings.alipay_transaction.seller_email_direct
+				pid,secret=Settings.alipay_transaction.pid_direct,Settings.alipay_transaction.secret_direct
+			else
+				pid,secret=Settings.alipay_transaction.pid,Settings.alipay_transaction.secret
+			end
+
 			pay_detail=OnlinePay.get_instance_pay_detail(online_pay)
 			#delete request params
 			notify_params = params.except(*request.path_parameters.keys)
 			#valid reques is right
-			if(pay_detail.notify_verify?(notify_params,Settings.alipay_transaction.pid,Settings.alipay_transaction.secret))	
+			if(pay_detail.notify_verify?(notify_params,pid,secret))	
 				begin
 					ret_hash=init_notify_ret_hash(online_pay)
 					rollback_callback_status=online_pay.callback_status
