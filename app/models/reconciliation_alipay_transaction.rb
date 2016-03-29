@@ -3,7 +3,7 @@ require 'nokogiri'
 class ReconciliationAlipayTransaction
 	include AlipayDetailable
 	include PayDetailable
-	attr_accessor :service,:page_no,:gmt_start_time,:gmt_end_time,:page_size
+	attr_accessor :service,:seller_email,:page_no,:gmt_start_time,:gmt_end_time,:page_size
 
 	WARN_FILE_PATH="check_file/finance_reconciliation/alipay_transaction"
 	MAX_CALL_TIMES=10
@@ -18,8 +18,9 @@ class ReconciliationAlipayTransaction
 	# page_size			分页大小
 	# trans_code			交易类型代码
 
-	def initialize(service,page_no=1,gmt_start_time="",gmt_end_time="",page_size=1000)
+	def initialize(service,seller_email,page_no=1,gmt_start_time="",gmt_end_time="",page_size=1000)
 		@service=service
+		@seller_email=seller_email
 		@page_no=page_no.to_i
 		@page_size=page_size
 
@@ -118,17 +119,23 @@ class ReconciliationAlipayTransaction
 		"batch_id [ #{@batch_id} ] : </br> {all_num:#{valid_all_num} = complete_num:#{valid_complete_num} + rescue_num:#{valid_rescue_num}</br> complete_num:#{valid_complete_num} = succ_num:#{valid_succ_num} + fail_num:#{valid_fail_num} }</br>"
 	end
 
-	def get_reconciliation_count
+	def get_reconciliation_count()
+		if @seller_email==Settings.alipay_transaction.seller_email_direct
+			pid,secret=Settings.alipay_transaction.pid_direct,Settings.alipay_transaction.secret_direct
+		else
+			pid,secret=Settings.alipay_transaction.pid,Settings.alipay_transaction.secret
+		end
+
 		options = {
 			# 'export_trade_account_report'
 			'service' => self.service,
-			'partner' => Settings.alipay_transaction.pid,
+			'partner' => pid,
 			'_input_charset' => 'utf-8',
 			'gmt_create_start' => self.gmt_start_time,
 			'gmt_create_end' => self.gmt_end_time
 		}
 
-		reconciliation_url="#{Settings.alipay_transaction.alipay_transaction_api_ur}?#{query_string(options,Settings.alipay_transaction.secret)}"
+		reconciliation_url="#{Settings.alipay_transaction.alipay_transaction_api_ur}?#{query_string(options,secret)}"
 		Rails.logger.info("#{reconciliation_url}")
 		response=method_url_response("get",reconciliation_url,true,{})
 		#Rails.logger.info(response.body)
@@ -136,11 +143,17 @@ class ReconciliationAlipayTransaction
 		# "#{self.service}</br>#{reconciliation_url}</br></br>#{response.body}"
 	end
 
-	def get_reconciliation_detail
+	def get_reconciliation_detail()
+		if @seller_email==Settings.alipay_transaction.seller_email_direct
+			pid,secret=Settings.alipay_transaction.pid_direct,Settings.alipay_transaction.secret_direct
+		else
+			pid,secret=Settings.alipay_transaction.pid,Settings.alipay_transaction.secret
+		end
+
 		options = {
 			# 'account.page.query'
 			'service' => self.service,
-			'partner' => Settings.alipay_transaction.pid,
+			'partner' => pid,
 			'_input_charset' => 'utf-8',
 			'page_no' => self.page_no,
 			'gmt_start_time' => self.gmt_start_time,
@@ -148,7 +161,7 @@ class ReconciliationAlipayTransaction
 			'page_size' => self.page_size
 		}
 
-		reconciliation_url="#{Settings.alipay_transaction.alipay_transaction_api_ur}?#{query_string(options,Settings.alipay_transaction.secret)}"
+		reconciliation_url="#{Settings.alipay_transaction.alipay_transaction_api_ur}?#{query_string(options,secret)}"
 		Rails.logger.info("#{reconciliation_url}")
 		response=method_url_response("get",reconciliation_url,true,{})
 

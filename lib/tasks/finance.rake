@@ -35,12 +35,20 @@ namespace :finance do
 
 	desc "对账:支付宝-国内"
 	task :reconciliation_alipay_transaction=>[:environment] do
-		@interface_logger.info("reconciliation_alipay_transaction start")
-		reconciliation=ReconciliationAlipayTransaction.new("account.page.query")
+		@interface_logger.info("reconciliation_alipay_transaction new account start")
+		reconciliation=ReconciliationAlipayTransaction.new("account.page.query",Settings.alipay_transaction.seller_email_direct)
 		message=reconciliation.finance_reconciliation()
 		#message.split('</br>').each do |t| @interface_logger.info t end
 		@interface_logger.info(out_message(message))
-		@interface_logger.info("reconciliation_alipay_transaction end")
+		@interface_logger.info("reconciliation_alipay_transaction new account end")
+
+		######## TMP ########
+		@interface_logger.info("reconciliation_alipay_transaction old account start")
+		reconciliation=ReconciliationAlipayTransaction.new("account.page.query",Settings.alipay_transaction.seller_email)
+		message=reconciliation.finance_reconciliation()
+		#message.split('</br>').each do |t| @interface_logger.info t end
+		@interface_logger.info(out_message(message))
+		@interface_logger.info("reconciliation_alipay_transaction old account end")
 	end
 
 	desc "对账:paypal"

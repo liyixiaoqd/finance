@@ -77,7 +77,7 @@ class ReconciliationSofort
 		skip_num=0
 		sheet_num=0
 		if country=="de"
-			skip_num=10
+			skip_num=5
 			sheet_num=0
 		elsif country=="nl"
 			skip_num=2
@@ -254,22 +254,31 @@ class ReconciliationSofort
 			j=0
 			row.each do |col|
 				j=j+1
-				if i==65
-					Rails.logger.info("#{j}:#{col}")
-				end
-				next unless j==16 || j==15 || j==13 || j==14 || j==26 || j==7
-				col.gsub!(/\t$/,"") if col.class.to_s=="String"
-				sofort_detail["amt"],sofort_detail['netamt']=col,col if j==16
-				sofort_detail["currencycode"]=col if j==15
-				if j==13
-					col=col.to_s
-					sofort_detail['transaction_date']=col[0,4]+"-"+col[4,2]+"-"+col[6,2] unless col.blank?
-				end
-				sofort_detail['timestamp']=sofort_detail['transaction_date']+" "+col if j==14
-				sofort_detail['name']=col if j==7
-				sofort_detail['order_no']=col if j==26
-			end
 
+				next unless j==3 || j==5 || j==6 || j==8 || j==10
+				col.gsub!(/\t$/,"") if col.class.to_s=="String"
+				sofort_detail["amt"],sofort_detail['netamt']=col,col if j==3
+				sofort_detail["currencycode"]=col if j==5
+				if j==6
+					col=col.to_s
+					sofort_detail['transaction_date']=col[0,4]+"-"+col[5,2]+"-"+col[8,2] unless col.blank?
+					sofort_detail['timestamp']=col
+				end
+				sofort_detail['name']=col if j==8
+				sofort_detail['order_no']=col if j==10
+				# next unless j==16 || j==15 || j==13 || j==14 || j==26 || j==7
+				# col.gsub!(/\t$/,"") if col.class.to_s=="String"
+				# sofort_detail["amt"],sofort_detail['netamt']=col,col if j==16
+				# sofort_detail["currencycode"]=col if j==15
+				# if j==13
+				# 	col=col.to_s
+				# 	sofort_detail['transaction_date']=col[0,4]+"-"+col[4,2]+"-"+col[6,2] unless col.blank?
+				# end
+				# sofort_detail['timestamp']=sofort_detail['transaction_date']+" "+col if j==14
+				# sofort_detail['name']=col if j==7
+				# sofort_detail['order_no']=col if j==26
+			end
+			
 			if sofort_detail['order_no'].blank?
 				raise "第#{i}行:对账标识(订单号)为空!"
 			end
@@ -312,7 +321,7 @@ class ReconciliationSofort
 					sofort_detail['order_no']=parttern_match[1] unless parttern_match.blank?
 				end
 			end
-			Rails.logger.info("timestamp:#{sofort_detail['timestamp']}")
+			#Rails.logger.info("timestamp:#{sofort_detail['timestamp']}")
 
 			if sofort_detail['order_no'].blank?
 				raise "第#{i}行:对账标识(订单号)获取失败!"
