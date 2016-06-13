@@ -52,6 +52,9 @@ class OnlinePayCallbackController < ApplicationController
 					online_pay.save!()
 					if online_pay.is_success?() && online_pay.find_reconciliation().blank?
 						online_pay.set_reconciliation.save!()
+						#quaie spec proc!!!!!
+						fw=FinanceWater.save_by_online_pay(online_pay)
+						ret_hash['water_no']=fw.id unless fw.blank?
 					end
 
 					if !online_pay.method_url_success?("post",redirect_url,false,ret_hash)
