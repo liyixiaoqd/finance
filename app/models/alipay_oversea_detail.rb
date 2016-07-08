@@ -39,9 +39,9 @@ class AlipayOverseaDetail
 	private 
 		def spec_payparams_valid(online_pay)
 			errmsg=''
-			if(online_pay['system']=='quaie')
-				errmsg="alipay_oversea.system can not be quaie"
-			elsif(online_pay['currency']!="EUR")
+			#if(online_pay['system']=='quaie')
+			#	errmsg="alipay_oversea.system can not be quaie"
+			if(online_pay['currency']!="EUR")
 				errmsg="alipay_oversea.currency must be 'EUR'"	
 			end
 
