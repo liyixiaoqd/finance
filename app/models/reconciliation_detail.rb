@@ -22,6 +22,7 @@ class ReconciliationDetail < ActiveRecord::Base
 		'PAYPAL_Processing' => 'PEND',
 		'PAYPAL_Completed' => 'SUCC',
 		'PAYPAL_Unclaimed' => 'SUCC',
+		'PAYPAL_Cleared' => 'SUCC',
 		'PAYPAL_Denied' => 'FAIL',
 		'PAYPAL_Reversed' => 'FAIL',
 		'ALIPAY_TRANSACTION_succ' => 'SUCC',
