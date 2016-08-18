@@ -79,6 +79,9 @@
 	      <% if isAuthority('7') %>
 	        <li > <%= link_to '模拟对账',simulation_simulate_reconciliation_path,method: :get %> </li>
 	      <% end %>
+	      <% if isAuthority('6') %>
+	        <li > <%= link_to '模拟调用',simulation_interface_call_path %> </li>
+	      <% end %>
 	    </ul>
 
 	</div>

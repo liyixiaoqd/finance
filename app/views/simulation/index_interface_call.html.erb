@@ -1,0 +1,42 @@
+<div class="container-fluid">
+	<% @page_title="模拟接口调用" %>
+	<div class="row-fluid">
+		<div class="alert alert-info">
+			<strong>SIMULATION INTERFACE_CALL INDEX PAGE</strong> 
+		</div>
+
+		<% if @res_body.present? %>
+			<div class="alert alert-info">
+				<button type="button" class="close" data-dismiss="alert">×</button>
+				<%= @res_body %>
+			</div>
+		<% end %>
+
+		<div class="well">
+			<div class="simulation_interface_call">
+				<%= form_tag("/simulation/interface_call", method: "post") do %>
+				         <%= label_tag(:label1, "调用网址:",class:"label_inline") %> 
+				         <input id="url" name="url" type="text" value="http://" style="width:600px"/>
+				         </br>
+				         <%= label_tag(:label2, "调用方式:",class:"label_inline") %> 
+				         <%= select_tag(:method,options_for_select([["get","get"],["post","post"]],"get")) %>
+				         <%= label_tag(:label6, "认证方式:",class:"label_inline") %> 
+				         <%= select_tag(:auth_method,options_for_select([["HTTP DIGEST","http_digest"],["HTTP BASIC","http_basic"],["TOKEN","token"],["无",""]],"HTTP DIGEST")) %>
+				         </br>
+				         <%= label_tag(:label3, "用户名:",class:"label_inline") %> 
+				         <%= text_field_tag(:username) %>
+				         <%= label_tag(:label4, "密码:",class:"label_inline") %> 
+				         <%= text_field_tag(:password) %>
+				         <%= label_tag(:label7, "token:",class:"label_inline") %> 
+				         <%= text_field_tag(:token) %>
+				         </br>
+				         <%= label_tag(:label5, "报文:",class:"label_inline") %>
+				         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+				         <%= submit_tag("调用",class: "btn") %>
+				         </br>
+				         <textarea placeholder="输入json字符串,使用:作为key,value分隔" id="body" name="body" style="width:800px;height:400px"></textarea>
+				<% end %>
+			</div>
+		</div>
+	</div>
+</div>

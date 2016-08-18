@@ -98,6 +98,10 @@ Rails.application.routes.draw do
   #reconciliation inteface call
   get 'simulation/simulate_reconciliation' => 'simulation#index_reconciliation'
   post 'simulation/simulate_reconciliation' => 'simulation#simulate_reconciliation'
+
+  #
+  get 'simulation/interface_call' => 'simulation#index_interface_call'
+  post 'simulation/interface_call' => 'simulation#interface_call'
   
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

@@ -15,6 +15,76 @@ class SimulationController < ApplicationController
 	def index_reconciliation
 	end
 
+	#模拟调用各个接口
+	def index_interface_call
+	end
+
+	def interface_call
+		logger.info("interface_call into")
+
+		@res_body=nil
+		if params['url'].blank? || params['url'][0,4]!="http" || params['url'].size<10
+			@res_body="请输入以http开头的网址"
+		elsif params['method'].blank? || ["get","post"].include?(params['method'])==false
+			@res_body="请选择调用方式 get或post"
+		elsif ["http_basic","http_digest"].include?(params['auth_method'])
+			if params['username'].blank? || params['password'].blank?
+				@res_body="此认证方式,需要输入 用户名,密码"
+			end
+		elsif "token"==params['auth_method'] && params['token'].blank?
+			@res_body="此认证方式,需要输入 token"
+		elsif params['body'].present?
+			begin
+				params['body'].gsub!("\r\n","")
+				JSON.parse( params['body'] )
+			rescue=>e
+				logger.info("json rescue: #{e.message}")
+				logger.info("params: #{params['body']}")
+				@res_body="报文非json格式,请确认"
+			end
+		end
+
+		if @res_body.present?
+			logger.info("interface_call return #{@res_body}")
+			@res_body="调用前校验失败: #{@res_body}"  
+			render "index_interface_call"
+			return
+		end
+
+		begin
+			response=method_url_call_interface(
+				params['method'],
+				params['url'],
+				params['auth_method'],
+				params['username'],
+				params['password'],
+				params['token'],
+				params['body']
+			)
+
+			if response.code!="200"
+				raise "http返回值异常 #{response.code}"
+			end
+		rescue=>e
+			@res_body=e.message
+			@res_body="调用中发生异常: #{@res_body}"  
+			render "index_interface_call"
+			return
+		end
+
+		begin
+			@res_body=JSON.parse response.body
+		rescue=>e
+			@res_body=response.body
+		end
+
+		@res_body="调用正常,返回报文: #{@res_body}"  
+		render "index_interface_call"
+		# respond_to do |format|
+		# 	format.js "alert(abc)"
+		# end
+	end
+
 	def simulate_reconciliation
 		payment_system=params['payment_system']
 		start_time=params['start_time']
@@ -213,6 +283,35 @@ class SimulationController < ApplicationController
 			response=http.request(request)
 			logger.info("sim response:#{response.code}")
 			response	
+		end
+
+		def method_url_call_interface(method,url_path,auth_method,username,password,token,params={})
+			uri = URI.parse(url_path)
+			http = Net::HTTP.new(uri.host, uri.port)
+			http.use_ssl =  uri.scheme == 'https' if url_path[0,5]=="https"
+			if(method=="get")
+				request = Net::HTTP::Get.new(uri.request_uri) 
+			else
+				request = Net::HTTP::Post.new(uri.request_uri) 
+			end
+
+			if auth_method=="http_digest"
+				digest_auth = Net::HTTP::DigestAuth.new
+				uri.user=username
+				uri.password=password
+
+				response = http.request(request)
+				auth = digest_auth.auth_header uri, response['www-authenticate'], method.upcase
+				request.add_field 'Authorization', auth
+			elsif auth_method=="http_basic"
+				request.basic_auth username,password
+			elsif auth_method=="token"
+				request.add_field 'Authorization', token
+			end
+
+			request.body=params
+			response=http.request(request)
+			response
 		end
 	
 		def method_params(method)
