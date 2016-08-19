@@ -17,10 +17,21 @@ class SimulationController < ApplicationController
 
 	#模拟调用各个接口
 	def index_interface_call
+		@display_interface={
+			"url"=>"http://",
+			"method"=>"get",
+			"auth_method"=>"http_digest",
+			"username"=>"",
+			"password"=>"",
+			"token"=>"",
+			"body"=>""
+		}
 	end
 
 	def interface_call
 		logger.info("interface_call into")
+
+		@display_interface=params
 
 		@res_body=nil
 		if params['url'].blank? || params['url'][0,4]!="http" || params['url'].size<10
@@ -78,6 +89,10 @@ class SimulationController < ApplicationController
 			@res_body=response.body
 		end
 
+		if @res_body.class.to_s=="String"
+			@res_body=@res_body.force_encoding("UTF-8")
+		end
+		
 		@res_body="调用正常,返回报文: #{@res_body}"  
 		render "index_interface_call"
 		# respond_to do |format|
