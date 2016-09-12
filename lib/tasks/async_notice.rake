@@ -29,7 +29,7 @@ namespace :async_notice do
 				#获取产生的财务流水ID
 				if op.system=="quaie"
 					fws=FinanceWater.where(user_id: op.user_id,operator: "system_submit",symbol: "Add",amount: op.amount).order("created_at desc")
-					if fw.present?
+					if fws.present?
 						ret_hash['water_no']=fws[0].id
 					end
 				end
