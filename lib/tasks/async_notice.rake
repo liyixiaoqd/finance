@@ -18,13 +18,21 @@ namespace :async_notice do
 				ret_hash={
 					'trade_no'=>op.trade_no,
 					'status'=>"",
-					'status_reason'=>"",
+					'status_reason'=>op.callback_status,
 					'amount'=>op.amount,
 					'payway'=>op.payway,
 					'paytype'=>op.paytype,
 					'water_no'=>'',
 					'sign'=>Digest::MD5.hexdigest("#{op.trade_no}#{Settings.authenticate.signkey}")		
 				}
+
+				#获取产生的财务流水ID
+				if op.system=="quaie"
+					fws=FinanceWater.where(user_id: op.user_id,operator: "system_submit",symbol: "Add",amount: op.amount).order("created_at desc")
+					if fw.present?
+						ret_hash['water_no']=fws[0].id
+					end
+				end
 
 				ret_hash['status']='success_notify'
 

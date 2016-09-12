@@ -33,25 +33,33 @@ class SimulationController < ApplicationController
 
 		@display_interface=params
 
-		@res_body=nil
+		@res_body=""
 		if params['url'].blank? || params['url'][0,4]!="http" || params['url'].size<10
-			@res_body="请输入以http开头的网址"
-		elsif params['method'].blank? || ["get","post"].include?(params['method'])==false
-			@res_body="请选择调用方式 get或post"
-		elsif ["http_basic","http_digest"].include?(params['auth_method'])
+			@res_body+="请输入以http开头的网址;;"
+		end
+
+		if params['method'].blank? || ["get","post"].include?(params['method'])==false
+			@res_body+="请选择调用方式 get或post;;"
+		end
+
+		if ["http_basic","http_digest"].include?(params['auth_method'])
 			if params['username'].blank? || params['password'].blank?
-				@res_body="此认证方式,需要输入 用户名,密码"
+				@res_body+="此认证方式,需要输入 用户名,密码;;"
 			end
-		elsif "token"==params['auth_method'] && params['token'].blank?
-			@res_body="此认证方式,需要输入 token"
-		elsif params['body'].present?
+		end
+
+		if "token"==params['auth_method'] && params['token'].blank?
+			@res_body+="此认证方式,需要输入 token;;"
+		end
+
+		if params['body'].present?
 			begin
 				params['body'].gsub!("\r\n","")
 				JSON.parse( params['body'] )
 			rescue=>e
 				logger.info("json rescue: #{e.message}")
 				logger.info("params: #{params['body']}")
-				@res_body="报文非json格式,请确认"
+				@res_body+="报文非json格式,请确认;;"
 			end
 		end
 
