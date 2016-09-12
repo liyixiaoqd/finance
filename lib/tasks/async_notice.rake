@@ -36,6 +36,7 @@ namespace :async_notice do
 
 				ret_hash['status']='success_notify'
 
+				@interface_logger.info("#{op.order_no} recall hash:#{ret_hash}")
 				op.with_lock do
 					redirect_notify_url=OnlinePay.redirect_url_replace("post",op.notification_url)
 					response=op.method_url_response("post",redirect_notify_url,false,ret_hash)
@@ -47,9 +48,9 @@ namespace :async_notice do
 					end
 					op.save!()
 				end
-				@interface_logger.info("#{op.order_no} re call info:#{op.status} #{op.reason}")
+				@interface_logger.info("#{op.order_no} recall info:#{op.status} #{op.reason}")
 			rescue => e
-				@interface_logger.info("#{op.order_no} re call error:#{e.message}")
+				@interface_logger.info("#{op.order_no} recall error:#{e.message}")
 			end
 		end
 		@interface_logger.info("=================== async_notice online_pay end===================")
