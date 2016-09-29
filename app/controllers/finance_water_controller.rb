@@ -40,8 +40,12 @@ class FinanceWaterController < ApplicationController
 			render json:{'SYSTEM'=>'PARAMS WRONG!'},status:400 and return 
 		end
 
+		#ID转换
+		old_userid=params['userid']
+		params['userid']=interface_userid_zh(params['system'],params['userid'])
+
 		ret_hash={
-			'userid'=>params['userid'],
+			'userid'=>old_userid,
 			'status'=>'failure',
 			'reasons'=>[],
 			'score'=>0.0,
@@ -302,13 +306,17 @@ class FinanceWaterController < ApplicationController
 			render json:{'SYSTEM'=>'PARAMS WRONG!'},status:400 and return 
 		end
 
+		#ID转换
+		old_userid=params['userid']
+		params['userid']=interface_userid_zh(params['system'],params['userid'])
+
 		user=User.find_by_system_and_userid(params['system'],params['userid'])
 		if user.blank?
 			render json:{'ERROR'=>'NO USER FIND!'},status:400 and return 
 		end
 
 		ret_hash={
-			'userid'=>params['userid'],
+			'userid'=>old_userid,
 			'water'=>[]
 		}
 
@@ -341,10 +349,14 @@ class FinanceWaterController < ApplicationController
 			render json:{'SYSTEM'=>'PARAMS WRONG!'},status:400 and return 
 		end
 
+		#ID转换
+		old_userid=params['userid']
+		params['userid']=interface_userid_zh(params['system'],params['userid'])
+
 		ret_hash={
 			'status'=>'failure',
 			'reasons'=>'',
-			'userid'=>params['user_id'],
+			'userid'=>old_userid,
 			'score'=>0.0,
 			'e_cash'=>0.0,
 			'waterno'=>[]
@@ -357,11 +369,6 @@ class FinanceWaterController < ApplicationController
 					ret_hash['reasons']="user is not exists!"
 					render json:ret_hash.to_json and return
 				end
-				   # {
-					# "water_no" :" 853422581"                       
-					# "order_no" :"TIME00001"			
-					# "amount " :500			
-				   # } 
 				finance_arrays=JSON.parse params['oper']
 				finance_arrays.each do |fa|
 					if fa['water_no'].blank?
@@ -419,6 +426,10 @@ class FinanceWaterController < ApplicationController
 			render json:{'SYSTEM'=>'PARAMS WRONG!'},status:400 and return 
 		end
 
+		#ID转换
+		old_userid=params['userid']
+		params['userid']=interface_userid_zh(params['system'],params['userid'])
+		
 		ret_hash={
 			'status'=>'failure',
 			'reasons'=>''

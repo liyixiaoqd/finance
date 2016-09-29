@@ -171,7 +171,7 @@ class SimulationController < ApplicationController
 
 		logger.info("payway:#{payway}")
 
-		userid="552b461202d0f099ec000033"
+		userid=User.find_by(username: "spec_username",system: "mypost4u").userid
 		callpath="/pay/#{userid}/submit"
 		
 		simulate_order_no=create_pay_order_no(payway,new_serial)
@@ -206,7 +206,7 @@ class SimulationController < ApplicationController
 	def simulate_pay_credit
 		trade_no=params['trade_no']
 		amount=params['amount']
-		userid="552b461202d0f099ec000033"
+		userid=User.find_by(username: "spec_username",system: "mypost4u").userid
 		callpath="/pay/#{userid}/submit_creditcard"
 		ip=request.remote_ip
 		

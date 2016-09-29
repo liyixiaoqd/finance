@@ -3,12 +3,7 @@ desc "财务对账rake任务 - 产生每日与外部系统对接文件"
 namespace :sync_file do
 	desc "生成同步文件"
 	task :product,[:arg1,:arg2,:arg3] =>[:environment] do|t,args|
-		@interface_logger = Logger.new("log/sync_file.log")
-		@interface_logger.level=Logger::INFO
-		@interface_logger.datetime_format="%Y-%m-%d %H:%M:%S"
-		@interface_logger.formatter=proc{|severity,datetime,progname,msg|
-			"[#{datetime}] :#{msg}\n"
-		}
+		init_interface_logger
 
 		filetype = args[:arg1]
 		@beg = args[:arg2]
@@ -31,6 +26,7 @@ namespace :sync_file do
 
 	desc "生成客户流水文件"
 	task :finance_water =>[:environment] do 
+		init_interface_logger
 		@interface_logger.info("user_finance_water sync file proc start")
 
 		begin
@@ -76,6 +72,7 @@ namespace :sync_file do
 
 	desc "生成财务确认文件"
 	task :finance_invoice =>[:environment] do 
+		init_interface_logger
 		@interface_logger.info("finance_invoice sync file proc start")
 
 		begin
@@ -94,27 +91,34 @@ namespace :sync_file do
 
 			split="|&|"
 			ReconciliationDetail.unscoped.includes(:online_pay).where("confirm_flag=\"#{ReconciliationDetail::CONFIRM_FLAG['SUCC']}\" and (invoice_date is null or invoice_date='') ").order("transaction_date asc").each do |rd|
-				@interface_logger.info("transactionid:[#{rd.transactionid}],[#{rd.system}]")
-				if rd.system.blank? || file_hash[rd.system].blank?
-					@interface_logger.info("WARN: no system:[#{rd.system}] include,ID:#{rd.id}")
-					next
+				ActiveRecord::Base.transaction do
+					begin
+						@interface_logger.info("transactionid:[#{rd.transactionid}],[#{rd.system}] start")
+						if rd.system.blank? || file_hash[rd.system].blank?
+							@interface_logger.info("WARN: no system:[#{rd.system}] include,ID:#{rd.id}")
+							next
+						end
+						#@interface_logger.info("file_hash[#{rd.system}]")
+
+						#退订单中包裹情况
+						if rd.batch_id=="refund_parcel"
+							order_no=rd.transactionid
+						else
+							order_no=rd.order_no
+						end
+
+						invoice_no=LockSequence.get_next_seq!("invoice",LockSequence.get_subtype("invoice",rd.send_country,rd.batch_id))
+						
+
+						rd.update_attributes!({'invoice_date'=>@end,'invoice_no'=>invoice_no})
+						@interface_logger.info("SUCC : #{rd.batch_id},#{order_no},#{invoice_no},#{@end}")
+
+						outline=[order_no,rd.transaction_date.to_s[0,10],invoice_no]
+						file_hash[rd.system].puts "#{outline.join(split)}"
+					rescue=>e
+						@interface_logger.info("FAIL : [#{e.message}]")
+					end
 				end
-				@interface_logger.info("file_hash[rd.system]")
-
-				#退订单中包裹情况
-				if rd.batch_id=="refund_parcel"
-					order_no=rd.transactionid
-				else
-					order_no=rd.order_no
-				end
-				@interface_logger.info("order_no:#{rd.batch_id},#{order_no}")
-
-				rd.update_attributes!({'invoice_date'=>@end})
-				
-				@interface_logger.info("invoice_date:#{@end}")
-
-				outline=[order_no,rd.transaction_date.to_s[0,10]]
-				file_hash[rd.system].puts "#{outline.join(split)}"
 			end
 
 			system_list.each do |s|
@@ -131,5 +135,17 @@ namespace :sync_file do
 			end
 		end
 		@interface_logger.info("finance_invoice sync file proc end")
+	end
+
+
+	def init_interface_logger
+		if @interface_logger.blank?
+			@interface_logger = Logger.new("log/sync_file.log")
+			@interface_logger.level=Logger::INFO
+			@interface_logger.datetime_format="%Y-%m-%d %H:%M:%S"
+			@interface_logger.formatter=proc{|severity,datetime,progname,msg|
+				"[#{datetime}] :#{msg}\n"
+			}
+		end
 	end
 end

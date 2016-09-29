@@ -238,6 +238,9 @@ class ReconciliationDetail < ActiveRecord::Base
 	 			isflag=true
 	 		elsif order_no[0,1]=="X" && order_no.length==14
 	 			isflag=true
+	 		elsif order_no.length==20 || order_no.length==22
+	 			#新系统包裹长度
+	 			isflag=true
 	 		end 
 	 	end
 

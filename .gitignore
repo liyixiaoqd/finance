@@ -31,4 +31,8 @@
 /test/tmp
 /readme.txt
 /lib/tasks/test*
+/lib/tasks/*txt
+/lib/tasks/*log
 /spec/test
+
+*bak

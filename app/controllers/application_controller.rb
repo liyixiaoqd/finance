@@ -14,7 +14,22 @@ class ApplicationController < ActionController::Base
 	REALM = Settings.authenticate.realm
  	SYSTEMS = {"finance_name" => Digest::MD5.hexdigest([Settings.authenticate.username,REALM,Settings.authenticate.passwd].join(":"))}
 
-	
+ 	#mypost4u系统切换,存在老ID调用接口情况,转换为新ID
+	def interface_userid_zh(system,userid)
+		zh_userid=userid
+		begin
+			if system=="mypost4u"
+				qim=QyIdMatch.find_by(old_id: userid,old_table: "users")
+				if qim.present?
+					zh_userid=qim.new_id.to_s
+				end
+			end
+		rescue=>e
+			zh_userid=userid
+		end
+		zh_userid
+	end
+
   	private
 	  	def deny_access(e)
 	  		if e.message==DENY_ACCESS_MESSAGE

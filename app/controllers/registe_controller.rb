@@ -94,8 +94,12 @@ class RegisteController < ApplicationController
 	def obtain
 		render json:{},status:400 and return unless params_valid("registe_obtain",params)
 
+		#ID转换
+		old_userid=params['userid']
+		params['userid']=interface_userid_zh(params['system'],params['userid'])
+
 		ret_hash={
-			'userid'=>params['userid'],
+			'userid'=>old_userid,
 			'type'=>[]
 		}
 

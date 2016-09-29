@@ -134,6 +134,10 @@ class OnlinePayController < ApplicationController
 
 		online_pay=nil
 		pay_detail=nil
+		
+		#ID转换
+		old_userid=params['userid']
+		params['userid']=interface_userid_zh(params['system'],params['userid'])
 
 		begin
 		#先产生order_no
