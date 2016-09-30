@@ -1,13 +1,24 @@
 class Notice < ActiveRecord::Base
 	belongs_to :finance_water
 
-	NOTICE_NOTICE_TYPE_ENUM=%w{pay recharge}
+	NOTICE_NOTICE_TYPE_ENUM=%w{pay recharge invoice}
 
 	validates :notice_type, inclusion: { in: NOTICE_NOTICE_TYPE_ENUM,message: "%{value} is not a valid notice.notice_type" }
 
 	default_scope { order('opertime asc,created_at asc') }
 
 	paginates_per 20
+
+	def self.set_params_by_invoice(fail_num,fail_msg)
+		notice=Notice.new
+		notice.title="发票产生异常,总失败比数:#{fail_num};请联系IT"
+		notice.content=fail_msg
+		notice.flag="0"
+		notice.notice_type="invoice"
+		notice.opertime=Time.now
+
+		notice		
+	end
 
 	def self.set_params_by_finance_water_pay(fw)
 		notice=nil

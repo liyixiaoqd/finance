@@ -54,8 +54,8 @@ namespace :import do
 	        		end
 
 	        		user.update_attributes!({userid: qim.new_id})
-                                       OnlinePay.where(userid: qim.old_id).update_all({userid: qim.new_id})
-                                       FinanceWater.where(userid: qim.old_id).update_all({userid: qim.new_id})
+                                       user.online_pay.update_all({userid: qim.new_id})
+                                       user.finance_water.update_all({userid: qim.new_id})
                                        
 	        		log_file.puts "succ : #{qim.old_id}"
 	        	rescue=>e

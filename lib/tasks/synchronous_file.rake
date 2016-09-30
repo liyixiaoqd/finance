@@ -75,6 +75,9 @@ namespace :sync_file do
 		init_interface_logger
 		@interface_logger.info("finance_invoice sync file proc start")
 
+
+		fail_msg=""
+		fail_num=0	
 		begin
 			system_list=["mypost4u","quaie"]
 			file_hash={}
@@ -95,8 +98,7 @@ namespace :sync_file do
 					begin
 						@interface_logger.info("transactionid:[#{rd.transactionid}],[#{rd.system}] start")
 						if rd.system.blank? || file_hash[rd.system].blank?
-							@interface_logger.info("WARN: no system:[#{rd.system}] include,ID:#{rd.id}")
-							next
+							raise "no system:[#{rd.system}] include,ID:#{rd.id}"
 						end
 						#@interface_logger.info("file_hash[#{rd.system}]")
 
@@ -116,6 +118,11 @@ namespace :sync_file do
 						outline=[order_no,rd.transaction_date.to_s[0,10],invoice_no]
 						file_hash[rd.system].puts "#{outline.join(split)}"
 					rescue=>e
+						fail_num+=1
+						if fail_msg.length<=1000
+							fail_msg+="#{rd.id},"
+						end
+						rd.update_attributes({'reconciliation_describe'=>"invoice:#{e.message}"})
 						@interface_logger.info("FAIL : [#{e.message}]")
 					end
 				end
@@ -132,6 +139,16 @@ namespace :sync_file do
 			@interface_logger.info("ERROR: finance_invoice sync file proc failure #{e.message}")
 			system_list.each do |s|
 				File.delete file_hash[s] unless file_hash[s].blank?
+			end
+		end
+
+
+		if fail_num>0
+			@interface_logger.info("file gen record fail_number: #{fail_num} and insert notice")
+			notice=Notice.set_params_by_invoice(fail_num,fail_msg)
+			notice.save
+			if notice.errors.present?
+				@interface_logger.info("insert notice error: #{notice.errors.full_messages}")
 			end
 		end
 		@interface_logger.info("finance_invoice sync file proc end")
