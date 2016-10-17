@@ -43,9 +43,13 @@
 	<td class="td_nowrap">
 		<% case get_expection_type_by_auth(online_pay.status)%>
 		<% when 'manual_payment'%>
-			<%=link_to '手动支付',expection_handling_manual_payment_path(online_pay_id: online_pay.id),method: :post,title: online_pay.reason%>
+			<% if online_pay.payway=="paypal" %>
+			<%=link_to '手动支付',expection_handling_manual_payment_path(online_pay_id: online_pay.id),method: :post,title: online_pay.reason,:onclick => "this.href=this.href+'?transactionid='+prompt('订单号/补款号:#{online_pay.order_no}\\n金额:#{online_pay.amount}\\n请输入支付交易号')" %>
+			<% else %>
+				<%=link_to '手动支付',expection_handling_manual_payment_path(online_pay_id: online_pay.id),method: :post,title: online_pay.reason,data: { confirm: "订单号/补款号:#{online_pay.order_no}\n金额:#{online_pay.amount}\n手动支付?" }%>
+			<% end %>
 		<% when 'recall_notify'%>
-			<%=link_to '手动调用',expection_handling_recall_notify_path(online_pay_id: online_pay.id),method: :post,title: online_pay.reason%>
+			<%=link_to '手动调用',expection_handling_recall_notify_path(online_pay_id: online_pay.id),method: :post,title: online_pay.reason,data: { confirm: "订单号/补款号:#{online_pay.order_no}\n金额:#{online_pay.amount}\n手动调用?" }%>
 		<% else %>
 			<span title="<%= online_pay.reason %>">
 				<%= online_pay.reason %>
