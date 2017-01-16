@@ -103,6 +103,8 @@ Rails.application.routes.draw do
   get 'simulation/interface_call' => 'simulation#index_interface_call'
   post 'simulation/interface_call' => 'simulation#interface_call'
   
+  #third_party service
+  post 'third_party_service/exchange_rate' => 'third_party_service#exchange_rate'
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

@@ -75,6 +75,43 @@ module PayDetailable extend ActiveSupport::Concern
 		ret
 	end
 
+	#获取table的行数
+	def get_table_tr_num(table_content)
+		begin
+			#Rails.logger.info("table_content: [#{table_content}]")
+			table_content.scan(/<\/tr>/).count
+		rescue=>e
+			Rails.logger.info("get_table_tr_num rescue: [#{e.message}]")
+			0
+		end
+	end
+
+
+	#获取table中指定tr行与td个数的内容
+	def get_content_from_table(table_content,tr_num,td_num)
+		content=nil
+		begin
+			#贪婪模式匹配tr
+			tr_content=table_content.scan(/<tr>.*?<\/tr>/m)[tr_num]
+			td_content=tr_content.scan(/<td.*?<\/td>/)[td_num]
+			#去除td标签内的所有html格式,防止死循环,做多处理10此
+			for i in 0...10 do
+				td_content_match = td_content.match(/>(.*)<\//) 
+				if td_content_match.blank?
+					content=td_content
+					break
+				end
+				td_content=td_content_match[1]
+			end 
+		rescue=>e
+			Rails.logger.info("get_content_from_table rescue: [#{e.message}]")
+			content=nil
+		end
+
+		content
+	end
+
+
 	def price_in_cents(price)
 		(price*100).round
 	end

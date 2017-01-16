@@ -311,3 +311,8 @@ AdminManage.all.each do |am|
 		ada.save!()
 	end
 end
+
+
+AccessAuthority.create!(:controller=>"ThirdPartyServiceController",:action=>"exchange_rate",
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>true,
+			:describe=>'汇率获取接口')

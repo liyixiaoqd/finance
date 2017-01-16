@@ -8,6 +8,7 @@ module Paramsable extend ActiveSupport::Concern
 	FINANCE_WATER_OBTAIN_PARAMS=%w{system channel userid water_no}
 	FINANCE_WATER_CORRECT_PARAMS=%w{system channel user_id oper}
 	FINANCE_WATER_INVOICE_MERCHANT_PARAMS=%w{system channel user_id oper}
+	EXCHANGE_RATE_PARAMS=%w{currencys rate_date}
 
 	def params_valid(action_name,params)
 		valid_flag=true;
@@ -23,6 +24,7 @@ module Paramsable extend ActiveSupport::Concern
 			when 'FINANCE_WATER_OBTAIN_PARAMS' then valid_flag=check_params(params_val,params)
 			when 'FINANCE_WATER_CORRECT_PARAMS' then valid_flag=check_params(params_val,params)
 			when 'FINANCE_WATER_INVOICE_MERCHANT_PARAMS' then valid_flag=check_params(params_val,params)
+			when 'EXCHANGE_RATE_PARAMS' then valid_flag=check_params(params_val,params)
 			else
 				valid_flag=false
 				logger.warn("match #{valid_flag} #{action_name} - #{match_name}")
