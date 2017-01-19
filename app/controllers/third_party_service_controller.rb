@@ -20,8 +20,8 @@ class ThirdPartyServiceController < ApplicationController
 		end
 
 		ret_info={
-			rate_date: use_params['rate_date'],
-			currency_info: []
+			"rate_date"=>use_params['rate_date'],
+			"currency_info"=>[]
 		}
 
 		use_params['currencys'].each do |currency|
