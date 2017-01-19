@@ -16,7 +16,7 @@ class ExchangeRate < ActiveRecord::Base
 	}
 
 	#由于要获取每天9点后的最近一条数据,因此crontab需要配置从9点开始到11点结束，每5分钟执行
-	#*/5 9-11 * * * 
+	#*/5 9-11 * * * /bin/bash -l -c 'source ~/.bashrc && source ~/.bash_profile && cd /opt/rails-app/finance && rails runner -e test 'ExchangeRate.getExchangeRate' >> /opt/rails-app/finance/log/cron_get_exchange_rate.log 2>&1'
 	def self.getExchangeRate(get_date=Time.now.strftime("%Y-%m-%d"))
 		currency_array=["GBP","EUR"]
 
@@ -103,7 +103,7 @@ class ExchangeRate < ActiveRecord::Base
 				get_num+=1
 
 				time=Time.parse(tmp_time).in_time_zone("Beijing").utc
-				puts("value:[#{value}],tmp_time:[#{tmp_time}]==>time:[#{time}]")
+				#puts("value:[#{value}],tmp_time:[#{tmp_time}]==>time:[#{time}]")
 				value=tmp_er.get_content_from_table(table_content,i,value_index).to_f
 			end
 			if get_num==0
@@ -113,10 +113,11 @@ class ExchangeRate < ActiveRecord::Base
 			if time.blank? || value.blank? || value<0.0000
 				raise "get value,time into failure: [#{table_content}],[#{table_num}]"
 			end
-			puts("LAST value:[#{value}],time:[#{time}]")
 
 			rate_info['rate']=(value/100*1.015).round(4)
 			rate_info['rate_datetime']=time
+
+			puts("value:[#{value}],rate:[#{rate_info['rate']}],time:[#{time}]")
 		rescue=>e
 			puts("getCurrencyRateFromWeb obtain rescue: #{e.message}")
 			Rails.logger.info(e.backtrace.inspect) unless Rails.env.production?

@@ -19,7 +19,10 @@ class ThirdPartyServiceController < ApplicationController
 			render json:{'SYSTEM'=>'PARAMS WRONG!'},status:400 and return 
 		end
 
-		ret_info=[]
+		ret_info={
+			rate_date: use_params['rate_date'],
+			currency_info: []
+		}
 
 		use_params['currencys'].each do |currency|
 			begin
@@ -28,7 +31,7 @@ class ThirdPartyServiceController < ApplicationController
 					raise "exchange rate not get and pleasn retry-after"
 				end
 
-				ret_info<<{
+				ret_info['currency_info']<<{
 					currency: currency,
 					rate: er.rate,
 					rate_datetime: er.rate_datetime,
@@ -36,7 +39,7 @@ class ThirdPartyServiceController < ApplicationController
 					reason: nil
 				}
 			rescue=>e
-				ret_info<<{
+				ret_info['currency_info']<<{
 					currency: currency,
 					rate: 0.0000,
 					rate_datetime: nil,
