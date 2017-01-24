@@ -161,11 +161,11 @@ class OnlinePayController < ApplicationController
 			# online_pay.with_lock do 
 			pay_detail=OnlinePay.get_instance_pay_detail(online_pay)
 			flag,online_pay.redirect_url,online_pay.trade_no,online_pay.is_credit,message=pay_detail.submit()
-			# if online_pay.paytype=="transaction"
-			# 	flag,online_pay.redirect_url,online_pay.trade_no,online_pay.is_credit,message=pay_detail.submit_direct()
-			# else
-			#  	flag,online_pay.redirect_url,online_pay.trade_no,online_pay.is_credit,message=pay_detail.submit()
-			# end
+			if online_pay.paytype=="transaction"
+				flag,online_pay.redirect_url,online_pay.trade_no,online_pay.is_credit,message=pay_detail.submit_direct()
+			else
+			 	flag,online_pay.redirect_url,online_pay.trade_no,online_pay.is_credit,message=pay_detail.submit()
+			end
 
 			logger.info("#{flag} - #{online_pay.redirect_url} - #{online_pay.trade_no} - #{message}")
 
