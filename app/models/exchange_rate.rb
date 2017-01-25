@@ -15,6 +15,37 @@ class ExchangeRate < ActiveRecord::Base
 		"EUR"=>"1326"
 	}
 
+	def self.checkIsNormal(get_date=Time.now.strftime("%Y-%m-%d"))
+		normal_flag=false
+		msg=""
+		currency_info=[]
+		currency_array=["GBP","EUR"]
+		
+		currency_array.each do |currency|
+			begin
+				er=ExchangeRate.find_by(currency: currency,rate_date: get_date)
+				if er.blank?
+					currency_info<<{currency=>"0.0"}
+					raise "#{get_date},#{currency} need check, no record"
+				end
+				
+				currency_info<<{currency=>er.rate.to_s}
+				if er.isGetSuccess?()==false || er.flag!=9
+					raise "#{get_date},#{currency} need check,flag[#{er.flag}],[#{er.remark}]"
+				end
+
+				normal_flag=true
+			rescue=>e
+				Rails.logger.info("checkIsNormal rescue:#{e.message}")
+				msg+=e.message+";"
+			end
+		end
+
+		normal_flag=false if msg.present?
+
+		[normal_flag,currency_info,msg]
+	end
+
 	#由于要获取每天9点后的最近一条数据,因此crontab需要配置从9点开始到11点结束，每5分钟执行
 	#*/5 9-11 * * * /bin/bash -l -c 'source ~/.bashrc && source ~/.bash_profile && cd /opt/rails-app/finance && rails runner -e test 'ExchangeRate.getExchangeRate' >> /opt/rails-app/finance/log/cron_get_exchange_rate.log 2>&1'
 	def self.getExchangeRate(get_date=Time.now.strftime("%Y-%m-%d"))
@@ -159,6 +190,7 @@ class ExchangeRate < ActiveRecord::Base
 					#是否浮动超过5%
 					if pre_er.rate*0.95 > self.rate || pre_er.rate*1.05 < self.rate
 						puts("[#{self.rate_date}] get pre day's rate threshold: [#{pre_er.rate}] <=> [#{self.rate}]")
+						self.remark="[#{self.rate_date}] get pre day's rate threshold: [#{pre_er.rate}] <=> [#{self.rate}]"
 						self.flag=8
 					else
 						self.flag=9
@@ -166,6 +198,7 @@ class ExchangeRate < ActiveRecord::Base
 				end
 			rescue=>e
 				puts("[#{self.rate_date}] get pre day's rate rescue: #{e.message}")
+				self.remark=e.message
 				self.flag=8
 			end
 		end
