@@ -585,7 +585,9 @@ class FinanceWaterController < ApplicationController
 			reconciliation_detail.reconciliation_describe="订单退费"
 
 
-			unless online_pay.blank?
+			if online_pay.blank?
+				reconciliation_detail.send_country = params["send_country"].downcase if params["send_country"].present?
+			else
 				reconciliation_detail.currencycode=online_pay.currency
 				reconciliation_detail.send_country=online_pay.send_country
 			end
