@@ -109,8 +109,12 @@ namespace :sync_file do
 							order_no=rd.order_no
 						end
 
-						invoice_no=LockSequence.get_next_seq!("invoice",LockSequence.get_subtype("invoice",rd.send_country,rd.batch_id))
-						
+						begin
+							invoice_no=LockSequence.get_next_seq!("invoice",LockSequence.get_subtype("invoice",rd.send_country,rd.batch_id))
+						rescue=>e
+							@interface_logger.info("INVOICE GET FAILURE : [#{e.message}]")
+							invoice_no=""
+						end
 
 						rd.update_attributes!({'invoice_date'=>@end,'invoice_no'=>invoice_no})
 						@interface_logger.info("SUCC : #{rd.batch_id},#{order_no},#{invoice_no},#{@end}")
