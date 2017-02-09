@@ -57,6 +57,11 @@ class LockSequence < ActiveRecord::Base
 			raise "type or subtype is nil"
 		end
 
+		beginning = subtype.split("_")[0]
+		if beginning.blank?
+			raise "subtype is wrong [#{subtype}]"
+		end
+
 		ls=LockSequence.lock.find_by(maintype: maintype,subtype: subtype,status: "enable")
 		if ls.blank?
 			raise "LockSequence not found sequence for [#{maintype}] , [#{subtype}]"
@@ -64,7 +69,8 @@ class LockSequence < ActiveRecord::Base
 		ls.seq+=1
 		ls.save!
 
-		sprintf(ls.str_format,ls.seq)
+		seq=sprintf(ls.str_format,ls.seq)
+		beginning+seq
 	end
 
 	#手动运行初始化函数
