@@ -488,7 +488,7 @@ class FinanceWaterController < ApplicationController
 		render json:ret_hash.to_json and return
 	end
 
-	private
+	public
 		def new_online_pay_each(user,finance_each,params)
 			if finance_each['is_pay']=="Y"
 				if finance_each['order_no'].blank?
@@ -585,12 +585,31 @@ class FinanceWaterController < ApplicationController
 			reconciliation_detail.reconciliation_describe="订单退费"
 
 
-			if online_pay.blank?
-				reconciliation_detail.send_country = params["send_country"].downcase if params["send_country"].present?
-			else
+			if online_pay.present?
 				reconciliation_detail.currencycode=online_pay.currency
 				reconciliation_detail.send_country=online_pay.send_country
 			end
+
+			reconciliation_detail.send_country = params["send_country"].downcase if params["send_country"].present?
+			reconciliation_detail.currencycode = params["currency"].downcase if params["currency"].present?
+
+			#手续费逻辑
+			#免除手续费,则feeamt记录为负数,amt记录为扣除手续费后的金额
+			if params["is_remit_fee"].present? && params["is_remit_fee"].upcase=="Y"
+				if params["fee_amount"].blank? && params["fee_amount"]>0.001
+					reconciliation_detail.feeamt = 5.0
+				else
+					reconciliation_detail.feeamt = params["fee_amount"].to_f
+				end
+
+				reconciliation_detail.feeamt = reconciliation_detail.feeamt*(-1) if reconciliation_detail.feeamt>0.001
+				
+				reconciliation_detail.amt += reconciliation_detail.feeamt
+			else
+				#不免除手续费,则feeamt记录为正数,amt包含了feeamt
+				reconciliation_detail.feeamt = params["fee_amount"].to_f if params["fee_amount"].blank? && params["fee_amount"]>0.001
+			end
+
 			
 			reconciliation_detail
 		end
