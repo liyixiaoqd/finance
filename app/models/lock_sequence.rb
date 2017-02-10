@@ -2,21 +2,60 @@
 
 class LockSequence < ActiveRecord::Base
 	validates :maintype, :subtype, presence: true
-	validates :seq, numericality:{:greater_than=>0,only_integer: true}
+	validates :seq, numericality:{:greater_than_or_equal_to=>0,only_integer: true}
 	validates :status, inclusion: { in: %w(enable disable),message: "%{value} is not a valid status" }
 
 	MAINTYPE_DESC={
 		"invoice"=>{
-			"D_in"=>"德国退费发票",
-			"_in"=>"荷兰退费发票",
-			"G_in"=>"英国退费发票",
-			"AT_in"=>"奥地利退费发票",
-			"GS_out"=>"德国发票",
-			"C_out"=>"荷兰发票",
-			"RF_out"=>"英国发票",
-			"ATGS_out"=>"奥地利发票"
+			"GSD-"=>"德国退费发票",
+			"CFN-"=>"荷兰退费发票",
+			"CNG-"=>"英国退费发票",
+			"GSEU-"=>"奥地利退费发票",
+			"RND-"=>"德国发票",
+			"FTN-"=>"荷兰发票",
+			"DNG-"=>"英国发票",
+			"RNEU-"=>"奥地利发票"
 		}
 	}
+
+	#判断交易系统来源及获取发票号
+	#只有新mypost4u要产生发票号
+	#rd - ReconciliationDetail record
+	def self.judge_system_and_get_invoice(rd)
+		if isNewMypost4uRecord?(rd)
+			get_next_seq!("invoice",get_subtype("invoice",rd.send_country,rd.batch_id))
+		else
+			""
+		end
+	end
+
+	#新mypost4u交易判断逻辑
+	def self.isNewMypost4uRecord?(rd)
+		isflag=true
+
+		#付款交易TM开头 ； 退费交易 20位订单号
+		if ['refund_order','refund_parcel'].include? (rd.batch_id)
+			if rd.batch_id=="refund_parcel"
+				order_no=rd.transactionid
+			else
+				order_no=rd.order_no
+			end
+
+			if order_no.length==20
+				isflag=true
+			else
+				isflag=false
+			end
+		else
+			if rd.order_no[0,2]=="TM"
+				isflag=true
+			else
+				isflag=false
+			end
+		end
+
+		isflag
+	end
 
 	def self.get_subtype(maintype,country,paytype)
 		subtype=nil
@@ -30,17 +69,15 @@ class LockSequence < ActiveRecord::Base
 				end
 
 				if paytype=="refund_parcel" || paytype=="refund_order"
-					zh={"de"=>"D", "nl"=>"","gb"=>"G", "at"=>"AT"}[country.downcase]
-					if zh.blank?
+					subtype={"de"=>"GSD-", "nl"=>"CFN-","gb"=>"CNG-", "at"=>"GSEU-"}[country.downcase]
+					if subtype.blank?
 						raise "no country map"
 					end
-					subtype = zh+"_in"
 				else
-					zh={"de"=>"GS", "nl"=>"C","gb"=>"RF", "at"=>"ATGS"}[country.downcase]
-					if zh.blank?
+					subtype={"de"=>"RND-", "nl"=>"FTN-","gb"=>"DNG-", "at"=>"RNEU-"}[country.downcase]
+					if subtype.blank?
 						raise "no country map"
 					end
-					subtype = zh+"_out"
 				end
 			end
 		rescue=>e
@@ -57,11 +94,6 @@ class LockSequence < ActiveRecord::Base
 			raise "type or subtype is nil"
 		end
 
-		beginning = subtype.split("_")[0]
-		if beginning.blank?
-			raise "subtype is wrong [#{subtype}]"
-		end
-
 		ls=LockSequence.lock.find_by(maintype: maintype,subtype: subtype,status: "enable")
 		if ls.blank?
 			raise "LockSequence not found sequence for [#{maintype}] , [#{subtype}]"
@@ -70,7 +102,7 @@ class LockSequence < ActiveRecord::Base
 		ls.save!
 
 		seq=sprintf(ls.str_format,ls.seq)
-		beginning+seq
+		subtype+seq
 	end
 
 	#手动运行初始化函数
