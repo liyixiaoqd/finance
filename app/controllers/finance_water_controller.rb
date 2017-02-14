@@ -595,22 +595,11 @@ class FinanceWaterController < ApplicationController
 
 			#手续费逻辑
 			#免除手续费,则feeamt记录为负数,amt记录为扣除手续费后的金额
-			if params["is_remit_fee"].present? && params["is_remit_fee"].upcase=="Y"
-				if params["fee_amount"].blank? && params["fee_amount"]>0.001
-					reconciliation_detail.feeamt = 5.0
-				else
-					reconciliation_detail.feeamt = params["fee_amount"].to_f
-				end
-
-				reconciliation_detail.feeamt = reconciliation_detail.feeamt*(-1) if reconciliation_detail.feeamt>0.001
-				
-				reconciliation_detail.amt += reconciliation_detail.feeamt
-			else
-				#不免除手续费,则feeamt记录为正数,amt包含了feeamt
-				reconciliation_detail.feeamt = params["fee_amount"].to_f if params["fee_amount"].blank? && params["fee_amount"]>0.001
+			if params["fee_amount"].present?
+				reconciliation_detail.feeamt = params["fee_amount"]
+				reconciliation_detail.amt -= reconciliation_detail.feeamt
 			end
 
-			
 			reconciliation_detail
 		end
 
