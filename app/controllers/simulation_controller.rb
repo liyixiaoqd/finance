@@ -181,6 +181,7 @@ class SimulationController < ApplicationController
 		when 'sofort' then simulate_params=init_sofort_submit_params(simulate_order_no,amount) 
 		when 'alipay_oversea' then simulate_params=init_alipay_oversea_submit_params(simulate_order_no,amount) 
 		when 'alipay_transaction' then simulate_params=init_alipay_transaction_submit_params(simulate_order_no,amount)
+		when 'oceanpayment_unionpay' then simulate_params=init_oceanpayment_unionpay_submit_params(simulate_order_no,amount)
 		else
 			simulate_params={}
 		end
@@ -427,8 +428,9 @@ class SimulationController < ApplicationController
 			when 'sofort' then order_no="sofort#{calldate}#{callnum}" 
 			when 'alipay_oversea' then order_no="alipay_oversea_#{calldate}_#{callnum}"
 			when 'alipay_transaction' then order_no="alipay_transaction_#{calldate}_#{callnum}"
+			when 'alipay_transaction' then order_no="alipay_transaction_#{calldate}_#{callnum}"
 			else
-				order_no="nopayway_#{calldate}_#{callnum}"
+				order_no="oceanpayment_unionpay_#{calldate}_#{callnum}"
 			end
 
 			order_no
@@ -522,6 +524,24 @@ class SimulationController < ApplicationController
 				'quantity'=>1
 			}		
 			init_online_pay_params.merge!(alipay_transaction_submit_params)
+		end
+
+		def init_oceanpayment_unionpay_submit_params(order_no,amount)
+			oceanpayment_unionpay_submit_params={
+				'system'=>'mypost4u',
+				'payway'=>'oceanpayment',
+				'paytype'=>'unionpay',
+				'amount'=>amount,
+				'order_no'=>order_no,
+				'currency'=>'CNY',
+				'logistics_name'=>'logistics_name',
+				'description'=>"测试交易:订单号#{order_no}的寄送包裹费用",
+				'success_url'=>"#{CALL_HOST}/simulation/callback_return",
+				'notification_url'=>"#{CALL_HOST}/simulation/callback_notify",
+				'quantity'=>1,
+				'country'=>'de'
+			}		
+			init_online_pay_params.merge!(oceanpayment_unionpay_submit_params)
 		end
 
 		def current_time_ymdHMS(format="")

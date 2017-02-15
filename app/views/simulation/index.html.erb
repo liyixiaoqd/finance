@@ -16,6 +16,9 @@
           <%= label_tag(:payway_alipay_oversea, "ALIPAY_OVERSEA") %>
           <%= radio_button_tag(:payway, "alipay_transaction") %>
           <%= label_tag(:payway_alipay_transaction, "ALIPAY_TRANSACTION") %> </br>
+          <%= radio_button_tag(:payway, "oceanpayment_unionpay") %>
+          <%= label_tag(:payway_alipay_transaction, "OCEANPAYMENT_UNIONPAY") %> </br>
+          
           <%= label_tag(:label3, "amount") %>
           <%= text_field_tag(:amount, 0.01) %>
           <%= text_field_tag(:serial, "#{SimulationController.get_simulation_num}") %>
