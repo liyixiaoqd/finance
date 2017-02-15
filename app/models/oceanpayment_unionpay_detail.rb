@@ -1,6 +1,6 @@
 class OceanpaymentUnionpayDetail
 	include PayDetailable
-	attr_accessor :country,:amount,:description,:currency,:order_no
+	attr_accessor :system,:country,:amount,:currency,:order_no
 
 	def initialize(online_pay)
 		if !payparams_valid("oceanpayment_unionpay",online_pay) ||  !spec_payparams_valid(online_pay)
@@ -21,7 +21,7 @@ class OceanpaymentUnionpayDetail
 			"order_number"=>@order_no,
 			"order_currency"=>@currency,
 			"order_amount"=>@amount.to_s,
-			"order_notes"=>@description,
+			"order_notes"=>@system,
 			"billing_firstName"=>"N/A",
 			"billing_lastName"=>"N/A",
 			"billing_email"=>Settings.oceanpayment_unionpay.billing_email,

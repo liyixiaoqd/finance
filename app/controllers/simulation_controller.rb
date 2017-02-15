@@ -81,7 +81,7 @@ class SimulationController < ApplicationController
 				params['body']
 			)
 
-			if response.code!="200"
+			if response.code[0]!="2"
 				raise "http返回值异常 #{response.code}"
 			end
 		rescue=>e

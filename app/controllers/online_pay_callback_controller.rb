@@ -443,6 +443,28 @@ class OnlinePayCallbackController < ApplicationController
 		end
 	end
 
+	def oceanpayment_unionpay_return
+		render_text="failure"
+		
+		#order_notes == system
+		online_pay=OnlinePay.find_by_system_and_payway_and_order_no(params['order_notes'],"sofort",params['order_no'])
+		render text: "#{render_text}" and return if (online_pay.blank? || online_pay.success_url.blank?)
+
+		ret_hash=init_return_ret_hash(online_pay)
+		redirect_url=OnlinePay.redirect_url_replace("get",online_pay.success_url,ret_hash)
+		logger.info("sofort_return:#{redirect_url}")
+		# if(method_url_response_code("get",redirect_url,false)=="200")
+		# 	render_text="success"
+		# end
+
+		# render text: "#{render_text}"
+		redirect_to redirect_url
+	end
+
+	def oceanpayment_unionpay_notify
+
+	end
+
 	private 
 		def init_return_ret_hash(online_pay)
 			{
