@@ -547,11 +547,11 @@ class SimulationController < ApplicationController
 			init_online_pay_params.merge!(alipay_transaction_submit_params)
 		end
 
-		def init_oceanpayment_submit_params(order_no,amount,payway)
+		def init_oceanpayment_submit_params(order_no,amount,paytype)
 			oceanpayment_submit_params={
 				'system'=>'mypost4u',
-				'payway'=>payway,
-				'paytype'=>'unionpay',
+				'payway'=>'oceanpayment',
+				'paytype'=>paytype,
 				'amount'=>amount,
 				'order_no'=>order_no,
 				'currency'=>'CNY',
