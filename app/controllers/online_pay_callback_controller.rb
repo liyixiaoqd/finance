@@ -448,7 +448,7 @@ class OnlinePayCallbackController < ApplicationController
 		logger.info("into oceanpayment_unionpay_return and params: [#{params}]")
 
 		#order_notes == system
-		online_pay=OnlinePay.get_online_pay_instance("oceanpayment","unionpay",params,"",false,true)
+		online_pay=OnlinePay.get_online_pay_instance("oceanpayment","unionpay"+params['subtype'],params,"",false,true)
 		render text: "#{render_text}" and return if (online_pay.blank? || online_pay.success_url.blank?)
 
 		ret_hash=init_return_ret_hash(online_pay)
@@ -484,7 +484,7 @@ class OnlinePayCallbackController < ApplicationController
 			render :text=>"#{render_text}" and return if (online_pay.blank? || online_pay.notification_url.blank?)
 			cq=CallQueue.online_pay_is_succ_record(online_pay.id)
 
-			pay_detail=OnlinePay.get_instance_pay_detail(online_pay)
+			pay_detail=OceanpaymentUnionpayDetail.new(online_pay)
 			
 			ret_hash=init_notify_ret_hash(online_pay)
 
@@ -571,7 +571,7 @@ class OnlinePayCallbackController < ApplicationController
 			render :text=>"#{render_text}" and return if (online_pay.blank? || online_pay.notification_url.blank?)
 			cq=CallQueue.online_pay_is_succ_record(online_pay.id)
 
-			pay_detail=OnlinePay.get_instance_pay_detail(online_pay)
+			pay_detail=OceanpaymentWechatpayDetail.new(online_pay)
 			
 			ret_hash=init_notify_ret_hash(online_pay)
 
