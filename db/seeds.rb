@@ -327,11 +327,18 @@ AccessAuthority.create!(:controller=>"SimulationController",:action=>"simulate_p
 
 AccessAuthority.create!(:controller=>"OnlinePayCallbackController",:action=>"oceanpayment_unionpay_return",
 			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>false,
-			:describe=>'alipay_oversea支付同步回调接口')
+			:describe=>'oceanpayment_unionpay支付同步回调接口')
 AccessAuthority.create!(:controller=>"OnlinePayCallbackController",:action=>"oceanpayment_unionpay_notify",
 			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>false,
-			:describe=>'alipay_oversea支付异步回调接口')
+			:describe=>'oceanpayment_unionpay支付异步回调接口')
 
 BasicData.create!(:basic_type=>"00A",:desc=>"financial reconciliation interface configuration",
 	                   :basic_sub_type=>"001",:sub_desc=>"postpone the date - day",
 	                   :payway=>"oceanpayment",:paytype=>"",:value=>"1")
+
+AccessAuthority.create!(:controller=>"OnlinePayCallbackController",:action=>"oceanpayment_wechatpay_return",
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>false,
+			:describe=>'oceanpayment_wechatpay支付同步回调接口')
+AccessAuthority.create!(:controller=>"OnlinePayCallbackController",:action=>"oceanpayment_wechatpay_notify",
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>false,
+			:describe=>'oceanpayment_wechatpay支付异步回调接口')

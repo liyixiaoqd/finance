@@ -697,7 +697,7 @@ class OnlinePayCallbackController < ApplicationController
 					params['payment_status'].to_s +
 					params['payment_details'].to_s +
 					params['payment_risk'].to_s +
-					Settings.oceanpayment_unionpay.secure_code_b2c
+					Settings.oceanpayment_wechatpay.secure_code
 				)
 
 				valid_flag = sha_result.upcase == params['signValue']
