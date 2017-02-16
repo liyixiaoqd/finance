@@ -26,6 +26,12 @@ class OceanpaymentUnionpayDetail
 			noticeUrl = Settings.oceanpayment_unionpay.notification_url + "/b2b"
 		end
 
+		if @currency=="RMB"
+			use_currency="CNY"
+		else
+			use_currency=@currency
+		end
+
 		post_params={
 			"account"=>Settings.oceanpayment_unionpay.account,
 			"terminal"=>terminal,
@@ -34,7 +40,7 @@ class OceanpaymentUnionpayDetail
 			"noticeUrl"=>noticeUrl,	#only 443 or 80
 			"methods"=>"UnionPay",
 			"order_number"=>trade_no,
-			"order_currency"=>@currency,
+			"order_currency"=>use_currency,
 			"order_amount"=>@amount.to_s,
 			"order_notes"=>@description,
 			"billing_firstName"=>"N/A",
