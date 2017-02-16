@@ -17,9 +17,11 @@ class OceanpaymentUnionpayDetail
 		if @paytype=="unionpay_b2c"
 			terminal=Settings.oceanpayment_unionpay.terminal_b2c
 			secure_code=Settings.oceanpayment_unionpay.secure_code_b2c
+			noticeUrl = Settings.oceanpayment_unionpay.notification_url + "/b2c"
 		else
 			terminal=Settings.oceanpayment_unionpay.terminal_b2b
 			secure_code=Settings.oceanpayment_unionpay.secure_code_b2b
+			noticeUrl = Settings.oceanpayment_unionpay.notification_url + "/b2b"
 		end
 
 		post_params={
@@ -27,7 +29,7 @@ class OceanpaymentUnionpayDetail
 			"terminal"=>terminal,
 			"signValue"=>"",
 			"backUrl"=>Settings.oceanpayment_unionpay.return_url,
-			"noticeUrl"=>Settings.oceanpayment_unionpay.notification_url,	#only 443 or 80
+			"noticeUrl"=>noticeUrl,	#only 443 or 80
 			"methods"=>"UnionPay",
 			"order_number"=>trade_no,
 			"order_currency"=>@currency,

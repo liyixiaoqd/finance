@@ -480,7 +480,7 @@ class OnlinePayCallbackController < ApplicationController
 
 		ActiveRecord::Base.transaction do
 			
-			online_pay=OnlinePay.get_online_pay_instance("oceanpayment","unionpay",use_params,"",false,true)
+			online_pay=OnlinePay.get_online_pay_instance("oceanpayment","unionpay_"+params['subtype'],use_params,"",false,true)
 			render :text=>"#{render_text}" and return if (online_pay.blank? || online_pay.notification_url.blank?)
 			cq=CallQueue.online_pay_is_succ_record(online_pay.id)
 
