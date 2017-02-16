@@ -577,7 +577,7 @@ class OnlinePayCallbackController < ApplicationController
 					Settings.oceanpayment_unionpay.secure_code_b2c
 				)
 
-				valid_flag = sha_result == params['signValue']
+				valid_flag = sha_result.upcase == params['signValue']
 				logger.info(" [#{sha_result}] ==== [#{params['signValue']}] , result: [#{valid_flag}]")
 			rescue=>e
 				logger.info("valid_oceanpayment_unionpay_notify rescue: #{e.message}")
