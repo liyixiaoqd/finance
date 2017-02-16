@@ -4,6 +4,7 @@ module PayDetailable extend ActiveSupport::Concern
 	PAY_ALIPAY_OVERSEA_PARAMS=%w{system amount description currency order_no success_url notification_url}
 	PAY_ALIPAY_TRANSACTION_PARAMS=%w{system quantity amount logistics_name description order_no success_url notification_url}
 	PAY_OCEANPAYMENT_UNIONPAY_PARAMS=%w{system country amount currency order_no success_url notification_url description userid paytype}
+	PAY_OCEANPAYMENT_WECHATPAY_PARAMS=%w{system country amount currency order_no success_url notification_url description userid paytype}
 
 
 	def payparams_valid(detail_name,online_pay)
@@ -16,6 +17,7 @@ module PayDetailable extend ActiveSupport::Concern
 			when 'PAY_ALIPAY_OVERSEA_PARAMS' then valid_flag=check_payparams(params_val,online_pay)
 			when 'PAY_ALIPAY_TRANSACTION_PARAMS' then valid_flag=check_payparams(params_val,online_pay)
 			when 'PAY_OCEANPAYMENT_UNIONPAY_PARAMS' then valid_flag=check_payparams(params_val,online_pay)
+			when 'PAY_OCEANPAYMENT_WECHATPAY_PARAMS' then valid_flag=check_payparams(params_val,online_pay)
 			else
 				valid_flag=false
 				Rails.logger.warn("match #{valid_flag} #{detail_name} - #{match_name}")
