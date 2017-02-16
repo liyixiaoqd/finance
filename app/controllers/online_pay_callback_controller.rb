@@ -531,6 +531,94 @@ class OnlinePayCallbackController < ApplicationController
 		end
 	end
 
+	def oceanpayment_wechatpay_return
+		render_text="failure"
+		logger.info("into oceanpayment_wechatpay_return and params: [#{params}]")
+
+		#order_notes == system
+		online_pay=OnlinePay.get_online_pay_instance("oceanpayment","wechatpay",params,"",false,true)
+		render text: "#{render_text}" and return if (online_pay.blank? || online_pay.success_url.blank?)
+
+		ret_hash=init_return_ret_hash(online_pay)
+		redirect_url=OnlinePay.redirect_url_replace("get",online_pay.success_url,ret_hash)
+		logger.info("oceanpayment_wechatpay_return:#{redirect_url}")
+		# if(method_url_response_code("get",redirect_url,false)=="200")
+		# 	render_text="success"
+		# end
+
+		# render text: "#{render_text}"
+		redirect_to redirect_url
+	end	
+
+	def oceanpayment_wechatpay_notify
+		logger.info("into oceanpayment_wechatpay_notify and params: [#{params}]")
+
+		render_text="failure"
+		use_params={}
+		begin
+			use_params = params['response']
+			if valid_oceanpayment_wechatpay_notify(use_params) == false
+				logger.info("into oceanpayment_wechatpay_notify return ,valid failure")
+				render :text=>render_text and return 
+			end
+		rescue=>e
+			logger.info("into oceanpayment_wechatpay_notify return ,rescue #{e.message}")
+			render :text=>render_text and return 
+		end
+
+		ActiveRecord::Base.transaction do
+			online_pay=OnlinePay.get_online_pay_instance("oceanpayment","wechatpay",use_params,"",false,true)
+			render :text=>"#{render_text}" and return if (online_pay.blank? || online_pay.notification_url.blank?)
+			cq=CallQueue.online_pay_is_succ_record(online_pay.id)
+
+			pay_detail=OnlinePay.get_instance_pay_detail(online_pay)
+			
+			ret_hash=init_notify_ret_hash(online_pay)
+
+			rollback_callback_status = online_pay.callback_status
+			use_params['payment_status']=use_params['payment_status'].to_s
+
+			render :text=>'receive-ok' and return if online_pay.check_has_updated?(use_params['payment_status'])
+
+			online_pay.callback_status=use_params['payment_status']
+			online_pay.set_status_by_callback!()
+
+			online_pay.reconciliation_id=online_pay.trade_no
+
+			ret_hash['status']=online_pay.status
+			ret_hash['status_reason']=online_pay.callback_status
+
+			redirect_url=OnlinePay.redirect_url_replace("post",online_pay.notification_url)
+			logger.info("oceanpayment_wechatpay_notify:#{redirect_url}")
+
+			begin
+				online_pay.save!()
+				if online_pay.is_success?() && online_pay.find_reconciliation().blank?
+					online_pay.set_reconciliation.save!()
+					cq.online_pay_is_succ_set() unless cq.blank?
+				end
+				# response_code=online_pay.method_url_response_code("post",redirect_url,false,ret_hash)
+				# unless response_code=="200"
+				# 	raise "call #{redirect_url} failure : #{response_code}"
+				# end
+				if !online_pay.method_url_success?("post",redirect_url,false,ret_hash)
+					if online_pay.status=='success_notify'
+						online_pay.set_status!("failure_notify_third","call notify_url wrong")
+						online_pay.update_attributes!({})
+					end
+				end
+
+				render_text="receive-ok"
+			rescue => e
+				online_pay.update_attributes(:status=>"failure_notify",:reason=>e.message,:callback_status=>rollback_callback_status)
+				logger.info("sofort_notify failure!! : #{e.message},[#{use_params}]")
+			end
+
+			render text: "#{render_text}"
+		end
+	end
+
+
 	private 
 		def init_return_ret_hash(online_pay)
 			{
@@ -569,6 +657,35 @@ class OnlinePayCallbackController < ApplicationController
 					params['order_amount'].to_s +
 					params['order_notes'].to_s +
 					params['card_number'].to_s +
+					params['payment_id'].to_s +
+					params['payment_authType'].to_s +
+					params['payment_status'].to_s +
+					params['payment_details'].to_s +
+					params['payment_risk'].to_s +
+					Settings.oceanpayment_unionpay.secure_code_b2c
+				)
+
+				valid_flag = sha_result.upcase == params['signValue']
+				logger.info(" [#{sha_result}] ==== [#{params['signValue']}] , result: [#{valid_flag}]")
+			rescue=>e
+				logger.info("valid_oceanpayment_unionpay_notify rescue: #{e.message}")
+				valid_flag=false
+			end
+
+			valid_flag
+		end
+
+		def valid_oceanpayment_wechatpay_notify(params)
+			valid_flag=false
+
+			begin
+				sha_result=Digest::SHA256.hexdigest(
+					params['account'].to_s +
+					params['terminal'].to_s +
+					params['order_number'].to_s +
+					params['order_currency'].to_s +
+					params['order_amount'].to_s +
+					params['order_notes'].to_s +
 					params['payment_id'].to_s +
 					params['payment_authType'].to_s +
 					params['payment_status'].to_s +

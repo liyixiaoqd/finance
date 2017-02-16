@@ -450,8 +450,11 @@ class SimulationController < ApplicationController
 			when 'alipay_oversea' then order_no="alipay_oversea_#{calldate}_#{callnum}"
 			when 'alipay_transaction' then order_no="alipay_transaction_#{calldate}_#{callnum}"
 			when 'alipay_transaction' then order_no="alipay_transaction_#{calldate}_#{callnum}"
+			when 'oceanpayment_unionpay_b2c' then order_no="oceanpayment_unionpay_b2c_#{calldate}_#{callnum}"
+			when 'oceanpayment_unionpay_b2b' then order_no="oceanpayment_unionpay_b2b_#{calldate}_#{callnum}"
+			when 'oceanpayment_wechatpay' then order_no="oceanpayment_wechatpay_#{calldate}_#{callnum}"
 			else
-				order_no="oceanpayment_unionpay_#{calldate}_#{callnum}"
+				order_no="unmatch_#{payway}_#{calldate}_#{callnum}"
 			end
 
 			order_no

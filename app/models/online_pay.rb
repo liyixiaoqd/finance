@@ -54,6 +54,13 @@ class OnlinePay < ActiveRecord::Base
 		'1' => 9 
 	}
 
+	# 0: 失败
+	# 1: 成功
+	OCEANPAYMENT_WECHATPAY_STATUS={
+		'0' => 0,
+		'1' => 9 
+	}
+
 	def set_channel!()
 		if (self.channel.blank?)
 			self.channel="web"
@@ -162,10 +169,16 @@ class OnlinePay < ActiveRecord::Base
 			else
 				self.status="intermediate_notify"
 			end	
-		elsif(self.payway=="oceanpayment"  && self.paytype=="unionpay")
+		elsif(self.payway=="oceanpayment"  && self.paytype[0,8]=="unionpay")
 			if(self.callback_status=="-1")
 				self.status="intermediate_notify"
 			elsif(self.callback_status=="0")
+				self.status="cancel_notify"
+			else
+				self.status="success_notify"
+			end
+		elsif(self.payway=="oceanpayment" && self.paytype=="wechatpay")
+			if(self.callback_status=="0")
 				self.status="cancel_notify"
 			else
 				self.status="success_notify"
@@ -212,12 +225,18 @@ class OnlinePay < ActiveRecord::Base
 				elsif(SOFORT_CALLBACK_STATUS[self.callback_status]>=SOFORT_CALLBACK_STATUS[new_callback_status])
 					has_updated=true
 				end	
-			elsif(self.payway=="oceanpayment"  && self.paytype=="unionpay")
+			elsif(self.payway=="oceanpayment"  && self.paytype[0,8]=="unionpay")
 				if OCEANPAYMENT_UNIONPAY_STATUS[self.callback_status]==9
 					has_updated=true
 				elsif OCEANPAYMENT_UNIONPAY_STATUS[self.callback_status]>=OCEANPAYMENT_UNIONPAY_STATUS[new_callback_status]
 					has_updated=true
 				end
+			elsif(self.payway=="oceanpayment" && self.paytype=="wechatpay")
+				if OCEANPAYMENT_WECHATPAY_STATUS[self.callback_status]==9
+					has_updated=true
+				elsif OCEANPAYMENT_WECHATPAY_STATUS[self.callback_status]>=OCEANPAYMENT_WECHATPAY_STATUS[new_callback_status]
+					has_updated=true
+				end				
 			end	
 		end
 
@@ -337,7 +356,9 @@ class OnlinePay < ActiveRecord::Base
 				when 'alipay_transaction' then trade_no=params['out_trade_no']
 				when 'paypal' then trade_no=params['token']
 				when 'sofort' then trade_no=params["status_notification"]["transaction"]
-				when 'oceanpayment_unionpay' then trade_no=params["order_number"]
+				when 'oceanpayment_unionpay_b2c' then trade_no=params["order_number"]
+				when 'oceanpayment_unionpay_b2b' then trade_no=params["order_number"]
+				when 'oceanpayment_wechatpay' then trade_no=params["order_number"]
 				else
 					logger.warn("ONLINE_PAY CALLBACK:get_online_pay_instance:#{pay_combine}=#{payway}+#{paytype}!")
 				end
@@ -348,7 +369,7 @@ class OnlinePay < ActiveRecord::Base
 			end
 
 			# 特殊处理支付宝
-			if pay_combine=="alipay_transaction" || pay_combine=="alipay_oversea" || pay_combine=="oceanpayment_unionpay"
+			if pay_combine=="alipay_transaction" || pay_combine=="alipay_oversea" || pay_combine[0,21]=="oceanpayment_unionpay" || pay_combine=="oceanpayment_wechatpay"
 				# op=OnlinePay.find_by_payway_and_paytype_and_order_no(payway,paytype,trade_no)
 				# if op.blank?
 				# 	raise "spec alipay get onlinepay wrong!"
