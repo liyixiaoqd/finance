@@ -247,7 +247,7 @@ class OnlinePayController < ApplicationController
 			# online_pay.with_lock do 
 			if online_pay.payway=="oceanpayment" && online_pay.paytype[0,8]=="unionpay"
 				pay_detail = OceanpaymentUnionpayDetail.new(online_pay)
-			elsif online_pay.payway=="oceanpayment" && online_pay.paytype[0,8]=="wechatpay"
+			elsif online_pay.payway=="oceanpayment" && online_pay.paytype=="wechatpay"
 				pay_detail = OceanpaymentWechatpayDetail.new(online_pay)
 			else
 				raise "not support ! [#{online_pay.payway}][#{online_pay.paytype}]"
