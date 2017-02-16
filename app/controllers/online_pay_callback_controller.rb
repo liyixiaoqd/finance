@@ -469,7 +469,7 @@ class OnlinePayCallbackController < ApplicationController
 		use_params={}
 		begin
 			use_params = params['response']
-			if valid_oceanpayment_unionpay_notify(use_params) == false
+			if valid_oceanpayment_unionpay_notify(use_params,params['subtype']) == false
 				logger.info("into oceanpayment_unionpay_notify return ,valid failure")
 				render :text=>render_text and return 
 			end
@@ -645,10 +645,16 @@ class OnlinePayCallbackController < ApplicationController
 			}
 		end
 
-		def valid_oceanpayment_unionpay_notify(params)
+		def valid_oceanpayment_unionpay_notify(params,subtype)
 			valid_flag=false
 
 			begin
+				if subtype=="b2c"
+					secure_code = Settings.oceanpayment_unionpay.secure_code_b2c
+				else
+					secure_code = Settings.oceanpayment_unionpay.secure_code_b2b
+				end
+				
 				sha_result=Digest::SHA256.hexdigest(
 					params['account'].to_s +
 					params['terminal'].to_s +
@@ -662,7 +668,7 @@ class OnlinePayCallbackController < ApplicationController
 					params['payment_status'].to_s +
 					params['payment_details'].to_s +
 					params['payment_risk'].to_s +
-					Settings.oceanpayment_unionpay.secure_code_b2c
+					secure_code
 				)
 
 				valid_flag = sha_result.upcase == params['signValue']
