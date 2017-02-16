@@ -16,8 +16,12 @@
           <%= label_tag(:payway_alipay_oversea, "ALIPAY_OVERSEA") %>
           <%= radio_button_tag(:payway, "alipay_transaction") %>
           <%= label_tag(:payway_alipay_transaction, "ALIPAY_TRANSACTION") %> </br>
-          <%= radio_button_tag(:payway, "oceanpayment_unionpay") %>
-          <%= label_tag(:payway_alipay_transaction, "OCEANPAYMENT_UNIONPAY") %> </br>
+          <%= radio_button_tag(:payway, "oceanpayment_unionpay_b2c") %>
+          <%= label_tag(:payway_alipay_transaction, "OCEANPAYMENT_UNIONPAY_B2C") %> </br>
+          <%= radio_button_tag(:payway, "oceanpayment_unionpay_b2b") %>
+          <%= label_tag(:payway_alipay_transaction, "OCEANPAYMENT_UNIONPAY_B2B") %> </br>
+          <%= radio_button_tag(:payway, "oceanpayment_wechatpay") %>
+          <%= label_tag(:payway_alipay_transaction, "OCEANPAYMENT_WECHATPAY") %> </br>
           
           <%= label_tag(:label3, "amount") %>
           <%= text_field_tag(:amount, 0.01) %>

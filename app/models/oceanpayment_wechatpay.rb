@@ -1,56 +1,48 @@
-class OceanpaymentUnionpayDetail
+class OceanpaymentWechatpayDetail
 	include PayDetailable
 	attr_accessor :system,:country,:amount,:currency,:order_no,:description,:userid,:paytype
 
 	def initialize(online_pay)
-		if !payparams_valid("oceanpayment_unionpay",online_pay) ||  !spec_payparams_valid(online_pay)
-			raise "oceanpayment_unionpay payparams valid failure!!"
+		if !payparams_valid("oceanpayment_wechatpay",online_pay) ||  !spec_payparams_valid(online_pay)
+			raise "oceanpayment_wechatpay payparams valid failure!!"
 		end
 
-		define_var("oceanpayment_unionpay",online_pay)
+		define_var("oceanpayment_wechatpay",online_pay)
 	end
 
 	def get_submit_info()
 		trade_no=@system+"_"+@order_no
 
 
-		if @paytype=="unionpay_b2c"
-			terminal=Settings.oceanpayment_unionpay.terminal_b2c
-			secure_code=Settings.oceanpayment_unionpay.secure_code_b2c
-		else
-			terminal=Settings.oceanpayment_unionpay.terminal_b2b
-			secure_code=Settings.oceanpayment_unionpay.secure_code_b2b
-		end
+		terminal=Settings.oceanpayment_wechatpay.terminal
+		secure_code=Settings.oceanpayment_wechatpay.secure_code
 
 		post_params={
-			"account"=>Settings.oceanpayment_unionpay.account,
+			"account"=>Settings.oceanpayment_wechatpay.account,
 			"terminal"=>terminal,
 			"signValue"=>"",
-			"backUrl"=>Settings.oceanpayment_unionpay.return_url,
-			"noticeUrl"=>Settings.oceanpayment_unionpay.notification_url,	#only 443 or 80
-			"methods"=>"UnionPay",
+			"backUrl"=>Settings.oceanpayment_wechatpay.return_url,
+			"noticeUrl"=>Settings.oceanpayment_wechatpay.notification_url,	#only 443 or 80
+			"methods"=>"WX",
 			"order_number"=>trade_no,
 			"order_currency"=>@currency,
 			"order_amount"=>@amount.to_s,
 			"order_notes"=>@description,
-			"billing_firstName"=>"N/A",
-			"billing_lastName"=>"N/A",
-			"billing_email"=>@userid.to_s+Settings.oceanpayment_unionpay.billing_email,
+			"billing_firstName"=>@userid,
+			"billing_lastName"=>@userid,
+			"billing_email"=>@userid.to_s+Settings.oceanpayment_wechatpay.billing_email,
 			"billing_country"=>@country.upcase,
-			"productSku"=>"N/A",
-			"productName"=>"N/A",
-			"productNum"=>"N/A",
+			"productName"=>"N/A"
 		}
 
 		post_params["signValue"]=get_sign_value(post_params,secure_code)
 
 
-		redirect_url=Settings.oceanpayment_unionpay.api_url
+		redirect_url=Settings.oceanpayment_wechatpay.api_url
 		Rails.logger.info(post_params) unless Rails.env.production?
 
 		[redirect_url,trade_no,post_params]
 	end
-
 
 	private 
 		def spec_payparams_valid(online_pay)

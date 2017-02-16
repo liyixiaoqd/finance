@@ -186,8 +186,14 @@ class SimulationController < ApplicationController
 		when 'sofort' then simulate_params=init_sofort_submit_params(simulate_order_no,amount) 
 		when 'alipay_oversea' then simulate_params=init_alipay_oversea_submit_params(simulate_order_no,amount) 
 		when 'alipay_transaction' then simulate_params=init_alipay_transaction_submit_params(simulate_order_no,amount)
-		when 'oceanpayment_unionpay' then 
-			simulate_params=init_oceanpayment_unionpay_submit_params(simulate_order_no,amount)
+		when 'oceanpayment_unionpay_b2c' then 
+			simulate_params=init_oceanpayment_submit_params(simulate_order_no,amount,"unionpay_b2c")
+			callpath="/pay/#{userid}/submit_post"
+		when 'oceanpayment_unionpay_b2b' then 
+			simulate_params=init_oceanpayment_submit_params(simulate_order_no,amount,"unionpay_b2b")
+			callpath="/pay/#{userid}/submit_post"
+		when 'oceanpayment_wechatpay' then 
+			simulate_params=init_oceanpayment_submit_params(simulate_order_no,amount,"wechatpay")
 			callpath="/pay/#{userid}/submit_post"
 		else
 			simulate_params={}
@@ -204,7 +210,7 @@ class SimulationController < ApplicationController
 		logger.info("SIMULATION CALL END !!")
 		#logger.info("body:#{response.body}\nresult:#{res_result}")
 		unless (res_result['redirect_url'].blank?)
-			if payway=="oceanpayment_unionpay"
+			if payway[0,12]=="oceanpayment"
 				@res=res_result
 				logger.info("res: [#{@res}]")
 				#post method to pay must use page 
@@ -541,10 +547,10 @@ class SimulationController < ApplicationController
 			init_online_pay_params.merge!(alipay_transaction_submit_params)
 		end
 
-		def init_oceanpayment_unionpay_submit_params(order_no,amount)
-			oceanpayment_unionpay_submit_params={
+		def init_oceanpayment_submit_params(order_no,amount,payway)
+			oceanpayment_submit_params={
 				'system'=>'mypost4u',
-				'payway'=>'oceanpayment',
+				'payway'=>payway,
 				'paytype'=>'unionpay',
 				'amount'=>amount,
 				'order_no'=>order_no,
@@ -556,7 +562,7 @@ class SimulationController < ApplicationController
 				'quantity'=>1,
 				'country'=>'de'
 			}		
-			init_online_pay_params.merge!(oceanpayment_unionpay_submit_params)
+			init_online_pay_params.merge!(oceanpayment_submit_params)
 		end
 
 		def current_time_ymdHMS(format="")

@@ -331,3 +331,7 @@ AccessAuthority.create!(:controller=>"OnlinePayCallbackController",:action=>"oce
 AccessAuthority.create!(:controller=>"OnlinePayCallbackController",:action=>"oceanpayment_unionpay_notify",
 			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>false,
 			:describe=>'alipay_oversea支付异步回调接口')
+
+BasicData.create!(:basic_type=>"00A",:desc=>"financial reconciliation interface configuration",
+	                   :basic_sub_type=>"001",:sub_desc=>"postpone the date - day",
+	                   :payway=>"oceanpayment",:paytype=>"",:value=>"1")

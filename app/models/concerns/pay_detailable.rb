@@ -3,7 +3,7 @@ module PayDetailable extend ActiveSupport::Concern
 	PAY_SOFORT_PARAMS=%w{system country currency order_no amount success_url notification_url abort_url timeout_url}
 	PAY_ALIPAY_OVERSEA_PARAMS=%w{system amount description currency order_no success_url notification_url}
 	PAY_ALIPAY_TRANSACTION_PARAMS=%w{system quantity amount logistics_name description order_no success_url notification_url}
-	PAY_OCEANPAYMENT_UNIONPAY_PARAMS=%w{system country amount currency order_no success_url notification_url description userid}
+	PAY_OCEANPAYMENT_UNIONPAY_PARAMS=%w{system country amount currency order_no success_url notification_url description userid paytype}
 
 
 	def payparams_valid(detail_name,online_pay)

@@ -1,7 +1,7 @@
 require 'csv'
 
 class OnlinePayController < ApplicationController
-	protect_from_forgery :except => :submit
+	protect_from_forgery :except => [:submit,:submit_post]
 	before_action :check_send_country,only: [:index,:export_index]
 	include Paramsable,OnlinePayHelper
 	
@@ -245,7 +245,13 @@ class OnlinePayController < ApplicationController
 
 			# logger.info("ONLINE PAY SUBMIT LOCK ONLINE_PAY START:#{online_pay.id} - #{online_pay.order_no}")
 			# online_pay.with_lock do 
-			pay_detail=OnlinePay.get_instance_pay_detail(online_pay)
+			if online_pay.payway=="oceanpayment" && online_pay.paytype[0,8]=="unionpay"
+				pay_detail = OceanpaymentUnionpayDetail.new(online_pay)
+			elsif online_pay.payway=="oceanpayment" && online_pay.paytype[0,8]=="wechatpay"
+				pay_detail = OceanpaymentWechatpayDetail.new(online_pay)
+			else
+				raise "not support ! [#{online_pay.payway}][#{online_pay.paytype}]"
+			end
 
 			online_pay.redirect_url,online_pay.trade_no,post_params = pay_detail.get_submit_info()
 			online_pay.is_credit=false
