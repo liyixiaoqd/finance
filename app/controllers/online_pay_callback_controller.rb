@@ -515,6 +515,7 @@ class OnlinePayCallbackController < ApplicationController
 				# unless response_code=="200"
 				# 	raise "call #{redirect_url} failure : #{response_code}"
 				# end
+				logger.info("ret_hash[#{ret_hash}]") unless Rails.env.production?
 				if !online_pay.method_url_success?("post",redirect_url,false,ret_hash)
 					if online_pay.status=='success_notify'
 						online_pay.set_status!("failure_notify_third","call notify_url wrong")
@@ -603,6 +604,7 @@ class OnlinePayCallbackController < ApplicationController
 				# unless response_code=="200"
 				# 	raise "call #{redirect_url} failure : #{response_code}"
 				# end
+				logger.info("ret_hash[#{ret_hash}]") unless Rails.env.production?
 				if !online_pay.method_url_success?("post",redirect_url,false,ret_hash)
 					if online_pay.status=='success_notify'
 						online_pay.set_status!("failure_notify_third","call notify_url wrong")
