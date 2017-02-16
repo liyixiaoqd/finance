@@ -494,12 +494,13 @@ class OnlinePayCallbackController < ApplicationController
 			render :text=>'receive-ok' and return if online_pay.check_has_updated?(use_params['payment_status'])
 
 			online_pay.callback_status=use_params['payment_status']
+			online_pay.reason=use_params['payment_details']
 			online_pay.set_status_by_callback!()
 
 			online_pay.reconciliation_id=online_pay.trade_no
 
 			ret_hash['status']=online_pay.status
-			ret_hash['status_reason']=online_pay.callback_status
+			ret_hash['status_reason']=online_pay.reason
 
 			redirect_url=OnlinePay.redirect_url_replace("post",online_pay.notification_url)
 			logger.info("oceanpayment_unionpay_notify:#{redirect_url}")
@@ -581,12 +582,13 @@ class OnlinePayCallbackController < ApplicationController
 			render :text=>'receive-ok' and return if online_pay.check_has_updated?(use_params['payment_status'])
 
 			online_pay.callback_status=use_params['payment_status']
+			online_pay.reason=use_params['payment_details']
 			online_pay.set_status_by_callback!()
 
 			online_pay.reconciliation_id=online_pay.trade_no
 
 			ret_hash['status']=online_pay.status
-			ret_hash['status_reason']=online_pay.callback_status
+			ret_hash['status_reason']=online_pay.reason
 
 			redirect_url=OnlinePay.redirect_url_replace("post",online_pay.notification_url)
 			logger.info("oceanpayment_wechatpay_notify:#{redirect_url}")
