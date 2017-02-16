@@ -16,6 +16,14 @@ module ApplicationHelper
 		send_country
 	end
 
+	def dynamic_payway_select_tag()
+		payway=PAYWAY_MAPPING_TO_DISPLAY
+	end
+
+	def dynamic_paytype_select_tag()
+		paytype=PAYTYPE_MAPPING_TO_DISPLAY
+	end
+
 	def isAuthority(name)
 		if session[:admin_auth].blank?
 			false 

@@ -35,7 +35,10 @@ module OnlinePayHelper
 		'Paypal'=>'paypal',
 		'Sofort'=>'sofort',
 		'Score'=>'积分',
-		'ECash'=>'电子现金'
+		'ECash'=>'电子现金',
+		"OceanpaymentUnionpayB2c"=>"银联-b2c",
+		"OceanpaymentUnionpayB2b"=>"银联-b2b",
+		"OceanpaymentWechatpay"=>"微信",
 	}
 
 	SYSTEM_MAPPING={

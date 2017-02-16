@@ -9,10 +9,10 @@
 			<div class="well">
 			<%= form_tag transaction_reconciliation_report_path,method:"get",remote: :true do %>
 				 <%= label_tag(:l1, "支付类型:",class:"label_inline") %> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-				 <%= select_tag(:payway,options_for_select([["",""],["paypal","paypal"],["sofort","sofort"],["支付宝","alipay"],["积分","score"],["电子现金","e_cash"]])) %> 
+				 <%= select_tag(:payway,options_for_select(dynamic_payway_select_tag)) %> 
 				 &nbsp;&nbsp;
 				 <%= label_tag(:l2, "支付子类型:",class:"label_inline") %>&nbsp;&nbsp;&nbsp;&nbsp;
-				 <%= select_tag(:paytype,options_for_select([["",""],["国内支付","transaction"],["海外支付","oversea"]])) %> 
+				 <%= select_tag(:paytype,options_for_select(dynamic_paytype_select_tag)) %> 
 				 </br>
 				 <%= label_tag(:l3, "货币:",class:"label_inline") %>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				 <%= select_tag(:currency,options_for_select([["",""],["EUR","EUR"],["GBP","GBP"],["RMB","RMB"]])) %> 
