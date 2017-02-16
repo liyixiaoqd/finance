@@ -78,13 +78,15 @@ Rails.application.routes.draw do
   get 'pay/callback/sofort_abort/:system/:order_no' => 'online_pay_callback#sofort_abort'
   post 'pay/callback/sofort_notify' => 'online_pay_callback#sofort_notify'
 
-  get 'pay/callback/oceanpayment_unionpay_return' => 'online_pay_callback#oceanpayment_unionpay_return'
-  post 'pay/callback/oceanpayment_unionpay_notify' => 'online_pay_callback#oceanpayment_unionpay_notify'
-
   #reconciliation inteface use 
   get 'pay/:payment_system/get_reconciliation' => 'online_pay#get_bill_from_payment_system'
 
+  #unionpay + weixinpay
 
+  post 'pay/:userid/submit_post' => 'online_pay#submit_post'
+  get 'pay/callback/oceanpayment_unionpay_return' => 'online_pay_callback#oceanpayment_unionpay_return'
+  post 'pay/callback/oceanpayment_unionpay_notify' => 'online_pay_callback#oceanpayment_unionpay_notify'
+  get 'simulation/simulate_pay_post' => 'simulation#simulate_pay_post'
  
   #web display  ---  simulate interface 
   get 'simulation' => 'simulation#index'

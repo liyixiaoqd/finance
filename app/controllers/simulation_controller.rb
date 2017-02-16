@@ -171,7 +171,12 @@ class SimulationController < ApplicationController
 
 		logger.info("payway:#{payway}")
 
-		userid=User.find_by(username: "spec_username",system: "mypost4u").userid
+		sim_user=User.find_by(username: "spec_username",system: "mypost4u")
+		if sim_user.blank?
+			sim_user=User.find_by(email: "fylee_ger@126.com",system: "mypost4u")
+		end
+		userid=sim_user.userid
+		
 		callpath="/pay/#{userid}/submit"
 		
 		simulate_order_no=create_pay_order_no(payway,new_serial)
@@ -181,7 +186,9 @@ class SimulationController < ApplicationController
 		when 'sofort' then simulate_params=init_sofort_submit_params(simulate_order_no,amount) 
 		when 'alipay_oversea' then simulate_params=init_alipay_oversea_submit_params(simulate_order_no,amount) 
 		when 'alipay_transaction' then simulate_params=init_alipay_transaction_submit_params(simulate_order_no,amount)
-		when 'oceanpayment_unionpay' then simulate_params=init_oceanpayment_unionpay_submit_params(simulate_order_no,amount)
+		when 'oceanpayment_unionpay' then 
+			simulate_params=init_oceanpayment_unionpay_submit_params(simulate_order_no,amount)
+			callpath="/pay/#{userid}/submit_post"
 		else
 			simulate_params={}
 		end
@@ -197,7 +204,15 @@ class SimulationController < ApplicationController
 		logger.info("SIMULATION CALL END !!")
 		#logger.info("body:#{response.body}\nresult:#{res_result}")
 		unless (res_result['redirect_url'].blank?)
-			redirect_to CGI.unescape(res_result['redirect_url'])
+			if payway=="oceanpayment_unionpay"
+				@res=res_result
+				logger.info("res: [#{@res}]")
+				#post method to pay must use page 
+				render simulation_simulate_pay_post_path
+			else
+				#get method to pay
+				redirect_to CGI.unescape(res_result['redirect_url'])
+			end
 		else
 			flash[:notice]='please modify and try again!'
 			render :action=>'index'

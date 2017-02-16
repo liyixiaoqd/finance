@@ -448,7 +448,7 @@ class OnlinePayCallbackController < ApplicationController
 		logger.info("into oceanpayment_unionpay_return and params: [#{params}]")
 
 		#order_notes == system
-		online_pay=OnlinePay.find_by_system_and_payway_and_order_no(params['order_notes'],"sofort",params['order_no'])
+		online_pay=OnlinePay.get_online_pay_instance("oceanpayment_unionpay","",params,"",false,true)
 		render text: "#{render_text}" and return if (online_pay.blank? || online_pay.success_url.blank?)
 
 		ret_hash=init_return_ret_hash(online_pay)
@@ -463,7 +463,58 @@ class OnlinePayCallbackController < ApplicationController
 	end
 
 	def oceanpayment_unionpay_notify
+		logger.info("into oceanpayment_unionpay_notify and params: [#{params}]")
 
+		ActiveRecord::Base.transaction do
+			render_text="failure"
+			online_pay=OnlinePay.get_online_pay_instance("sofort","",params,"",false,true)
+			render :text=>"#{render_text}" and return if (online_pay.blank? || online_pay.notification_url.blank?)
+			cq=CallQueue.online_pay_is_succ_record(online_pay.id)
+
+			pay_detail=OnlinePay.get_instance_pay_detail(online_pay)
+			
+			ret_hash=init_notify_ret_hash(online_pay)
+			rollback_callback_status,online_pay.reason=pay_detail.identify_transaction(online_pay.trade_no,online_pay.country)
+			#check is status has updated
+			logger.warn("sofort_notify:identify_transaction failure") if rollback_callback_status.blank?
+			render :text=>'success' and return if online_pay.check_has_updated?(rollback_callback_status)
+
+			online_pay.callback_status,rollback_callback_status=rollback_callback_status,online_pay.callback_status
+			online_pay.set_status_by_callback!()
+
+			online_pay.reconciliation_id=online_pay.trade_no
+
+			ret_hash['status']=online_pay.status
+			ret_hash['status_reason']=online_pay.callback_status
+
+			redirect_url=OnlinePay.redirect_url_replace("post",online_pay.notification_url)
+			logger.info("sofort_notify:#{redirect_url}")
+
+			begin
+				online_pay.save!()
+				if online_pay.is_success?() && online_pay.find_reconciliation().blank?
+					online_pay.set_reconciliation.save!()
+					cq.online_pay_is_succ_set() unless cq.blank?
+				end
+				# response_code=online_pay.method_url_response_code("post",redirect_url,false,ret_hash)
+				# unless response_code=="200"
+				# 	raise "call #{redirect_url} failure : #{response_code}"
+				# end
+				if !online_pay.method_url_success?("post",redirect_url,false,ret_hash)
+					if online_pay.status=='success_notify'
+						online_pay.set_status!("failure_notify_third","call notify_url wrong")
+						online_pay.update_attributes!({})
+					end
+				end
+
+				render_text="success"
+			rescue => e
+				online_pay.update_attributes(:status=>"failure_notify",:reason=>e.message,:callback_status=>rollback_callback_status)
+				logger.info("sofort_notify failure!! : #{e.message},[#{params}]")
+			end
+
+			render text: "#{render_text}"
+		end
 	end
 
 	private 

@@ -1,0 +1,13 @@
+<h1>SIMULATE PAY POST TEMP PAGE</h1>
+
+<%= form_tag(CGI.unescape(@res["redirect_url"]), method: "post") do %>
+  <%= label_tag(:label1, "trade_no: #{@res['trade_no']}") %> </br>
+
+	<% @res['post_params'].each do |key,value| %>
+		<%= label_tag("label_#{key}", "#{key}") %>
+		<%= text_field_tag("#{key}" ,"#{value}") %> </br>
+	<% end %>
+
+  </br>  </br>
+  <%= submit_tag("call") %>
+<% end %>

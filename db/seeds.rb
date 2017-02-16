@@ -316,3 +316,18 @@ end
 AccessAuthority.create!(:controller=>"ThirdPartyServiceController",:action=>"exchange_rate",
 			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>true,
 			:describe=>'汇率获取接口')
+
+AccessAuthority.create!(:controller=>"OnlinePayController",:action=>"submit_post",
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>true,
+			:describe=>'支付提交接口,返回post')
+
+AccessAuthority.create!(:controller=>"SimulationController",:action=>"simulate_pay_post",
+			:is_sign_in=>true,:is_interface=>false,
+			:describe=>'模拟交易 - 模拟支付')
+
+AccessAuthority.create!(:controller=>"OnlinePayCallbackController",:action=>"oceanpayment_unionpay_return",
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>false,
+			:describe=>'alipay_oversea支付同步回调接口')
+AccessAuthority.create!(:controller=>"OnlinePayCallbackController",:action=>"oceanpayment_unionpay_notify",
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>false,
+			:describe=>'alipay_oversea支付异步回调接口')

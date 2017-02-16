@@ -1,6 +1,6 @@
 class OceanpaymentUnionpayDetail
 	include PayDetailable
-	attr_accessor :system,:country,:amount,:currency,:order_no
+	attr_accessor :system,:country,:amount,:currency,:order_no,:description,:userid
 
 	def initialize(online_pay)
 		if !payparams_valid("oceanpayment_unionpay",online_pay) ||  !spec_payparams_valid(online_pay)
@@ -10,7 +10,9 @@ class OceanpaymentUnionpayDetail
 		define_var("oceanpayment_unionpay",online_pay)
 	end
 
-	def submit()
+	def get_submit_info()
+		trade_no=@system+@order_no
+
 		post_params={
 			"account"=>Settings.oceanpayment_unionpay.account,
 			"terminal"=>Settings.oceanpayment_unionpay.terminal_b2c,
@@ -18,13 +20,13 @@ class OceanpaymentUnionpayDetail
 			"backUrl"=>Settings.oceanpayment_unionpay.return_url,
 			"noticeUrl"=>Settings.oceanpayment_unionpay.notification_url,	#only 443 or 80
 			"methods"=>"UnionPay",
-			"order_number"=>@order_no,
+			"order_number"=>trade_no,
 			"order_currency"=>@currency,
 			"order_amount"=>@amount.to_s,
-			"order_notes"=>@system,
+			"order_notes"=>@description,
 			"billing_firstName"=>"N/A",
 			"billing_lastName"=>"N/A",
-			"billing_email"=>Settings.oceanpayment_unionpay.billing_email,
+			"billing_email"=>userid.to_s+Settings.oceanpayment_unionpay.billing_email,
 			"billing_country"=>@country,
 			"productSku"=>"N/A",
 			"productName"=>"N/A",
@@ -37,14 +39,7 @@ class OceanpaymentUnionpayDetail
 		redirect_url=Settings.oceanpayment_unionpay.api_url
 		Rails.logger.info(post_params) unless Rails.env.production?
 
-		response=method_url_response("post",redirect_url,true,post_params)
-		if response.code=="200"
-			Rails.logger.info(response.body)
-			["success",redirect_url,"","false",""]
-		else
-			Rails.logger.info("#{response.code} - #{response.body}")
-			["failure","","","","get alipay url failure,code:#{response_code}"]
-		end
+		[redirect_url,trade_no,post_params]
 	end
 
 

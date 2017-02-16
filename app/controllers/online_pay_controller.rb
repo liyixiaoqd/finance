@@ -208,6 +208,75 @@ class OnlinePayController < ApplicationController
 		render json:ret_hash.to_json
 	end
 
+	#return url and post params   
+	def submit_post
+		#logger.info(params.inspect)
+		render json:{},status:400 and return unless params_valid("online_pay_submit",params)
+		ret_hash={
+			'redirect_url'=>'',
+			'trade_no'=>'',
+			'post_params'=>{}
+		}
+
+		online_pay=nil
+		pay_detail=nil
+		
+		#ID转换
+		old_userid=params['userid']
+		params['userid']=interface_userid_zh(params['system'],params['userid'])
+
+		begin
+		#先产生order_no
+			user=User.find_by_system_and_userid(params['system'],params['userid'])
+			if(user.blank?)
+				render json:{},status:400 and return
+			end
+
+			logger.info("ONLINE PAY SUBMIT_POST LOCK USER START:#{user.username} - #{params['order_no']}")
+			user.with_lock do 				
+				online_pay=new_online_pay_params(user,params,request)
+				# if(online_pay.status=='failure_submit')
+				# 	logger.warn("no user:#{online_pay.userid} pay record save!")
+				# 	render json:{},status:400 and return
+				# end
+				online_pay.save!
+			end
+			logger.info("ONLINE PAY SUBMIT_POST LOCK USER END:#{user.username} - #{online_pay.order_no} - #{online_pay.id}")
+
+			# logger.info("ONLINE PAY SUBMIT LOCK ONLINE_PAY START:#{online_pay.id} - #{online_pay.order_no}")
+			# online_pay.with_lock do 
+			pay_detail=OnlinePay.get_instance_pay_detail(online_pay)
+
+			online_pay.redirect_url,online_pay.trade_no,post_params = pay_detail.get_submit_info()
+			online_pay.is_credit=false
+			online_pay.update_attributes!({})
+
+			OrderNoToTradeNo.create!({
+				payway: online_pay.payway,
+				paytype: online_pay.paytype,
+				order_no: online_pay.order_no,
+				trade_no: online_pay.trade_no
+			}) unless online_pay.trade_no.blank?
+
+			ret_hash['redirect_url']=CGI.escape(online_pay.redirect_url)
+			ret_hash['trade_no'] = online_pay.trade_no
+			ret_hash['post_params'] = post_params
+			# end
+			# logger.info("ONLINE PAY SUBMIT LOCK ONLINE_PAY END:#{online_pay.id} - #{online_pay.order_no}")
+		rescue => e
+			#failure also save pay record!!
+			logger.info("online_pay_redirect create or call failure! : #{e.message}")
+			unless (online_pay.blank?)
+				online_pay.set_status!("failure_submit",e.message)
+				online_pay.save
+			end
+			render json:{},status:400 and return
+		end
+
+		logger.info("ONLINE_PAY SUBMIT_POST RET:#{ret_hash}")
+		render json:ret_hash.to_json
+	end
+
 	# def  submit_creditcard
 	# 	render json:{},status:400 and return unless params_valid("online_pay_submit_creditcard",params)
 	# 	ret_hash={
