@@ -465,21 +465,28 @@ class OnlinePayCallbackController < ApplicationController
 	def oceanpayment_unionpay_notify
 		logger.info("into oceanpayment_unionpay_notify and params: [#{params}]")
 
+		render_text="failure"
+		if valid_oceanpayment_unionpay_notify(params) == false
+			logger.info("into oceanpayment_unionpay_notify return ,valid failure")
+			render :text=>render_text and return 
+		end
+
 		ActiveRecord::Base.transaction do
-			render_text="failure"
-			online_pay=OnlinePay.get_online_pay_instance("sofort","",params,"",false,true)
+			
+			online_pay=OnlinePay.get_online_pay_instance("oceanpayment_unionpay","",params,"",false,true)
 			render :text=>"#{render_text}" and return if (online_pay.blank? || online_pay.notification_url.blank?)
 			cq=CallQueue.online_pay_is_succ_record(online_pay.id)
 
 			pay_detail=OnlinePay.get_instance_pay_detail(online_pay)
 			
 			ret_hash=init_notify_ret_hash(online_pay)
-			rollback_callback_status,online_pay.reason=pay_detail.identify_transaction(online_pay.trade_no,online_pay.country)
-			#check is status has updated
-			logger.warn("sofort_notify:identify_transaction failure") if rollback_callback_status.blank?
-			render :text=>'success' and return if online_pay.check_has_updated?(rollback_callback_status)
 
-			online_pay.callback_status,rollback_callback_status=rollback_callback_status,online_pay.callback_status
+			rollback_callback_status = online_pay.callback_status
+			params['payment_status']=params['payment_status'].to_s
+
+			render :text=>'receive-ok' and return if online_pay.check_has_updated?(params['payment_status'])
+
+			online_pay.callback_status=params['payment_status']
 			online_pay.set_status_by_callback!()
 
 			online_pay.reconciliation_id=online_pay.trade_no
@@ -488,7 +495,7 @@ class OnlinePayCallbackController < ApplicationController
 			ret_hash['status_reason']=online_pay.callback_status
 
 			redirect_url=OnlinePay.redirect_url_replace("post",online_pay.notification_url)
-			logger.info("sofort_notify:#{redirect_url}")
+			logger.info("oceanpayment_unionpay_notify:#{redirect_url}")
 
 			begin
 				online_pay.save!()
@@ -507,7 +514,7 @@ class OnlinePayCallbackController < ApplicationController
 					end
 				end
 
-				render_text="success"
+				render_text="receive-ok"
 			rescue => e
 				online_pay.update_attributes(:status=>"failure_notify",:reason=>e.message,:callback_status=>rollback_callback_status)
 				logger.info("sofort_notify failure!! : #{e.message},[#{params}]")
@@ -541,5 +548,35 @@ class OnlinePayCallbackController < ApplicationController
 				'water_no'=>'',
 				'sign'=>Digest::MD5.hexdigest("#{online_pay.trade_no}#{Settings.authenticate.signkey}")		
 			}
+		end
+
+		def valid_oceanpayment_unionpay_notify(params)
+			valid_flag=false
+
+			begin
+				sha_result=Digest::SHA256.hexdigest(
+					params['account'].to_s +
+					params['terminal'].to_s +
+					params['order_number'].to_s +
+					params['order_currency'].to_s +
+					params['order_amount'].to_s +
+					params['order_notes'].to_s +
+					params['card_number'].to_s +
+					params['payment_id'].to_s +
+					params['payment_authType'].to_s +
+					params['payment_status'].to_s +
+					params['payment_details'].to_s +
+					params['payment_risk'].to_s +
+					Settings.oceanpayment_unionpay.secure_code_b2c
+				)
+
+				valid_flag = sha_result == params['signValue']
+				logger.info(" [#{sha_result}] ==== [#{params['signValue']}] , result: [#{valid_flag}]")
+			rescue=>e
+				logger.info("valid_oceanpayment_unionpay_notify rescue: #{e.message}")
+				valid_flag=false
+			end
+
+			valid_flag
 		end
 end

@@ -45,6 +45,15 @@ class OnlinePay < ActiveRecord::Base
  		'success_credit'=>9
 	}
 
+	# -1: 待处理(预授权才会有)
+	# 0: 失败
+	# 1: 成功
+	OCEANPAYMENT_UNIONPAY_STATUS={
+		'0' => 0,
+		'-1' => 8,
+		'1' => 9 
+	}
+
 	def set_channel!()
 		if (self.channel.blank?)
 			self.channel="web"
@@ -152,7 +161,15 @@ class OnlinePay < ActiveRecord::Base
 				self.status="success_notify"
 			else
 				self.status="intermediate_notify"
-			end				
+			end	
+		elsif(self.payway=="oceanpayment"  && self.paytype=="unionpay")
+			if(self.callback_status=="-1")
+				self.status="intermediate_notify"
+			elsif(self.callback_status=="0")
+				self.status="cancel_notify"
+			else
+				self.status="success_notify"
+			end
 		end
 	end
 
@@ -194,7 +211,13 @@ class OnlinePay < ActiveRecord::Base
 					has_updated=true
 				elsif(SOFORT_CALLBACK_STATUS[self.callback_status]>=SOFORT_CALLBACK_STATUS[new_callback_status])
 					has_updated=true
-				end		
+				end	
+			elsif(self.payway=="oceanpayment"  && self.paytype=="unionpay")
+				if OCEANPAYMENT_UNIONPAY_STATUS[self.callback_status]==9
+					has_updated=true
+				elsif OCEANPAYMENT_UNIONPAY_STATUS[self.callback_status]>=OCEANPAYMENT_UNIONPAY_STATUS[new_callback_status]
+					has_updated=true
+				end
 			end	
 		end
 
