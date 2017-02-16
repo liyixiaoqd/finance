@@ -494,8 +494,8 @@ class OnlinePayCallbackController < ApplicationController
 			render :text=>'receive-ok' and return if online_pay.check_has_updated?(use_params['payment_status'])
 
 			online_pay.callback_status=use_params['payment_status']
-			online_pay.reason=use_params['payment_details']
 			online_pay.set_status_by_callback!()
+			online_pay.reason=use_params['payment_details']
 
 			online_pay.reconciliation_id=online_pay.trade_no
 
@@ -583,8 +583,8 @@ class OnlinePayCallbackController < ApplicationController
 			render :text=>'receive-ok' and return if online_pay.check_has_updated?(use_params['payment_status'])
 
 			online_pay.callback_status=use_params['payment_status']
-			online_pay.reason=use_params['payment_details']
 			online_pay.set_status_by_callback!()
+			online_pay.reason=use_params['payment_details']
 
 			online_pay.reconciliation_id=online_pay.trade_no
 
