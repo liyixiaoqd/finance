@@ -314,6 +314,7 @@ class OnlinePay < ActiveRecord::Base
 				when 'alipay_transaction' then trade_no=params['out_trade_no']
 				when 'paypal' then trade_no=params['token']
 				when 'sofort' then trade_no=params["status_notification"]["transaction"]
+				when 'oceanpayment_unionpay' then trade_no=params["order_number"]
 				else
 					logger.warn("ONLINE_PAY CALLBACK:get_online_pay_instance:#{pay_combine}=#{payway}+#{paytype}!")
 				end
@@ -324,7 +325,7 @@ class OnlinePay < ActiveRecord::Base
 			end
 
 			# 特殊处理支付宝
-			if pay_combine=="alipay_transaction" || pay_combine=="alipay_oversea"
+			if pay_combine=="alipay_transaction" || pay_combine=="alipay_oversea" || pay_combine=="oceanpayment_unionpay"
 				# op=OnlinePay.find_by_payway_and_paytype_and_order_no(payway,paytype,trade_no)
 				# if op.blank?
 				# 	raise "spec alipay get onlinepay wrong!"
