@@ -448,7 +448,7 @@ class OnlinePayCallbackController < ApplicationController
 		logger.info("into oceanpayment_unionpay_return and params: [#{params}]")
 
 		#order_notes == system
-		online_pay=OnlinePay.get_online_pay_instance("oceanpayment_unionpay","",params,"",false,true)
+		online_pay=OnlinePay.get_online_pay_instance("oceanpayment","unionpay",params,"",false,true)
 		render text: "#{render_text}" and return if (online_pay.blank? || online_pay.success_url.blank?)
 
 		ret_hash=init_return_ret_hash(online_pay)
@@ -466,14 +466,21 @@ class OnlinePayCallbackController < ApplicationController
 		logger.info("into oceanpayment_unionpay_notify and params: [#{params}]")
 
 		render_text="failure"
-		if valid_oceanpayment_unionpay_notify(params) == false
-			logger.info("into oceanpayment_unionpay_notify return ,valid failure")
+		use_params={}
+		begin
+			use_params = params['response']
+			if valid_oceanpayment_unionpay_notify(use_params) == false
+				logger.info("into oceanpayment_unionpay_notify return ,valid failure")
+				render :text=>render_text and return 
+			end
+		rescue=>e
+			logger.info("into oceanpayment_unionpay_notify return ,rescue #{e.message}")
 			render :text=>render_text and return 
 		end
 
 		ActiveRecord::Base.transaction do
 			
-			online_pay=OnlinePay.get_online_pay_instance("oceanpayment_unionpay","",params,"",false,true)
+			online_pay=OnlinePay.get_online_pay_instance("oceanpayment","unionpay",use_params,"",false,true)
 			render :text=>"#{render_text}" and return if (online_pay.blank? || online_pay.notification_url.blank?)
 			cq=CallQueue.online_pay_is_succ_record(online_pay.id)
 
@@ -482,11 +489,11 @@ class OnlinePayCallbackController < ApplicationController
 			ret_hash=init_notify_ret_hash(online_pay)
 
 			rollback_callback_status = online_pay.callback_status
-			params['payment_status']=params['payment_status'].to_s
+			use_params['payment_status']=use_params['payment_status'].to_s
 
-			render :text=>'receive-ok' and return if online_pay.check_has_updated?(params['payment_status'])
+			render :text=>'receive-ok' and return if online_pay.check_has_updated?(use_params['payment_status'])
 
-			online_pay.callback_status=params['payment_status']
+			online_pay.callback_status=use_params['payment_status']
 			online_pay.set_status_by_callback!()
 
 			online_pay.reconciliation_id=online_pay.trade_no
@@ -517,7 +524,7 @@ class OnlinePayCallbackController < ApplicationController
 				render_text="receive-ok"
 			rescue => e
 				online_pay.update_attributes(:status=>"failure_notify",:reason=>e.message,:callback_status=>rollback_callback_status)
-				logger.info("sofort_notify failure!! : #{e.message},[#{params}]")
+				logger.info("sofort_notify failure!! : #{e.message},[#{use_params}]")
 			end
 
 			render text: "#{render_text}"
