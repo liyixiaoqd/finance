@@ -84,7 +84,7 @@ Rails.application.routes.draw do
   #unionpay + weixinpay
 
   post 'pay/:userid/submit_post' => 'online_pay#submit_post'
-  get 'pay/callback/oceanpayment_unionpay_return' => 'online_pay_callback#oceanpayment_unionpay_return'
+  post 'pay/callback/oceanpayment_unionpay_return' => 'online_pay_callback#oceanpayment_unionpay_return'
   post 'pay/callback/oceanpayment_unionpay_notify' => 'online_pay_callback#oceanpayment_unionpay_notify'
   get 'simulation/simulate_pay_post' => 'simulation#simulate_pay_post'
  
