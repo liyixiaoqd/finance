@@ -448,7 +448,7 @@ class OnlinePayCallbackController < ApplicationController
 		logger.info("into oceanpayment_unionpay_return and params: [#{params}]")
 
 		#order_notes == system
-		online_pay=OnlinePay.get_online_pay_instance("oceanpayment","unionpay"+params['subtype'],params,"",false,true)
+		online_pay=OnlinePay.get_online_pay_instance("oceanpayment","unionpay_"+params['subtype'],params,"",false,true)
 		render text: "#{render_text}" and return if (online_pay.blank? || online_pay.success_url.blank?)
 
 		ret_hash=init_return_ret_hash(online_pay)
