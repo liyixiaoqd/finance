@@ -557,7 +557,7 @@ class SimulationController < ApplicationController
 				'paytype'=>paytype,
 				'amount'=>amount,
 				'order_no'=>order_no,
-				'currency'=>'CNY',
+				'currency'=>'RMB',
 				'logistics_name'=>'logistics_name',
 				'description'=>"测试交易:订单号#{order_no}的寄送包裹费用",
 				'success_url'=>"#{CALL_HOST}/simulation/callback_return",
