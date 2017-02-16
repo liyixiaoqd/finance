@@ -47,6 +47,8 @@ class ReconciliationOceanpayment
 			message=message+valid_reconciliation(order_nos)
 			@batch_id+=1
 		end
+
+		message
 	end
 
 	def valid_reconciliation(order_nos)

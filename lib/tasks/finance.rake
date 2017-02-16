@@ -71,6 +71,22 @@ namespace :finance do
 	task :reconciliation_sofort=>[:environment] do
 	end
 
+	desc "对账:oceanpayment - 包含银联b2b+银联b2c+微信"
+	task :reconciliation_oceanpayment=>[:environment] do
+		if @interface_logger.blank?
+			@interface_logger = Logger.new("log/reconciliation.log")
+		end
+		@interface_logger.info("reconciliation_oceanpayment start")
+		["unionpay_b2c","unionpay_b2b","wechatpay"].each do |subtype|
+			@interface_logger.info("#{subtype} start")
+			reconciliation=ReconciliationOceanpayment.new(subtype)
+			message=reconciliation.finance_reconciliation()
+			@interface_logger.info(out_message(message))
+			@interface_logger.info("#{subtype} end")
+		end
+		@interface_logger.info("reconciliation_oceanpayment end")
+	end
+
 	def out_message(message)
 		out=""
 		pre="\t\t"
