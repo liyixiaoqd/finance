@@ -11,7 +11,7 @@ class OceanpaymentUnionpayDetail
 	end
 
 	def get_submit_info()
-		trade_no=@system+@order_no
+		trade_no=@system+"_"+@order_no
 
 		post_params={
 			"account"=>Settings.oceanpayment_unionpay.account,
