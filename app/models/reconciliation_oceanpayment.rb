@@ -96,11 +96,11 @@ class ReconciliationOceanpayment
 			else
 				result_infos['response']['paymentInfo'].each do |payinfo|
 					valid_flag,valid_msg=valid_reconciliation_process(payinfo)
-					valid_complete_num+=1
 					if valid_msg.present?
 						check_file << "[#{payinfo['order_number']}] - [#{valid_msg}]\n"
 						valid_rescue_num+=1
 					else
+						valid_complete_num+=1
 						check_file<< "[#{payinfo['order_number']}] - [#{valid_flag}]\n"
 						if valid_flag==true
 							valid_succ_num+=1
@@ -134,7 +134,7 @@ class ReconciliationOceanpayment
 				return [true,nil]
 			end
 
-			Rails.logger.info("is pay? [op.order_no] [op.status]  <-> [#{payinfo['payment_results']}]")
+			Rails.logger.info("is pay? [#{op.order_no}] [#{op.status}]  <-> [#{payinfo['payment_results']}]")
 			if payinfo['payment_results'].to_s=="1"	#实际支付成功
 				if rd.present?	#对账存在记录 
 					if rd.online_pay_status=~ /^success/ && payinfo['order_amount'].to_f==rd.amt   	#财务系统支付成功
@@ -162,7 +162,7 @@ class ReconciliationOceanpayment
 			else	#实际未支付成功
 				if rd.present? && rd.online_pay_status=~ /^success/ 	#财务系统支付成功
 					valid_flag=false
-					set_flag!(ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['FAIL'],"#{rd.payway} is failure[#{payinfo['payment_results']},#{payinfo['payment_details']}] but online_pay is #{rd.online_pay_status}")
+					rd.set_flag!(ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['FAIL'],"#{rd.payway} is failure[#{payinfo['payment_results']},#{payinfo['payment_details']}] but online_pay is #{rd.online_pay_status}")
 				end
 			end
 
