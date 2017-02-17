@@ -342,3 +342,15 @@ AccessAuthority.create!(:controller=>"OnlinePayCallbackController",:action=>"oce
 AccessAuthority.create!(:controller=>"OnlinePayCallbackController",:action=>"oceanpayment_wechatpay_notify",
 			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>false,
 			:describe=>'oceanpayment_wechatpay支付异步回调接口')
+
+OnlinePay.where(system: "mypost4u").where("created_at>='2017-01-01'").each do |op|
+	if op.order_no =~ /M$/
+		op.update!(order_type: "package_material")
+	end
+
+	if op.reconciliation_detail.present?
+		op.reconciliation_detail.update!(order_type: op.order_type)
+	end
+end
+
+ReconciliationDetail.where("order_type is null").update_all(order_type: "parcel")

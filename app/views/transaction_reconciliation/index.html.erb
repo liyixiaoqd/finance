@@ -14,7 +14,7 @@
 				 <%= label_tag(:l2, "包裹发送国家:",class:"label_inline") %>
 				 <%= select_tag(:send_country,options_for_select(dynamic_send_country_select_tag)) %>
 				  &nbsp;&nbsp;&nbsp;
-				 <%= label_tag(:l11, "货币:",class:"label_inline") %>&nbsp;&nbsp;&nbsp;
+				 <%= label_tag(:l11, "货币:",class:"label_inline") %>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				 <%= select_tag(:currencycode,options_for_select([["",""],["EUR","EUR"],["GBP","GBP"],["RMB","RMB"]])) %> 
 				 &nbsp;&nbsp;
 				 </br>
@@ -23,6 +23,9 @@
 				 &nbsp;&nbsp;&nbsp;
 				 <%= label_tag(:l4, "支付子类型:",class:"label_inline") %>&nbsp;&nbsp;&nbsp;
 				 <%= select_tag(:paytype,options_for_select(dynamic_paytype_select_tag)) %> 
+				 &nbsp;&nbsp;&nbsp;
+				 <%= label_tag(:l11, "订单类型:",class:"label_inline") %>
+				 <%= select_tag(:order_type,options_for_select(dynamic_order_type_select_tag)) %>  
 				 </br>
 				 <%= label_tag(:l5, "对账状态:",class:"label_inline") %> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 				 <%= select_tag(:reconciliation_flag,options_for_select([["",""],["未对账","0"],["对账失败","1"],["对账成功","2"]])) %> 

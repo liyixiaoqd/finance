@@ -31,4 +31,10 @@ module Enumsable extend ActiveSupport::Concern
 		"银联-b2b"=>"unionpay_b2b",
 		"微信"=>"wechatpay"
 	}
+
+	ORDER_TYPE_MAPPING_TO_DISPLAY={
+		""=>"",
+		"包裹"=>"parcel",
+		"包材"=>"package_material"
+	}
 end

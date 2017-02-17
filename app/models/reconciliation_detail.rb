@@ -198,6 +198,15 @@ class ReconciliationDetail < ActiveRecord::Base
 			self.confirm_date=self.transaction_date
 			self.invoice_date=self.transaction_date
 		end
+
+		#SET ORDER_TYPE
+		if self.order_type.blank? && self.online_pay_id.present?
+			begin
+				self.order_type = OnlinePay.find(self.online_pay_id).order_type
+			rescue
+				self.order_type= ""
+			end
+		end
 	end
 
 	def warn_to_file(errmsg="unknow")

@@ -6,7 +6,7 @@ class TransactionReconciliationController < ApplicationController
 	include Timeutilsable
 	include Enumsable
 
-	CONDITION_PARAMS=%w{payway paytype reconciliation_flag start_time end_time transactionid online_pay_id confirm_flag send_country system order_no currencycode}
+	CONDITION_PARAMS=%w{payway paytype reconciliation_flag start_time end_time transactionid online_pay_id confirm_flag send_country system order_no currencycode order_type}
 	# def index
 	# 	@reconciliation_details=ReconciliationDetail.includes(:online_pay).all.page(params[:page])
 
@@ -92,6 +92,7 @@ class TransactionReconciliationController < ApplicationController
 		currency=params['currency']
 		start_time=params['start_time']
 		end_time=params['end_time']
+		order_type=params['order_type']
 
 		if start_time.blank? || end_time.blank?
 			@finance_summary=FinanceSummary.new(OnlinePay.current_time_format("%Y-%m-%d",0),OnlinePay.current_time_format("%Y-%m-%d",0))
@@ -102,6 +103,7 @@ class TransactionReconciliationController < ApplicationController
 			condition+=" and paytype='#{paytype}'" unless paytype.blank?
 			condition+=" and send_country='#{send_country}'" unless send_country.blank?
 			condition+=" and currency='#{currency}'" unless currency.blank?
+			condition+=" and order_type='#{order_type}'" unless order_type.blank?
 			@finance_summary.setAmountAndNum!(condition)
 			logger.info(@finance_summary.output)
 		end
@@ -178,6 +180,7 @@ class TransactionReconciliationController < ApplicationController
 		sql+=" and transaction_date=:start_time " unless params['start_time'].blank?
 		sql+=" and system=:system " unless params['system'].blank?
 		sql+=" and send_country=:send_country " unless params['send_country'].blank?
+		sql+=" and order_type=:order_type " unless params['order_type'].blank?
 		if params['reconciliation_type']=="out"
 			sql+=" and batch_id in('refund_order','refund_parcel') "
 		else
@@ -190,6 +193,7 @@ class TransactionReconciliationController < ApplicationController
 		@send_country=params['send_country']
 		@transaction_date=params['start_time']
 		@reconciliation_type=params['reconciliation_type']
+		@order_type=params['order_type']
 	end
 
 	def confirm

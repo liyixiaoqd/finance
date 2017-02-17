@@ -5,7 +5,7 @@ class OnlinePayController < ApplicationController
 	before_action :check_send_country,only: [:index,:export_index]
 	include Paramsable,OnlinePayHelper
 	
-	CONDITION_PARAMS=%w{payway paytype reconciliation_flag start_time end_time reconciliation_id order_no user_id system send_country online_pay_status}
+	CONDITION_PARAMS=%w{payway paytype reconciliation_flag start_time end_time reconciliation_id order_no user_id system send_country online_pay_status order_type}
 	# before_action :authenticate_admin!,:only=>[:show,:show_single_detail]
 	def index
 		if (params['username'].present? || params['email'].present? )
@@ -403,6 +403,9 @@ class OnlinePayController < ApplicationController
 			online_pay.quantity=params.delete('quantity')
 			online_pay.logistics_name=params.delete('logistics_name')
 			online_pay.send_country=params.delete('send_country')
+
+			online_pay.set_order_type!(params.delete('order_type'))
+
 			online_pay.other_params=params.inspect
 
 			online_pay.remote_host=request.remote_host

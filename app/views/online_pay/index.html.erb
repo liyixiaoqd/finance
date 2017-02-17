@@ -24,6 +24,9 @@
 					 &nbsp;&nbsp;&nbsp;
 					 <%= label_tag(:l4, "支付子类型:",class:"label_inline") %>&nbsp;&nbsp;&nbsp;
 					 <%= select_tag(:paytype,options_for_select(dynamic_paytype_select_tag)) %> 
+					 &nbsp;&nbsp;&nbsp;
+					 <%= label_tag(:l11, "订单类型:",class:"label_inline") %>
+					 <%= select_tag(:order_type,options_for_select(dynamic_order_type_select_tag)) %> 
 					 </br>
 					 <%= label_tag(:l5, "用户名:",class:"label_inline") %> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 					 <%= text_field_tag(:username) %>

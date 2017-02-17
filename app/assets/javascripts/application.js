@@ -40,7 +40,8 @@ $(document).ready(function(){
   	new_url+="?start_time="+document.getElementById("start_time").value+
   		    "&system="+document.getElementById("system").value+
   		    "&send_country="+document.getElementById("send_country").value+
-  		    "&reconciliation_type="+document.getElementById("reconciliation_type").value
+  		    "&reconciliation_type="+document.getElementById("reconciliation_type").value+
+  		    "&order_type="+document.getElementById("order_type").value
 
 	location.replace(new_url);
   });
@@ -50,7 +51,8 @@ $(document).ready(function(){
   	new_url+="?start_time="+document.getElementById("start_time").value+
   		    "&system="+document.getElementById("system").value+
   		    "&send_country="+document.getElementById("send_country").value+
-  		    "&reconciliation_type="+document.getElementById("reconciliation_type").value
+  		    "&reconciliation_type="+document.getElementById("reconciliation_type").value+
+  		    "&order_type="+document.getElementById("order_type").value
 	location.replace(new_url);
   });
 

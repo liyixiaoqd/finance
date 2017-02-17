@@ -2,13 +2,13 @@ class OnlinePay < ActiveRecord::Base
 	include PayDetailable
 
 	ONLINE_PAY_STATUS_ENUM=%w{submit failure_submit submit_credit intermediate_notify success_notify cancel_notify failure_notify success_credit failure_credit success_score success_e_cash failure_notify_third}
-
+	ONLINE_PAY_ORDER_TYPE_ENUM=%w{parcel package_material}
 	belongs_to :user
 	has_one :reconciliation_detail
 	validates :system, :channel, :userid, :payway,:amount,:order_no,:status, presence: true
 	validates :amount, numericality:{:greater_than_or_equal_to=>0.00}
 	validates :status, inclusion: { in: ONLINE_PAY_STATUS_ENUM,message: "%{value} is not a valid online_pay.status" }
-
+	validates :order_type, inclusion: { in: ONLINE_PAY_ORDER_TYPE_ENUM,message: "%{value} is not a valid online_pay.order_type" }
 	before_create :create_unique_valid
 
 	paginates_per 14
@@ -98,6 +98,20 @@ class OnlinePay < ActiveRecord::Base
 
 		if(self.country.blank?)
 			set_status!("failure_submit","country wrong!")
+		end
+	end
+
+	def set_order_type!(input_order_type)
+		if self.order_type.blank?
+			if input_order_type.present?
+				self.order_type=input_order_type
+			else
+				if self.system=="mypost4u" && self.order_no =~ /M$/
+					self.order_type="package_material"
+				else
+					self.order_type="parcel"
+				end
+			end
 		end
 	end
 
@@ -290,7 +304,8 @@ class OnlinePay < ActiveRecord::Base
 			'country' => self.country,
 			'send_country' => self.send_country,
 			'system' => self.system,
-			'order_no' => self.order_no
+			'order_no' => self.order_no,
+			'order_type' => self.order_type
 		}
 
 		rd=ReconciliationDetail.init(reconciliation_params)

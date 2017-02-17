@@ -20,6 +20,9 @@
 					 &nbsp;&nbsp;&nbsp;
 					 <%= label_tag(:l11, "交易来源系统:",class:"label_inline") %> 
 					 <%= select_tag(:system,options_for_select([["",""],["包裹网站","mypost4u"],["quaie","quaie"]],@system),class: "auto_refresh") %> 
+					 &nbsp;&nbsp;&nbsp;
+					 <%= label_tag(:l11, "订单类型:",class:"label_inline") %>
+					 <%= select_tag(:order_type,options_for_select(dynamic_order_type_select_tag,@order_type),class: "auto_refresh") %>  
 					 </br>
 					<%= label_tag(:l13, "确认类型:",class:"label_inline") %>					 
 					<%= select_tag(:reconciliation_type,options_for_select([["进账","in"],["退费","out"]],@reconciliation_type),class: "auto_refresh") %> 
