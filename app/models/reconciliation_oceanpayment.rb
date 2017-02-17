@@ -129,6 +129,11 @@ class ReconciliationOceanpayment
 			end
 			rd=op.reconciliation_detail
 
+			if rd.present? && rd.confirm_flag==ReconciliationDetail::CONFIRM_FLAG['SUCC']
+				#has valid!
+				return [true,nil]
+			end
+
 			if payinfo['payment_results'].to_s=="1"	#实际支付成功
 				if rd.present?	#对账存在记录 
 					if rd.online_pay_status=~ /^success/ && payinfo['order_amount'].to_f==rd.amt   	#财务系统支付成功
