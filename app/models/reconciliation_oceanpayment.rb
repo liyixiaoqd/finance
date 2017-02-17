@@ -81,7 +81,7 @@ class ReconciliationOceanpayment
 			#单条记录
 			if result_infos['response']['paymentInfo'].class.to_s=="Hash"
 				payinfo = result_infos['response']['paymentInfo']
-				valid_flag,valid_msg=valid_reconciliation(payinfo)
+				valid_flag,valid_msg=valid_reconciliation_process(payinfo)
 				valid_complete_num+=1
 				if valid_msg.present?
 					check_file << "#{valid_msg}\n"
@@ -95,7 +95,7 @@ class ReconciliationOceanpayment
 				end
 			else
 				result_infos['response']['paymentInfo'].each do |payinfo|
-					valid_flag,valid_msg=valid_reconciliation(payinfo)
+					valid_flag,valid_msg=valid_reconciliation_process(payinfo)
 					valid_complete_num+=1
 					if valid_msg.present?
 						check_file << "#{valid_msg}\n"
@@ -114,11 +114,12 @@ class ReconciliationOceanpayment
 			Rails.logger.info(e.message)
 			valid_rescue_num=valid_all_num
 		end
+		check_file.close
 
 		"batch_id [ #{@batch_id} ] : </br> {all_num:#{valid_all_num} = complete_num:#{valid_complete_num} + rescue_num:#{valid_rescue_num}</br> complete_num:#{valid_complete_num} = succ_num:#{valid_succ_num} + fail_num:#{valid_fail_num} }</br>"
 	end
 
-	def valid_reconciliation(payinfo)
+	def valid_reconciliation_process(payinfo)
 		valid_flag,msg=true,nil
 		begin
 			op=OnlinePay.find_by(payway: "oceanpayment",paytype: @paytype,trade_no: payinfo['order_number'])
