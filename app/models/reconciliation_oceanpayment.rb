@@ -64,13 +64,24 @@ class ReconciliationOceanpayment
 
 
 		begin
+			if @paytype=="unionpay_b2c"
+				terminal = Settings.oceanpayment_unionpay.terminal_b2c
+				secure_code = Settings.oceanpayment_unionpay.secure_code_b2c
+			elsif @paytype=="unionpay_b2b"
+				terminal = Settings.oceanpayment_unionpay.terminal_b2b
+				secure_code = Settings.oceanpayment_unionpay.secure_code_b2b
+			else
+				terminal =  Settings.oceanpayment_wechatpay.terminal
+				secure_code = Settings.oceanpayment_wechatpay.secure_code
+			end
+			
 			post_params={
 				"account"=>Settings.oceanpayment_unionpay.account,
-				"terminal"=>Settings.oceanpayment_unionpay.terminal_b2c,
+				"terminal"=>terminal,
 				"signValue"=>"",
 				"order_number"=>order_nos.join(",")
 			}
-			post_params['signValue'] = get_sign_value(post_params)
+			post_params['signValue'] = get_sign_value(post_params,secure_code)
 			Rails.logger.info(post_params) unless Rails.env.production?
 			response=method_url_response("post",Settings.oceanpayment_unionpay.query_api_url,true,post_params)
 			if response.code!="200"
@@ -174,12 +185,12 @@ class ReconciliationOceanpayment
 		[valid_flag,msg]
 	end
 
-	def get_sign_value(post_params)
+	def get_sign_value(post_params,secure_code)
 		Digest::SHA256.hexdigest(
 			post_params['account'].to_s +
 			post_params['terminal'].to_s +
 			post_params['order_number'].to_s +
-			Settings.oceanpayment_unionpay.secure_code_b2c
+			secure_code
 		)
 	end
 end
