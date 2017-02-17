@@ -162,7 +162,7 @@ class ReconciliationOceanpayment
 			else	#实际未支付成功
 				if rd.present? && rd.online_pay_status=~ /^success/ 	#财务系统支付成功
 					valid_flag=false
-					set_flag!(ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['FAIL'],"#{self.payway} is failure[#{payinfo['payment_results']},#{payinfo['payment_details']}] but online_pay is #{rd.online_pay_status}")
+					set_flag!(ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['FAIL'],"#{rd.payway} is failure[#{payinfo['payment_results']},#{payinfo['payment_details']}] but online_pay is #{rd.online_pay_status}")
 				end
 			end
 
