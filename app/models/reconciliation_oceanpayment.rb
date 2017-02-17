@@ -78,9 +78,36 @@ class ReconciliationOceanpayment
 			end
 
 			result_infos=Hash.from_xml(response.body)
-			p result_infos
-			result_infos.each do |result|
-				p result
+			#单条记录
+			if result_infos['response']['paymentInfo'].class.to_s=="Hash"
+				payinfo = result_infos['response']['paymentInfo']
+				valid_flag,valid_msg=valid_reconciliation(payinfo)
+				valid_complete_num+=1
+				if valid_msg.present?
+					check_file << "#{valid_msg}\n"
+					valid_rescue_num+=1
+				else
+					if valid_flag==true
+						valid_succ_num+=1
+					else
+						valid_fail_num+=1
+					end
+				end
+			else
+				result_infos['response']['paymentInfo'].each do |payinfo|
+					valid_flag,valid_msg=valid_reconciliation(payinfo)
+					valid_complete_num+=1
+					if valid_msg.present?
+						check_file << "#{valid_msg}\n"
+						valid_rescue_num+=1
+					else
+						if valid_flag==true
+							valid_succ_num+=1
+						else
+							valid_fail_num+=1
+						end
+					end
+				end
 			end
 		rescue=>e
 			check_file << "#{e.message}\n" 
@@ -89,6 +116,45 @@ class ReconciliationOceanpayment
 		end
 
 		"batch_id [ #{@batch_id} ] : </br> {all_num:#{valid_all_num} = complete_num:#{valid_complete_num} + rescue_num:#{valid_rescue_num}</br> complete_num:#{valid_complete_num} = succ_num:#{valid_succ_num} + fail_num:#{valid_fail_num} }</br>"
+	end
+
+	def valid_reconciliation(payinfo)
+		valid_flag,msg=true,nil
+		begin
+			op=OnlinePay.find_by(payway: "oceanpayment",paytype: @paytype,trade_no: payinfo['order_number'])
+			if op.blank?
+				raise "no trade_no [#{payinfo['order_number']}] record!"
+			end
+			rd=op.reconciliation_detail
+
+			if payinfo['payment_results'].to_s=="1"	#实际支付成功
+				if rd.present?	#对账存在记录 
+					if rd.online_pay_status=~ /^success/ && payinfo['order_amount'].to_f==rd.amt   	#财务系统支付成功
+						rd.set_flag!(ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC'],"")
+					else	#财务系统未支付成功
+						valid_flag=false
+						if payinfo['order_amount'].to_f!=rd.amt
+							rd.set_flag!(ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['FAIL'],"amount not match: #{payinfo['order_amount']} <=> #{rd.amt}")
+						else
+							rd.set_flag!(ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['FAIL'],"#{rd.payway} is success_pay but online_pay is #{rd.online_pay_status}")
+						end
+					end
+				else	#对账不存在记录 
+					valid_flag=false
+					rd=op.set_reconciliation
+					rd.set_flag!(ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['FAIL'],"#{rd.payway} is success_pay but online_pay is #{rd.online_pay_status}")
+				end
+			else	#实际未支付成功
+				if rd.present? && rd.online_pay_status=~ /^success/ 	#财务系统支付成功
+					valid_flag=false
+					set_flag!(RECONCILIATIONDETAIL_FLAG['FAIL'],"#{self.payway} is failure[#{payinfo['payment_results']},#{payinfo['payment_details']}] but online_pay is #{rd.online_pay_status}")
+				end
+			end
+		rescue=>e
+			msg=e.message
+		end
+
+		[valid_flag,msg]
 	end
 
 	def get_sign_value(post_params)
