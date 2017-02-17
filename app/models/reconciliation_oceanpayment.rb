@@ -134,6 +134,7 @@ class ReconciliationOceanpayment
 				return [true,nil]
 			end
 
+			Rails.logger.info("is pay? [op.order_no] [op.status]  <-> [#{payinfo['payment_results']}]")
 			if payinfo['payment_results'].to_s=="1"	#实际支付成功
 				if rd.present?	#对账存在记录 
 					if rd.online_pay_status=~ /^success/ && payinfo['order_amount'].to_f==rd.amt   	#财务系统支付成功
@@ -161,7 +162,7 @@ class ReconciliationOceanpayment
 			else	#实际未支付成功
 				if rd.present? && rd.online_pay_status=~ /^success/ 	#财务系统支付成功
 					valid_flag=false
-					set_flag!(RECONCILIATIONDETAIL_FLAG['FAIL'],"#{self.payway} is failure[#{payinfo['payment_results']},#{payinfo['payment_details']}] but online_pay is #{rd.online_pay_status}")
+					set_flag!(ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['FAIL'],"#{self.payway} is failure[#{payinfo['payment_results']},#{payinfo['payment_details']}] but online_pay is #{rd.online_pay_status}")
 				end
 			end
 
