@@ -520,6 +520,7 @@ class FinanceWaterController < ApplicationController
 				online_pay.actual_amount=finance_each["amount"]
 				online_pay.currency=finance_each["currency"]
 				online_pay.send_country=finance_each["send_country"]
+				online_pay.set_order_type!(finance_each["order_type"])
 
 				if finance_each["watertype"]=="score"
 					online_pay.payway="score"
@@ -554,6 +555,7 @@ class FinanceWaterController < ApplicationController
 			reconciliation_detail.send_country=online_pay.send_country
 			reconciliation_detail.system=online_pay.system
 			reconciliation_detail.order_no=online_pay.order_no
+			reconciliation_detail.order_type=online_pay.order_type
 
 			reconciliation_detail
 		end
@@ -588,6 +590,7 @@ class FinanceWaterController < ApplicationController
 			if online_pay.present?
 				reconciliation_detail.currencycode=online_pay.currency
 				reconciliation_detail.send_country=online_pay.send_country
+				reconciliation_detail.order_type=online_pay.order_type
 			end
 
 			reconciliation_detail.send_country = params["send_country"].downcase if params["send_country"].present?

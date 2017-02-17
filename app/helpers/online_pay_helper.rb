@@ -46,6 +46,11 @@ module OnlinePayHelper
 		'quaie' => 'quaie'
 	}
 
+	ORDER_TYPE_MAPPING={
+		"parcel"=>"包裹",
+		"package_material"=>"包材"
+	}
+
 	ACTUAL_PAY=%w(score e_cash)
 
 	def status_mapping(status)
@@ -58,6 +63,10 @@ module OnlinePayHelper
 
 	def system_mapping(system)
 		SYSTEM_MAPPING[system]
+	end
+
+	def order_type_mapping(order_type)
+		ORDER_TYPE_MAPPING[order_type]
 	end
 
 	def actual_pay(payway)

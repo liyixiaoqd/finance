@@ -49,6 +49,10 @@
 						<td><%= @online_pay.reason %></td>
 					</tr>
 					<tr>
+						<td>订单类型</td>
+						<td><%= order_type_mapping(@online_pay.order_type) %></td>
+					</tr>
+					<tr>
 						<td>对账备注</td>
 						<td><%= @online_pay.get_transaction_desc() %></td>
 					</tr>
