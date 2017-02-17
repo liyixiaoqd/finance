@@ -82,11 +82,11 @@ class ReconciliationOceanpayment
 			if result_infos['response']['paymentInfo'].class.to_s=="Hash"
 				payinfo = result_infos['response']['paymentInfo']
 				valid_flag,valid_msg=valid_reconciliation_process(payinfo)
-				valid_complete_num+=1
 				if valid_msg.present?
 					check_file << "#{valid_msg}\n"
 					valid_rescue_num+=1
 				else
+					valid_complete_num+=1
 					if valid_flag==true
 						valid_succ_num+=1
 					else
@@ -98,7 +98,7 @@ class ReconciliationOceanpayment
 					valid_flag,valid_msg=valid_reconciliation_process(payinfo)
 					valid_complete_num+=1
 					if valid_msg.present?
-						check_file << "#{valid_msg}\n"
+						check_file << "[#{payinfo['order_number']}] - [#{valid_msg}]\n"
 						valid_rescue_num+=1
 					else
 						check_file<< "[#{payinfo['order_number']}] - [#{valid_flag}]\n"
@@ -143,7 +143,12 @@ class ReconciliationOceanpayment
 					end
 				else	#对账不存在记录 
 					valid_flag=false
+					if op.reconciliation_id.blank?
+						op.reconciliation_id=op.trade_no
+						op.save!()
+					end
 					rd=op.set_reconciliation
+
 					rd.set_flag!(ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['FAIL'],"#{rd.payway} is success_pay but online_pay is #{rd.online_pay_status}")
 				end
 			else	#实际未支付成功
