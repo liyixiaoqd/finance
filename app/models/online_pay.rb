@@ -102,15 +102,13 @@ class OnlinePay < ActiveRecord::Base
 	end
 
 	def set_order_type!(input_order_type)
-		if self.order_type.blank?
-			if input_order_type.present?
-				self.order_type=input_order_type
+		if input_order_type.present?
+			self.order_type=input_order_type
+		else
+			if self.system=="mypost4u" && self.order_no =~ /M$/
+				self.order_type="package_material"
 			else
-				if self.system=="mypost4u" && self.order_no =~ /M$/
-					self.order_type="package_material"
-				else
-					self.order_type="parcel"
-				end
+				self.order_type="parcel"
 			end
 		end
 	end
