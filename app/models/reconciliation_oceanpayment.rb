@@ -101,6 +101,7 @@ class ReconciliationOceanpayment
 						check_file << "#{valid_msg}\n"
 						valid_rescue_num+=1
 					else
+						check_file<< "[#{payinfo['order_number']}] - [#{valid_flag}]\n"
 						if valid_flag==true
 							valid_succ_num+=1
 						else
@@ -151,6 +152,8 @@ class ReconciliationOceanpayment
 					set_flag!(RECONCILIATIONDETAIL_FLAG['FAIL'],"#{self.payway} is failure[#{payinfo['payment_results']},#{payinfo['payment_details']}] but online_pay is #{rd.online_pay_status}")
 				end
 			end
+
+			rd.save!() if rd.present?
 		rescue=>e
 			msg=e.message
 		end
