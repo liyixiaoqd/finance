@@ -154,6 +154,7 @@ class ReconciliationOceanpayment
 					end
 					rd=op.set_reconciliation
 					rd.transaction_date = payinfo['payment_dateTime'].in_time_zone("Beijing")
+					rd.timestamp = rd.transaction_date
 
 					rd.set_flag!(ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['FAIL'],"#{rd.payway} is success_pay but online_pay is #{rd.online_pay_status}")
 				end
