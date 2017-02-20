@@ -17,6 +17,13 @@ class OceanpaymentWechatpayDetail
 		terminal=Settings.oceanpayment_wechatpay.terminal
 		secure_code=Settings.oceanpayment_wechatpay.secure_code
 
+		if @currency=="RMB"
+			use_currency="CNY"
+		else
+			use_currency=@currency
+		end
+
+
 		post_params={
 			"account"=>Settings.oceanpayment_wechatpay.account,
 			"terminal"=>terminal,
@@ -25,7 +32,7 @@ class OceanpaymentWechatpayDetail
 			"noticeUrl"=>Settings.oceanpayment_wechatpay.notification_url,	#only 443 or 80
 			"methods"=>"WX",
 			"order_number"=>trade_no,
-			"order_currency"=>@currency,
+			"order_currency"=>use_currency,
 			"order_amount"=>@amount.to_s,
 			"order_notes"=>@description,
 			"billing_firstName"=>@userid,
