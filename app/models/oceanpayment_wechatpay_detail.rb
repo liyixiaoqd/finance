@@ -54,7 +54,7 @@ class OceanpaymentWechatpayDetail
 
 
 		redirect_url=Settings.oceanpayment_wechatpay.api_url
-		Rails.logger.info("submit_post ret params: [#{post_params}]")  Rails.logger.info("submit_post ret params: [#{post_params}]") unless Rails.env.production?
+		Rails.logger.info("submit_post ret params: [#{post_params}]") unless Rails.env.production?
 
 		[redirect_url,trade_no,post_params]
 	end
