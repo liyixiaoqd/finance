@@ -563,7 +563,10 @@ class SimulationController < ApplicationController
 				'success_url'=>"#{CALL_HOST}/simulation/callback_return",
 				'notification_url'=>"#{CALL_HOST}/simulation/callback_notify",
 				'quantity'=>1,
-				'country'=>'de'
+				'country'=>'de',
+				'customer_name'=>'lyx',
+				'customer_id'=>'310109198433333333',
+				'customer_phone'=>'+8613901983333'
 			}		
 			init_online_pay_params.merge!(oceanpayment_submit_params)
 		end

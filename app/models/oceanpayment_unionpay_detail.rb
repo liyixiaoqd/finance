@@ -1,6 +1,6 @@
 class OceanpaymentUnionpayDetail
 	include PayDetailable
-	attr_accessor :system,:country,:amount,:currency,:order_no,:description,:userid,:paytype
+	attr_accessor :system,:country,:amount,:currency,:order_no,:description,:userid,:paytype,:other_params
 
 	def initialize(online_pay)
 		if !payparams_valid("oceanpayment_unionpay",online_pay) ||  !spec_payparams_valid(online_pay)
@@ -13,6 +13,13 @@ class OceanpaymentUnionpayDetail
 	def get_submit_info()
 		trade_no=@system+"_"+@order_no
 
+		if @other_params.class.to_s=="String"
+			customer_info_hash = JSON.parse @other_params.gsub("\"=>\"","\":\"")
+		else
+			customer_info_hash = @other_params
+		end
+		p "customer_info_hash: [#{customer_info_hash}]"
+		customer_id,customer_name,customer_phone=customer_info_hash['customer_id'],customer_info_hash['customer_name'],customer_info_hash['customer_phone']
 
 		if @paytype=="unionpay_b2c"
 			terminal=Settings.oceanpayment_unionpay.terminal_b2c
@@ -32,6 +39,9 @@ class OceanpaymentUnionpayDetail
 			use_currency=@currency
 		end
 
+		#BUG BUG!
+		Rails.logger.info("other_params: #{@other_params} , #{@other_params['customer_name']} , #{customer_name}")
+
 		post_params={
 			"account"=>Settings.oceanpayment_unionpay.account,
 			"terminal"=>terminal,
@@ -42,10 +52,11 @@ class OceanpaymentUnionpayDetail
 			"order_number"=>trade_no,
 			"order_currency"=>use_currency,
 			"order_amount"=>@amount.to_s,
-			"order_notes"=>@description,
-			"billing_firstName"=>"N/A",
-			"billing_lastName"=>"N/A",
+			"order_notes"=>customer_id,
+			"billing_firstName"=>customer_name,
+			"billing_lastName"=>customer_name,
 			"billing_email"=>@userid.to_s+Settings.oceanpayment_unionpay.billing_email,
+			"billing_phone"=>customer_phone,
 			"billing_country"=>@country.upcase,
 			"productSku"=>"N/A",
 			"productName"=>"N/A",
@@ -56,7 +67,7 @@ class OceanpaymentUnionpayDetail
 
 
 		redirect_url=Settings.oceanpayment_unionpay.api_url
-		Rails.logger.info(post_params) unless Rails.env.production?
+		Rails.logger.info("submit_post ret params: [#{post_params}]") unless Rails.env.production?
 
 		[redirect_url,trade_no,post_params]
 	end
@@ -65,6 +76,10 @@ class OceanpaymentUnionpayDetail
 	private 
 		def spec_payparams_valid(online_pay)
 			errmsg=''
+
+			if online_pay['other_params']['customer_phone'].blank? || online_pay['other_params']['customer_name'].blank? || online_pay['other_params']['customer_id'].blank?
+				errmsg="customer info is missing"
+			end
 
 			if errmsg.blank?
 				true
