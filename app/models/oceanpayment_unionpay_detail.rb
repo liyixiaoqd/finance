@@ -27,13 +27,13 @@ class OceanpaymentUnionpayDetail
 			secure_code=Settings.oceanpayment_unionpay.secure_code_b2c
 			backUrl = Settings.oceanpayment_unionpay.return_url + "/b2c"
 			noticeUrl = Settings.oceanpayment_unionpay.notification_url + "/b2c"
-			company_name=customer_info_hash['company_name']
+			company_name=customer_name
 		else
 			terminal=Settings.oceanpayment_unionpay.terminal_b2b
 			secure_code=Settings.oceanpayment_unionpay.secure_code_b2b
 			backUrl = Settings.oceanpayment_unionpay.return_url + "/b2b"
 			noticeUrl = Settings.oceanpayment_unionpay.notification_url + "/b2b"
-			company_name=customer_name
+			company_name=customer_info_hash['company_name']
 		end
 
 		if @currency=="RMB"
