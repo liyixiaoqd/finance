@@ -47,7 +47,7 @@ class OceanpaymentWechatpayDetail
 			"billing_lastName"=>customer_name,
 			"billing_email"=>customer_email,
 			"billing_phone"=>customer_phone,
-			"billing_country"=>@country.upcase,
+			"billing_country"=>"N/A",
 			"productName"=>"N/A"
 		}
 
