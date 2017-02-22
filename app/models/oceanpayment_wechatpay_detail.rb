@@ -18,8 +18,9 @@ class OceanpaymentWechatpayDetail
 		else
 			customer_info_hash = @other_params
 		end
-		p "customer_info_hash: [#{customer_info_hash}]"
-		customer_id,customer_name,customer_phone=customer_info_hash['customer_id'],customer_info_hash['customer_name'],customer_info_hash['customer_phone']
+		
+		customer_id,customer_name=customer_info_hash['customer_id'],customer_info_hash['customer_name']
+		customer_phone,customer_email=customer_info_hash['customer_phone'],customer_info_hash['customer_email']
 
 		terminal=Settings.oceanpayment_wechatpay.terminal
 		secure_code=Settings.oceanpayment_wechatpay.secure_code
@@ -44,7 +45,7 @@ class OceanpaymentWechatpayDetail
 			"order_notes"=>customer_id,
 			"billing_firstName"=>customer_name,
 			"billing_lastName"=>customer_name,
-			"billing_email"=>@userid.to_s+Settings.oceanpayment_wechatpay.billing_email,
+			"billing_email"=>customer_email,
 			"billing_phone"=>customer_phone,
 			"billing_country"=>@country.upcase,
 			"productName"=>"N/A"

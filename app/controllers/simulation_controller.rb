@@ -566,7 +566,8 @@ class SimulationController < ApplicationController
 				'country'=>'de',
 				'customer_name'=>'lyx',
 				'customer_id'=>'310109198433333333',
-				'customer_phone'=>'+8613901983333'
+				'customer_phone'=>'+8613901983333',
+				'customer_email'=>'test_lyx@htomail.com'
 			}		
 			init_online_pay_params.merge!(oceanpayment_submit_params)
 		end

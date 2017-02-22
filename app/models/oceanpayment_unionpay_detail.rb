@@ -18,8 +18,9 @@ class OceanpaymentUnionpayDetail
 		else
 			customer_info_hash = @other_params
 		end
-		p "customer_info_hash: [#{customer_info_hash}]"
-		customer_id,customer_name,customer_phone=customer_info_hash['customer_id'],customer_info_hash['customer_name'],customer_info_hash['customer_phone']
+		
+		customer_id,customer_name=customer_info_hash['customer_id'],customer_info_hash['customer_name']
+		customer_phone,customer_email=customer_info_hash['customer_phone'],customer_info_hash['customer_email']
 
 		if @paytype=="unionpay_b2c"
 			terminal=Settings.oceanpayment_unionpay.terminal_b2c
@@ -55,7 +56,7 @@ class OceanpaymentUnionpayDetail
 			"order_notes"=>customer_id,
 			"billing_firstName"=>customer_name,
 			"billing_lastName"=>customer_name,
-			"billing_email"=>@userid.to_s+Settings.oceanpayment_unionpay.billing_email,
+			"billing_email"=>customer_email,
 			"billing_phone"=>customer_phone,
 			"billing_country"=>@country.upcase,
 			"productSku"=>"N/A",
@@ -77,7 +78,10 @@ class OceanpaymentUnionpayDetail
 		def spec_payparams_valid(online_pay)
 			errmsg=''
 
-			if online_pay['other_params']['customer_phone'].blank? || online_pay['other_params']['customer_name'].blank? || online_pay['other_params']['customer_id'].blank?
+			if online_pay['other_params']['customer_phone'].blank? || 
+				online_pay['other_params']['customer_name'].blank? || 
+				online_pay['other_params']['customer_id'].blank? ||
+				online_pay['other_params']['customer_email'].blank?
 				errmsg="customer info is missing"
 			end
 
