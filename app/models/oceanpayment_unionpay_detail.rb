@@ -27,11 +27,13 @@ class OceanpaymentUnionpayDetail
 			secure_code=Settings.oceanpayment_unionpay.secure_code_b2c
 			backUrl = Settings.oceanpayment_unionpay.return_url + "/b2c"
 			noticeUrl = Settings.oceanpayment_unionpay.notification_url + "/b2c"
+			company_name=customer_info_hash['company_name']
 		else
 			terminal=Settings.oceanpayment_unionpay.terminal_b2b
 			secure_code=Settings.oceanpayment_unionpay.secure_code_b2b
 			backUrl = Settings.oceanpayment_unionpay.return_url + "/b2b"
 			noticeUrl = Settings.oceanpayment_unionpay.notification_url + "/b2b"
+			company_name=customer_name
 		end
 
 		if @currency=="RMB"
@@ -54,7 +56,7 @@ class OceanpaymentUnionpayDetail
 			"order_currency"=>use_currency,
 			"order_amount"=>@amount.to_s,
 			"order_notes"=>customer_id,
-			"billing_firstName"=>customer_name,
+			"billing_firstName"=>company_name,
 			"billing_lastName"=>customer_name,
 			"billing_email"=>customer_email,
 			"billing_phone"=>customer_phone,
@@ -84,6 +86,11 @@ class OceanpaymentUnionpayDetail
 				online_pay['other_params']['customer_email'].blank?
 				errmsg="customer info is missing"
 			end
+
+			if online_pay['paytype']=="unionpay_b2b" && online_pay['other_params']['company_name'].blank?
+				errmsg="company info is missing"
+			end 
+
 
 			if errmsg.blank?
 				true
