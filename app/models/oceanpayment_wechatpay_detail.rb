@@ -14,13 +14,13 @@ class OceanpaymentWechatpayDetail
 		trade_no=@system+"_"+@order_no
 
 		if @other_params.class.to_s=="String"
-			customer_info_hash = JSON.parse @other_params.gsub("\"=>\"","\":\"")
+			consumer_info_hash = JSON.parse @other_params.gsub("\"=>\"","\":\"")
 		else
-			customer_info_hash = @other_params
+			consumer_info_hash = @other_params
 		end
 		
-		customer_id,customer_name=customer_info_hash['customer_id'],customer_info_hash['customer_name']
-		customer_phone,customer_email=customer_info_hash['customer_phone'],customer_info_hash['customer_email']
+		consumer_id,consumer_name=consumer_info_hash['consumer_id'],consumer_info_hash['consumer_name']
+		consumer_phone,consumer_email=consumer_info_hash['consumer_phone'],consumer_info_hash['consumer_email']
 
 		terminal=Settings.oceanpayment_wechatpay.terminal
 		secure_code=Settings.oceanpayment_wechatpay.secure_code
@@ -42,11 +42,11 @@ class OceanpaymentWechatpayDetail
 			"order_number"=>trade_no,
 			"order_currency"=>use_currency,
 			"order_amount"=>@amount.to_s,
-			"order_notes"=>customer_id,
-			"billing_firstName"=>customer_name,
-			"billing_lastName"=>customer_name,
-			"billing_email"=>customer_email,
-			"billing_phone"=>customer_phone,
+			"order_notes"=>consumer_id,
+			"billing_firstName"=>consumer_name,
+			"billing_lastName"=>consumer_name,
+			"billing_email"=>consumer_email,
+			"billing_phone"=>consumer_phone,
 			"billing_country"=>"N/A",
 			"productName"=>"N/A"
 		}
@@ -64,8 +64,8 @@ class OceanpaymentWechatpayDetail
 		def spec_payparams_valid(online_pay)
 			errmsg=''
 
-			if online_pay.other_params['customer_phone'].blank? || online_pay.other_params['customer_name'].blank? || online_pay.other_params['customer_id'].blank?
-				errmsg="customer info is missing"
+			if online_pay.other_params['consumer_phone'].blank? || online_pay.other_params['consumer_name'].blank? || online_pay.other_params['consumer_id'].blank?
+				errmsg="consumer info is missing"
 			end
 
 			if errmsg.blank?

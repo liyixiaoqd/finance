@@ -14,26 +14,26 @@ class OceanpaymentUnionpayDetail
 		trade_no=@system+"_"+@order_no
 
 		if @other_params.class.to_s=="String"
-			customer_info_hash = JSON.parse @other_params.gsub("\"=>\"","\":\"")
+			consumer_info_hash = JSON.parse @other_params.gsub("\"=>\"","\":\"")
 		else
-			customer_info_hash = @other_params
+			consumer_info_hash = @other_params
 		end
 		
-		customer_id,customer_name=customer_info_hash['customer_id'],customer_info_hash['customer_name']
-		customer_phone,customer_email=customer_info_hash['customer_phone'],customer_info_hash['customer_email']
+		consumer_id,consumer_name=consumer_info_hash['consumer_id'],consumer_info_hash['consumer_name']
+		consumer_phone,consumer_email=consumer_info_hash['consumer_phone'],consumer_info_hash['consumer_email']
 
 		if @paytype=="unionpay_b2c"
 			terminal=Settings.oceanpayment_unionpay.terminal_b2c
 			secure_code=Settings.oceanpayment_unionpay.secure_code_b2c
 			backUrl = Settings.oceanpayment_unionpay.return_url + "/b2c"
 			noticeUrl = Settings.oceanpayment_unionpay.notification_url + "/b2c"
-			company_name=customer_name
+			company_name=consumer_name
 		else
 			terminal=Settings.oceanpayment_unionpay.terminal_b2b
 			secure_code=Settings.oceanpayment_unionpay.secure_code_b2b
 			backUrl = Settings.oceanpayment_unionpay.return_url + "/b2b"
 			noticeUrl = Settings.oceanpayment_unionpay.notification_url + "/b2b"
-			company_name=customer_info_hash['company_name']
+			company_name=consumer_info_hash['company_name']
 		end
 
 		if @currency=="RMB"
@@ -43,7 +43,7 @@ class OceanpaymentUnionpayDetail
 		end
 
 		#BUG BUG!
-		Rails.logger.info("other_params: #{@other_params} , #{@other_params['customer_name']} , #{customer_name}")
+		Rails.logger.info("other_params: #{@other_params} , #{@other_params['consumer_name']} , #{consumer_name}")
 
 		post_params={
 			"account"=>Settings.oceanpayment_unionpay.account,
@@ -55,11 +55,11 @@ class OceanpaymentUnionpayDetail
 			"order_number"=>trade_no,
 			"order_currency"=>use_currency,
 			"order_amount"=>@amount.to_s,
-			"order_notes"=>customer_id,
+			"order_notes"=>consumer_id,
 			"billing_firstName"=>company_name,
-			"billing_lastName"=>customer_name,
-			"billing_email"=>customer_email,
-			"billing_phone"=>customer_phone,
+			"billing_lastName"=>consumer_name,
+			"billing_email"=>consumer_email,
+			"billing_phone"=>consumer_phone,
 			"billing_country"=>"N/A",
 			"productSku"=>"N/A",
 			"productName"=>"N/A",
@@ -80,11 +80,11 @@ class OceanpaymentUnionpayDetail
 		def spec_payparams_valid(online_pay)
 			errmsg=''
 
-			if online_pay['other_params']['customer_phone'].blank? || 
-				online_pay['other_params']['customer_name'].blank? || 
-				online_pay['other_params']['customer_id'].blank? ||
-				online_pay['other_params']['customer_email'].blank?
-				errmsg="customer info is missing"
+			if online_pay['other_params']['consumer_phone'].blank? || 
+				online_pay['other_params']['consumer_name'].blank? || 
+				online_pay['other_params']['consumer_id'].blank? ||
+				online_pay['other_params']['consumer_email'].blank?
+				errmsg="consumer info is missing"
 			end
 
 			if online_pay['paytype']=="unionpay_b2b" && online_pay['other_params']['company_name'].blank?
