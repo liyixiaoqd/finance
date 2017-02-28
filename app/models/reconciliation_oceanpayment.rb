@@ -65,18 +65,21 @@ class ReconciliationOceanpayment
 
 		begin
 			if @paytype=="unionpay_b2c"
+				account = Settings.oceanpayment_unionpay.account_b2c
 				terminal = Settings.oceanpayment_unionpay.terminal_b2c
 				secure_code = Settings.oceanpayment_unionpay.secure_code_b2c
 			elsif @paytype=="unionpay_b2b"
+				account = Settings.oceanpayment_unionpay.account_b2b
 				terminal = Settings.oceanpayment_unionpay.terminal_b2b
 				secure_code = Settings.oceanpayment_unionpay.secure_code_b2b
 			else
+				account = Settings.oceanpayment_wechatpay.account
 				terminal =  Settings.oceanpayment_wechatpay.terminal
 				secure_code = Settings.oceanpayment_wechatpay.secure_code
 			end
 			
 			post_params={
-				"account"=>Settings.oceanpayment_unionpay.account,
+				"account"=>account,
 				"terminal"=>terminal,
 				"signValue"=>"",
 				"order_number"=>order_nos.join(",")

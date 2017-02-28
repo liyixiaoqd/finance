@@ -23,12 +23,14 @@ class OceanpaymentUnionpayDetail
 		consumer_phone,consumer_email=consumer_info_hash['consumer_phone'],consumer_info_hash['consumer_email']
 
 		if @paytype=="unionpay_b2c"
+			account=Settings.oceanpayment_unionpay.account_b2c
 			terminal=Settings.oceanpayment_unionpay.terminal_b2c
 			secure_code=Settings.oceanpayment_unionpay.secure_code_b2c
 			backUrl = Settings.oceanpayment_unionpay.return_url + "/b2c"
 			noticeUrl = Settings.oceanpayment_unionpay.notification_url + "/b2c"
 			company_name=consumer_name
 		else
+			account=Settings.oceanpayment_unionpay.account_b2b
 			terminal=Settings.oceanpayment_unionpay.terminal_b2b
 			secure_code=Settings.oceanpayment_unionpay.secure_code_b2b
 			backUrl = Settings.oceanpayment_unionpay.return_url + "/b2b"
@@ -46,7 +48,7 @@ class OceanpaymentUnionpayDetail
 		Rails.logger.info("other_params: #{@other_params} , #{@other_params['consumer_name']} , #{consumer_name}")
 
 		post_params={
-			"account"=>Settings.oceanpayment_unionpay.account,
+			"account"=>account,
 			"terminal"=>terminal,
 			"signValue"=>"",
 			"backUrl"=>backUrl,
