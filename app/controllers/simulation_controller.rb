@@ -569,6 +569,11 @@ class SimulationController < ApplicationController
 				'consumer_phone'=>'+8613901983333',
 				'consumer_email'=>'test_lyx@htomail.com'
 			}		
+
+			if paytype=="unionpay_b2b"
+				oceanpayment_submit_params['company_name']='company'
+			end
+			
 			init_online_pay_params.merge!(oceanpayment_submit_params)
 		end
 
