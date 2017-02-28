@@ -281,6 +281,11 @@ class FinanceWaterController < ApplicationController
 				end
 
 				reconciliation_detail=new_reconciliation_detail_each_refund(online_pay,params)
+				#不可重复退款
+				if ReconciliationDetail.find_by(transactionid: reconciliation_detail.transactionid,system: reconciliation_detail.system).present?
+					raise "[#{reconciliation_detail.transactionid}] 存在退费记录,不可重复退费!"
+				end
+
 				reconciliation_detail.save
 
 				if reconciliation_detail.errors.any?
