@@ -19,8 +19,9 @@ class OceanpaymentUnionpayDetail
 			consumer_info_hash = @other_params
 		end
 		
-		consumer_id,consumer_name=consumer_info_hash['consumer_id'],consumer_info_hash['consumer_name']
-		consumer_phone,consumer_email=consumer_info_hash['consumer_phone'],consumer_info_hash['consumer_email']
+		consumer_id=consumer_info_hash['consumer_id']
+		consumer_phone=consumer_info_hash['consumer_phone']
+		consumer_email=consumer_info_hash['consumer_email']
 
 		if @paytype=="unionpay_b2c"
 			account=Settings.oceanpayment_unionpay.account_b2c
@@ -28,14 +29,14 @@ class OceanpaymentUnionpayDetail
 			secure_code=Settings.oceanpayment_unionpay.secure_code_b2c
 			backUrl = Settings.oceanpayment_unionpay.return_url + "/b2c"
 			noticeUrl = Settings.oceanpayment_unionpay.notification_url + "/b2c"
-			company_name=consumer_name
+			billing_name=consumer_info_hash['consumer_name']
 		else
 			account=Settings.oceanpayment_unionpay.account_b2b
 			terminal=Settings.oceanpayment_unionpay.terminal_b2b
 			secure_code=Settings.oceanpayment_unionpay.secure_code_b2b
 			backUrl = Settings.oceanpayment_unionpay.return_url + "/b2b"
 			noticeUrl = Settings.oceanpayment_unionpay.notification_url + "/b2b"
-			company_name=consumer_info_hash['company_name']
+			billing_name=consumer_info_hash['company_name']
 		end
 
 		if @currency=="RMB"
@@ -45,7 +46,7 @@ class OceanpaymentUnionpayDetail
 		end
 
 		#BUG BUG!
-		Rails.logger.info("other_params: #{@other_params} , #{@other_params['consumer_name']} , #{consumer_name}")
+		Rails.logger.info("other_params: #{@other_params}")
 
 		post_params={
 			"account"=>account,
@@ -58,8 +59,8 @@ class OceanpaymentUnionpayDetail
 			"order_currency"=>use_currency,
 			"order_amount"=>@amount.to_s,
 			"order_notes"=>consumer_id,
-			"billing_firstName"=>company_name,
-			"billing_lastName"=>consumer_name,
+			"billing_firstName"=>billing_name,
+			"billing_lastName"=>billing_name,
 			"billing_email"=>consumer_email,
 			"billing_phone"=>consumer_phone,
 			"billing_country"=>"N/A",
@@ -83,14 +84,15 @@ class OceanpaymentUnionpayDetail
 			errmsg=''
 
 			if online_pay['other_params']['consumer_phone'].blank? || 
-				online_pay['other_params']['consumer_name'].blank? || 
 				online_pay['other_params']['consumer_id'].blank? ||
 				online_pay['other_params']['consumer_email'].blank?
-				errmsg="consumer info is missing"
+				errmsg="consumer or company info is missing"
 			end
 
 			if online_pay['paytype']=="unionpay_b2b" && online_pay['other_params']['company_name'].blank?
 				errmsg="company info is missing"
+			elsif online_pay['paytype']=="unionpay_b2c" && online_pay['other_params']['consumer_name'].blank?
+				errmsg="consumer info is missing"
 			end 
 
 
