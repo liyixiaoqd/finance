@@ -23,6 +23,7 @@ class OnlinePay < ActiveRecord::Base
  		'WAIT_BUYER_PAY' => 0,
 		'WAIT_SELLER_SEND_GOODS' => 1,
 		'WAIT_BUYER_CONFIRM_GOODS' => 2,
+		'TRADE_SUCCESS' => 9 ,
 		'TRADE_FINISHED' => 9
 	}
 
