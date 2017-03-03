@@ -165,7 +165,7 @@ class OnlinePayController < ApplicationController
 				raise "can not use alipay oversea"
 			end
 			if online_pay.paytype=="transaction"
-				flag,online_pay.redirect_url,online_pay.trade_no,online_pay.is_credit,message=pay_detail.submit_direct()
+				flag,online_pay.redirect_url,online_pay.trade_no,online_pay.is_credit,message=pay_detail.submit_direct_new()
 			else
 			 	flag,online_pay.redirect_url,online_pay.trade_no,online_pay.is_credit,message=pay_detail.submit()
 			end

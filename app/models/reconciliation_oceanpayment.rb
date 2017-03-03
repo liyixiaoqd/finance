@@ -3,7 +3,7 @@ class ReconciliationOceanpayment
 	attr_accessor :paytype,:startdate,:enddate
 
 	WARN_FILE_PATH="check_file/finance_reconciliation/oceampayment"
-	MAX_ORDER_NUM=100
+	MAX_ORDER_NUM=40
 
 	def initialize(paytype,startdate="",enddate="")
 		@paytype=paytype
@@ -86,7 +86,7 @@ class ReconciliationOceanpayment
 			}
 			post_params['signValue'] = get_sign_value(post_params,secure_code)
 			Rails.logger.info(post_params) unless Rails.env.production?
-			response=method_url_response("post",Settings.oceanpayment_unionpay.query_api_url,true,post_params)
+			response=method_url_response("post",Settings.oceanpayment_wechatpay.query_api_url,true,post_params)
 			if response.code!="200"
 				raise "main rescue:get web failure, #{Settings.oceanpayment_unionpay.query_api_url} , response.code"
 			end

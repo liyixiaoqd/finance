@@ -24,7 +24,7 @@ module AlipayDetailable extend ActiveSupport::Concern
 		query = params.sort.map do |key, value|
 			"#{key}=#{value}"
 		end.join('&')
-		Rails.logger.info(query)
+		Rails.logger.info("generate_sign [#{query}#{secret}]")
 		Digest::MD5.hexdigest("#{query}#{secret}")
 	end
 
