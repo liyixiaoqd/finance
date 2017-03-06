@@ -84,10 +84,10 @@ Rails.application.routes.draw do
   #unionpay + weixinpay
 
   post 'pay/:userid/submit_post' => 'online_pay#submit_post'
-  post 'pay/callback/oceanpayment_unionpay_return/:subtype' => 'online_pay_callback#oceanpayment_unionpay_return'
+  get 'pay/callback/oceanpayment_unionpay_return/:subtype' => 'online_pay_callback#oceanpayment_unionpay_return'
   post 'pay/callback/oceanpayment_unionpay_notify/:subtype' => 'online_pay_callback#oceanpayment_unionpay_notify'
   get 'simulation/simulate_pay_post' => 'simulation#simulate_pay_post'
-  post 'pay/callback/oceanpayment_wechatpay_return' => 'online_pay_callback#oceanpayment_wechatpay_return'
+  get 'pay/callback/oceanpayment_wechatpay_return' => 'online_pay_callback#oceanpayment_wechatpay_return'
   post 'pay/callback/oceanpayment_wechatpay_notify' => 'online_pay_callback#oceanpayment_wechatpay_notify'
  
   #web display  ---  simulate interface 
