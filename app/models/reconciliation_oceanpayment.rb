@@ -1,11 +1,11 @@
 class ReconciliationOceanpayment
 	include PayDetailable
-	attr_accessor :paytype,:startdate,:enddate
+	attr_accessor :paytype,:startdate,:enddate,:system
 
 	WARN_FILE_PATH="check_file/finance_reconciliation/oceampayment"
 	MAX_ORDER_NUM=40
 
-	def initialize(paytype,startdate="",enddate="")
+	def initialize(paytype,system,startdate="",enddate="")
 		@paytype=paytype
 
 		post_day=BasicData.get_value("00A","001","oceanpayment","").to_i
@@ -22,6 +22,7 @@ class ReconciliationOceanpayment
 			@enddate=enddate.to_time
 		end	
 
+		@system=system
 		@reconciliation_date=current_time_format("%Y%m%d",0)
 		@batch_id=1
 	end
@@ -30,9 +31,9 @@ class ReconciliationOceanpayment
 	def finance_reconciliation
 		count=0
 		order_nos=[]
-		message="#{@startdate} - #{@enddate} </br> "
+		message="#{@startdate} - #{@enddate}  , SYSTEM[#{@system}] </br> "
 		OnlinePay.where(" (created_at >= '#{@startdate}' and created_at<= '#{@enddate}') or (updated_at >= '#{@startdate}' and updated_at<= '#{@enddate}') ")
-			.where(payway: "oceanpayment",paytype: @paytype).each do |op|
+			.where(payway: "oceanpayment",paytype: @paytype,system: @system).each do |op|
 				count+=1
 				order_nos<< op.trade_no
 				if count==MAX_ORDER_NUM
@@ -64,20 +65,37 @@ class ReconciliationOceanpayment
 
 
 		begin
-			if @paytype=="unionpay_b2c"
-				account = Settings.oceanpayment_unionpay.account_b2c
-				terminal = Settings.oceanpayment_unionpay.terminal_b2c
-				secure_code = Settings.oceanpayment_unionpay.secure_code_b2c
-			elsif @paytype=="unionpay_b2b"
-				account = Settings.oceanpayment_unionpay.account_b2b
-				terminal = Settings.oceanpayment_unionpay.terminal_b2b
-				secure_code = Settings.oceanpayment_unionpay.secure_code_b2b
+			if @system=="quaie"
+				if @paytype=="unionpay_b2c"
+					account=Settings.oceanpayment_unionpay.quaie.account
+					terminal=Settings.oceanpayment_unionpay.quaie.terminal
+					secure_code=Settings.oceanpayment_unionpay.quaie.secure_code
+					query_api_url = Settings.oceanpayment_unionpay.quaie.query_api_url
+				else
+					account=Settings.oceanpayment_wechatpay.quaie.account
+					terminal=Settings.oceanpayment_wechatpay.quaie.terminal
+					secure_code=Settings.oceanpayment_wechatpay.quaie.secure_code
+					query_api_url = Settings.oceanpayment_wechatpay.quaie.query_api_url
+				end
 			else
-				account = Settings.oceanpayment_wechatpay.account
-				terminal =  Settings.oceanpayment_wechatpay.terminal
-				secure_code = Settings.oceanpayment_wechatpay.secure_code
+				if @paytype=="unionpay_b2c"
+					account = Settings.oceanpayment_unionpay.account_b2c
+					terminal = Settings.oceanpayment_unionpay.terminal_b2c
+					secure_code = Settings.oceanpayment_unionpay.secure_code_b2c
+					query_api_url = Settings.oceanpayment_unionpay.query_api_url_b2c
+				elsif @paytype=="unionpay_b2b"
+					account = Settings.oceanpayment_unionpay.account_b2b
+					terminal = Settings.oceanpayment_unionpay.terminal_b2b
+					secure_code = Settings.oceanpayment_unionpay.secure_code_b2b
+					query_api_url = Settings.oceanpayment_unionpay.query_api_url_b2b
+				else
+					account = Settings.oceanpayment_wechatpay.account
+					terminal =  Settings.oceanpayment_wechatpay.terminal
+					secure_code = Settings.oceanpayment_wechatpay.secure_code
+					secure_code = Settings.oceanpayment_wechatpay.query_api_url
+				end
 			end
-			
+				
 			post_params={
 				"account"=>account,
 				"terminal"=>terminal,
@@ -86,7 +104,7 @@ class ReconciliationOceanpayment
 			}
 			post_params['signValue'] = get_sign_value(post_params,secure_code)
 			Rails.logger.info(post_params) unless Rails.env.production?
-			response=method_url_response("post",Settings.oceanpayment_wechatpay.query_api_url,true,post_params)
+			response=method_url_response("post",query_api_url,true,post_params)
 			if response.code!="200"
 				raise "main rescue:get web failure, #{Settings.oceanpayment_unionpay.query_api_url} , response.code"
 			end

@@ -22,8 +22,17 @@ class OceanpaymentWechatpayDetail
 		consumer_id,consumer_name=consumer_info_hash['consumer_id'],consumer_info_hash['consumer_name']
 		consumer_phone,consumer_email=consumer_info_hash['consumer_phone'],consumer_info_hash['consumer_email']
 
-		terminal=Settings.oceanpayment_wechatpay.terminal
-		secure_code=Settings.oceanpayment_wechatpay.secure_code
+		if @system=="quaie"
+			account=Settings.oceanpayment_wechatpay.quaie.account
+			terminal=Settings.oceanpayment_wechatpay.quaie.terminal
+			secure_code=Settings.oceanpayment_wechatpay.quaie.secure_code
+			use_url=Settings.oceanpayment_wechatpay.quaie.api_url
+		else
+			account=Settings.oceanpayment_wechatpay.account
+			terminal=Settings.oceanpayment_wechatpay.terminal
+			secure_code=Settings.oceanpayment_wechatpay.secure_code
+			use_url=Settings.oceanpayment_wechatpay.api_url
+		end
 
 		if @currency=="RMB"
 			use_currency="CNY"
@@ -33,7 +42,7 @@ class OceanpaymentWechatpayDetail
 
 
 		post_params={
-			"account"=>Settings.oceanpayment_wechatpay.account,
+			"account"=>account,
 			"terminal"=>terminal,
 			"signValue"=>"",
 			"backUrl"=>Settings.oceanpayment_wechatpay.return_url,
@@ -54,7 +63,7 @@ class OceanpaymentWechatpayDetail
 		post_params["signValue"]=get_sign_value(post_params,secure_code)
 
 
-		redirect_url=Settings.oceanpayment_wechatpay.api_url
+		redirect_url=use_url
 		Rails.logger.info("submit_post ret params: [#{post_params}]") unless Rails.env.production?
 
 		[redirect_url,trade_no,post_params]

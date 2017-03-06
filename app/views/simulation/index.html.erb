@@ -25,7 +25,13 @@
           
           <%= label_tag(:label3, "amount") %>
           <%= text_field_tag(:amount, 0.01) %>
-          <%= text_field_tag(:serial, "#{SimulationController.get_simulation_num}") %>
+          <%= text_field_tag(:serial, "#{SimulationController.get_simulation_num}") %> </br>
+          <%= label_tag(:label4, "银联or微信填写") %>
+          <%= text_field_tag(:system, "mypost4u",placeholder: "系统 mypost4u or quaie") %> </br>
+          <%= text_field_tag(:consumer_name,"",placeholder: "消费者name") %>
+          <%= text_field_tag(:company_name,"",placeholder: "公司名称") %></br>
+          <%= text_field_tag(:consumer_id,"",placeholder: "消费者id or 企业组织机构代码") %>
+          <%= text_field_tag(:consumer_phone,"",placeholder: "phone") %> </br>
           </br>  </br>
           <%= submit_tag("call") %>
         <% end %>

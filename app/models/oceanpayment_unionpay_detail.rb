@@ -23,20 +23,32 @@ class OceanpaymentUnionpayDetail
 		consumer_phone=consumer_info_hash['consumer_phone']
 		consumer_email=consumer_info_hash['consumer_email']
 
-		if @paytype=="unionpay_b2c"
-			account=Settings.oceanpayment_unionpay.account_b2c
-			terminal=Settings.oceanpayment_unionpay.terminal_b2c
-			secure_code=Settings.oceanpayment_unionpay.secure_code_b2c
+		if @system=="quaie"
+			account=Settings.oceanpayment_unionpay.quaie.account
+			terminal=Settings.oceanpayment_unionpay.quaie.terminal
+			secure_code=Settings.oceanpayment_unionpay.quaie.secure_code
 			backUrl = Settings.oceanpayment_unionpay.return_url + "/b2c"
 			noticeUrl = Settings.oceanpayment_unionpay.notification_url + "/b2c"
 			billing_name=consumer_info_hash['consumer_name']
+			use_url=Settings.oceanpayment_unionpay.quaie.api_url
 		else
-			account=Settings.oceanpayment_unionpay.account_b2b
-			terminal=Settings.oceanpayment_unionpay.terminal_b2b
-			secure_code=Settings.oceanpayment_unionpay.secure_code_b2b
-			backUrl = Settings.oceanpayment_unionpay.return_url + "/b2b"
-			noticeUrl = Settings.oceanpayment_unionpay.notification_url + "/b2b"
-			billing_name=consumer_info_hash['company_name']
+			if @paytype=="unionpay_b2c"
+				account=Settings.oceanpayment_unionpay.account_b2c
+				terminal=Settings.oceanpayment_unionpay.terminal_b2c
+				secure_code=Settings.oceanpayment_unionpay.secure_code_b2c
+				backUrl = Settings.oceanpayment_unionpay.return_url + "/b2c"
+				noticeUrl = Settings.oceanpayment_unionpay.notification_url + "/b2c"
+				billing_name=consumer_info_hash['consumer_name']
+				use_url=Settings.oceanpayment_unionpay.api_url_b2c
+			else
+				account=Settings.oceanpayment_unionpay.account_b2b
+				terminal=Settings.oceanpayment_unionpay.terminal_b2b
+				secure_code=Settings.oceanpayment_unionpay.secure_code_b2b
+				backUrl = Settings.oceanpayment_unionpay.return_url + "/b2b"
+				noticeUrl = Settings.oceanpayment_unionpay.notification_url + "/b2b"
+				billing_name=consumer_info_hash['company_name']
+				use_url=Settings.oceanpayment_unionpay.api_url_b2b
+			end
 		end
 
 		if @currency=="RMB"
@@ -72,7 +84,7 @@ class OceanpaymentUnionpayDetail
 		post_params["signValue"]=get_sign_value(post_params,secure_code)
 
 
-		redirect_url=Settings.oceanpayment_unionpay.api_url
+		redirect_url=use_url
 		Rails.logger.info("submit_post ret params: [#{post_params}]") unless Rails.env.production?
 
 		[redirect_url,trade_no,post_params]

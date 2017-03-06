@@ -171,9 +171,13 @@ class SimulationController < ApplicationController
 
 		logger.info("payway:#{payway}")
 
-		sim_user=User.find_by(username: "spec_username",system: "mypost4u")
-		if sim_user.blank?
-			sim_user=User.find_by(email: "fylee_ger@126.com",system: "mypost4u")
+		if params['system'].blank? || params['system']=="mypost4u"
+			sim_user=User.find_by(username: "spec_username",system: "mypost4u")
+			if sim_user.blank?
+				sim_user=User.find_by(email: "fylee_ger@126.com",system: "mypost4u")
+			end
+		else
+			sim_user=User.find_by(username: "#{params['system']}_spec_username",system: params['system'])
 		end
 		userid=sim_user.userid
 		
@@ -187,13 +191,13 @@ class SimulationController < ApplicationController
 		when 'alipay_oversea' then simulate_params=init_alipay_oversea_submit_params(simulate_order_no,amount) 
 		when 'alipay_transaction' then simulate_params=init_alipay_transaction_submit_params(simulate_order_no,amount)
 		when 'oceanpayment_unionpay_b2c' then 
-			simulate_params=init_oceanpayment_submit_params(simulate_order_no,amount,"unionpay_b2c")
+			simulate_params=init_oceanpayment_submit_params(simulate_order_no,amount,"unionpay_b2c",params)
 			callpath="/pay/#{userid}/submit_post"
 		when 'oceanpayment_unionpay_b2b' then 
-			simulate_params=init_oceanpayment_submit_params(simulate_order_no,amount,"unionpay_b2b")
+			simulate_params=init_oceanpayment_submit_params(simulate_order_no,amount,"unionpay_b2b",params)
 			callpath="/pay/#{userid}/submit_post"
 		when 'oceanpayment_wechatpay' then 
-			simulate_params=init_oceanpayment_submit_params(simulate_order_no,amount,"wechatpay")
+			simulate_params=init_oceanpayment_submit_params(simulate_order_no,amount,"wechatpay",params)
 			callpath="/pay/#{userid}/submit_post"
 		else
 			simulate_params={}
@@ -550,9 +554,9 @@ class SimulationController < ApplicationController
 			init_online_pay_params.merge!(alipay_transaction_submit_params)
 		end
 
-		def init_oceanpayment_submit_params(order_no,amount,paytype)
+		def init_oceanpayment_submit_params(order_no,amount,paytype,params)
 			oceanpayment_submit_params={
-				'system'=>'mypost4u',
+				'system'=>params['system'].blank? ? "mypost4u" : params['system'],
 				'payway'=>'oceanpayment',
 				'paytype'=>paytype,
 				'amount'=>amount,
@@ -564,16 +568,13 @@ class SimulationController < ApplicationController
 				'notification_url'=>"#{CALL_HOST}/simulation/callback_notify",
 				'quantity'=>1,
 				'country'=>'de',
-				'consumer_name'=>'lyx',
-				'consumer_id'=>'310109198433333333',
-				'consumer_phone'=>'+8613901983333',
-				'consumer_email'=>'test_lyx@htomail.com'
+				'consumer_name'=>params['consumer_name'],
+				'consumer_id'=>params['consumer_id'],
+				'consumer_phone'=>params['consumer_phone'],
+				'consumer_email'=>"#{params['consumer_id']}@hotmail.com",
+				'company_name'=>params['company_name']
 			}		
 
-			if paytype=="unionpay_b2b"
-				oceanpayment_submit_params['company_name']='company'
-			end
-			
 			init_online_pay_params.merge!(oceanpayment_submit_params)
 		end
 
