@@ -12,16 +12,17 @@ class ExchangeRate < ActiveRecord::Base
 
 	CURRENCY_WEB_MAPPING={
 		"GBP"=>"1314",
-		"EUR"=>"1326"
+		"EUR"=>"1326",
+		"HKD"=>"1315",
+		"USD"=>"1316"
 	}
 
 	def self.checkIsNormal(get_date=Time.now.strftime("%Y-%m-%d"))
 		normal_flag=false
 		msg=""
 		currency_info=[]
-		currency_array=["GBP","EUR"]
 		
-		currency_array.each do |currency|
+		CURRENCY_WEB_MAPPING.keys.each do |currency|
 			begin
 				er=ExchangeRate.find_by(currency: currency,rate_date: get_date)
 				if er.blank?
@@ -49,9 +50,7 @@ class ExchangeRate < ActiveRecord::Base
 	#由于要获取每天9点后的最近一条数据,因此crontab需要配置从9点开始到11点结束，每5分钟执行
 	#*/5 9-11 * * * /bin/bash -l -c 'source ~/.bashrc && source ~/.bash_profile && cd /opt/rails-app/finance && rails runner -e test 'ExchangeRate.getExchangeRate' >> /opt/rails-app/finance/log/cron_get_exchange_rate.log 2>&1'
 	def self.getExchangeRate(get_date=Time.now.strftime("%Y-%m-%d"))
-		currency_array=["GBP","EUR"]
-
-		currency_array.each do |currency|
+		CURRENCY_WEB_MAPPING.keys.each do |currency|
 			begin
 				er=ExchangeRate.find_by(currency: currency,rate_date: get_date)
 				if er.blank?
