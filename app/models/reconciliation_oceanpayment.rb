@@ -106,7 +106,7 @@ class ReconciliationOceanpayment
 			Rails.logger.info(post_params) unless Rails.env.production?
 			response=method_url_response("post",query_api_url,true,post_params)
 			if response.code!="200"
-				raise "main rescue:get web failure, #{Settings.oceanpayment_unionpay.query_api_url} , response.code"
+				raise "main rescue:get web failure, #{query_api_url} , response.code"
 			end
 
 			result_infos=Hash.from_xml(response.body)
@@ -163,6 +163,7 @@ class ReconciliationOceanpayment
 
 			if rd.present? && rd.confirm_flag==ReconciliationDetail::CONFIRM_FLAG['SUCC']
 				#has valid!
+				gen_callback_task(payinfo,rd)
 				return [true,nil]
 			end
 
@@ -198,6 +199,8 @@ class ReconciliationOceanpayment
 				end
 			end
 
+			gen_callback_task(payinfo,rd) if rd.reconciliation_flag==RECONCILIATIONDETAIL_FLAG['SUCC']
+
 			rd.save!() if rd.present?
 		rescue=>e
 			msg=e.message
@@ -206,11 +209,79 @@ class ReconciliationOceanpayment
 		[valid_flag,msg]
 	end
 
+	#
+	def gen_callback_task(payinfo,reconciliation_detail)
+		CallQueue.oceanpayment_push_task_save!(reconciliation_detail.id,payinfo['payment_id'])
+	end
+
 	def get_sign_value(post_params,secure_code)
 		Digest::SHA256.hexdigest(
 			post_params['account'].to_s +
 			post_params['terminal'].to_s +
 			post_params['order_number'].to_s +
+			secure_code
+		)
+	end
+
+	def self.push_track_info(online_pay)
+		push_flag=false
+		begin
+			raise "push_track_info failure: no online_pay input" if online_pay.blank?
+			raise "[#{online_pay.order_no}] no track_info get" if online_pay.online_pay_track_info.blank?
+
+			if online_pay.paytype=="unionpay_b2c"
+				account = Settings.oceanpayment_unionpay.account_b2c
+				terminal = Settings.oceanpayment_unionpay.terminal_b2c
+				secure_code = Settings.oceanpayment_unionpay.secure_code_b2c	
+			elsif online_pay.paytype=="unionpay_b2b"
+				account = Settings.oceanpayment_unionpay.account_b2b
+				terminal = Settings.oceanpayment_unionpay.terminal_b2b
+				secure_code = Settings.oceanpayment_unionpay.secure_code_b2b
+			else
+				account = Settings.oceanpayment_wechatpay.account
+				terminal =  Settings.oceanpayment_wechatpay.terminal
+				secure_code = Settings.oceanpayment_wechatpay.secure_code
+			end
+
+			post_params={
+				"account"=>account,
+				"terminal"=>terminal,
+				"signValue"=>"",
+				"payment_id"=>online_pay.reconciliation_detail.transactionid,
+				"tracking_number"=>online_pay.online_pay_track_info.ishpmt_nums,
+				"tracking_site"=>online_pay.online_pay_track_info.tracking_urls,
+				"tracking_handler"=>Settings.oceanpayment_unionpay.track_handler
+			}
+
+			post_params['signValue'] = get_track_sign_value(post_params,secure_code)
+			Rails.logger.info(post_params) unless Rails.env.production?
+			response=method_url_response_by_class("post",Settings.oceanpayment_unionpay.track_url,true,post_params)
+			if response.code!="200"
+				raise "main rescue:get web failure, #{Settings.oceanpayment_unionpay.track_url} , response.code"
+			end
+
+			result_infos=Hash.from_xml(response.body)
+			if result_infos['response']['tracking_results'].to_i==1
+				push_flag=true
+			else
+				raise "ReconciliationOceanpayment.push_track_info failure: [#{result_infos['response']['tracking_results']}]"
+			end
+		rescue=>e
+			p "#{e.message}"
+			push_flag=false
+		end
+
+		push_flag
+	end
+
+	def self.get_track_sign_value(post_params,secure_code)
+		Digest::SHA256.hexdigest(
+			post_params['account'].to_s +
+			post_params['terminal'].to_s +
+			post_params['payment_id'].to_s +
+			post_params['tracking_number'].to_s +
+			post_params['tracking_site'].to_s +
+			post_params['tracking_handler'].to_s +
 			secure_code
 		)
 	end

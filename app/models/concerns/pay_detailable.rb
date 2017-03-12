@@ -160,6 +160,64 @@ module PayDetailable extend ActiveSupport::Concern
 
 			new_redirect_url
 		end
+
+
+
+		def method_url_call_http_auth(method,url_path,username,password,params={})
+			digest_auth = Net::HTTP::DigestAuth.new
+			uri = URI.parse(url_path)
+			uri.user=username
+			uri.password=password
+
+			http = Net::HTTP.new(uri.host, uri.port)
+			http.use_ssl =  uri.scheme == 'https' if url_path[0,5]=="https"
+
+			if(method=="get")
+				request = Net::HTTP::Get.new(uri.request_uri) 
+			else
+				request = Net::HTTP::Post.new(uri.request_uri) 
+			end
+
+			response = http.request(request)
+			auth = digest_auth.auth_header uri, response['www-authenticate'], method.upcase
+			request.add_field 'Authorization', auth
+
+			unless(method=="get")
+				if params.present?
+					request.body=params.to_json if params.present?
+				end
+			end
+
+			response=http.request(request)
+			response	
+		end
+
+	def method_url_response_by_class(method,url_path,https_boolean,params={})
+		uri = URI.parse(url_path)
+		http = Net::HTTP.new(uri.host, uri.port)
+
+		http.use_ssl =  uri.scheme == 'https' if (https_boolean==true || url_path[0,5].upcase=="HTTPS")
+		http.read_timeout=20
+		if(method=="get")
+			request = Net::HTTP::Get.new(uri.request_uri) 
+		else
+			request = Net::HTTP::Post.new(uri.request_uri) 
+			request.set_form_data(params)
+		end
+
+		#test !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		response=nil
+		begin
+			Timeout::timeout(22){
+				response=http.request(request)
+			}
+		rescue => e
+			Rails.logger.info("CALL URL:#{url_path} EXPECTION:#{e.message}")
+			response=MyResponse.new
+		end
+		Rails.logger.info("url.code:#{response.code}")
+		response		
+	end
 	end
 
 	private

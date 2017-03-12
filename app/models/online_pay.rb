@@ -5,6 +5,7 @@ class OnlinePay < ActiveRecord::Base
 	ONLINE_PAY_ORDER_TYPE_ENUM=%w{parcel package_material}
 	belongs_to :user
 	has_one :reconciliation_detail
+	has_one :online_pay_track_info
 	validates :system, :channel, :userid, :payway,:amount,:order_no,:status, presence: true
 	validates :amount, numericality:{:greater_than_or_equal_to=>0.00}
 	validates :status, inclusion: { in: ONLINE_PAY_STATUS_ENUM,message: "%{value} is not a valid online_pay.status" }

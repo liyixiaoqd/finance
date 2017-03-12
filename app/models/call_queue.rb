@@ -1,4 +1,7 @@
+require 'concerns/net_http_auth.rb'
+
 class CallQueue < ActiveRecord::Base
+	include PayDetailable
 	# t.string :callback_interface
 	# t.string :reference_id
 	# t.string :status
@@ -113,5 +116,159 @@ class CallQueue < ActiveRecord::Base
 			'paytype'=>online_pay.paytype,
 			'sign'=>Digest::MD5.hexdigest("#{online_pay.trade_no}#{Settings.authenticate.signkey}")
 		}
+	end
+
+	#oceanpayment_push_task - 1
+	def self.oceanpayment_push_task_save!(reconciliation_detail_id,oceanpayment_payment_id)
+		if reconciliation_detail_id.blank? or oceanpayment_payment_id.blank?
+			raise "CallQueue.save_oceanpayment_push_task excepiton: params null"
+		end
+
+		if CallQueue.find_by_callback_interface_and_reference_id("oceanpayment_push",reconciliation_detail_id).blank?	
+			cq=CallQueue.new
+			cq.callback_interface="oceanpayment_push"
+			cq.reference_id=reconciliation_detail_id
+			cq.status="init"
+			cq.try_amount=10
+			cq.tried_amount=0
+			cq.run_batch=oceanpayment_payment_id
+			cq.start_call_time=Time.now.utc.to_s[0,19]	#5分钟后才允许调用 UTC
+
+			unless cq.save
+				raise "CallQueue.save_oceanpayment_push_task excepiton: #{cq.errors.full_messages}"
+			end
+		end
+	end
+
+
+	#oceanpayment_push_task - 2
+	def self.oceanpayment_push_task_get_info()
+		p "CallQueue.oceanpayment_push_task_get_info start [#{Time.now}]"
+		max_call_num=10
+		count=0
+		cq_array=[]
+		CallQueue.where(callback_interface: "oceanpayment_push",status: ["init","get_track_info"]).each do |cq|
+			count+=1
+			cq_array<<cq
+			if count>=max_call_num
+				oceanpayment_push_task_get_info_proc(cq_array)
+				count=0
+				cq_array=[]
+			end
+		end
+
+		if count>0
+			oceanpayment_push_task_get_info_proc(cq_array)
+			count=0
+			cq_array=[]
+		end
+
+		p "CallQueue.oceanpayment_push_task_get_info end [#{Time.now}]"
+	end
+
+	def self.oceanpayment_push_task_get_info_proc(cq_array)
+		begin
+			post_params={"order_numbers"=>[]}
+			cq_array.each do |cq|
+				rd=ReconciliationDetail.find_by(id: cq.reference_id)
+				if rd.blank?
+					p "id[#{cq.reference_id}] is null?????"
+					next
+				end
+
+				if rd.system=="mypost4u"
+					post_params["order_numbers"]<<{
+						"order_no"=>rd.order_no,
+						"trade_no"=>rd.online_pay.trade_no
+					}
+				end
+			end
+			
+			if post_params["order_numbers"].length==0
+				p "no info need call"
+				return
+			end
+
+			p "CallQueue.oceanpayment_push_task_get_info_proc post_params : [#{post_params}]"
+			response=method_url_call_http_auth("post",Settings.mypost4u.get_track_info_url,Settings.authenticate.username,Settings.authenticate.passwd,post_params)
+			if response.code!="200" 
+				raise "call [#{Settings.mypost4u.get_track_info_url}] failure: [#{response.code}]"
+			end
+
+			ret_hash=JSON.parse response.body
+			ret_hash['logistics_informations'].each do |track_info|
+				p "return track_info  [#{track_info}]"
+				rd=OnlinePay.find_by(trade_no: track_info['trade_no']).reconciliation_detail
+				if rd.blank?
+					p "no ReconciliationDetail found?? [#{track_info['trade_no']}]"
+					next
+				end
+
+				cq_array.each do |cq|
+					if cq.reference_id.to_i == rd.id.to_i
+						cq.tried_amount+=1
+
+						if track_info["is_complete"]=="S"
+							p "[#{track_info['trade_no']}] no need to call"
+							cq.status="finished_no_push"
+						elsif track_info["is_complete"]=="Y"
+							cq.status="need_push"
+							cq.tried_amount=0
+							cq.try_amount=3
+
+							opti=OnlinePayTrackInfo.find_by(order_no: rd.order_no)
+							if opti.blank?
+								opti=OnlinePayTrackInfo.new(order_no: rd.order_no)
+							end
+							opti.ishpmt_nums=track_info["ishpmt_num"]
+							opti.tracking_urls=track_info["tracking_url"]
+
+							opti.save!
+						else
+							p "[#{track_info['trade_no']}] unfinished call next time"
+
+							if cq.tried_amount>=cq.try_amount
+								cq.status="limit_get_track_info"
+							else
+								cq.status="get_track_info"
+							end
+						end
+
+						cq.save!
+						cq_array.delete(cq)
+						break
+					end
+				end
+			end
+		rescue=>e
+			p e.message
+		end
+	end
+
+
+	#oceanpayment_push_task - 3
+	def self.oceanpayment_push_task_push()
+		p "CallQueue.oceanpayment_push_task_push start [#{Time.now}]"
+		CallQueue.where(callback_interface: "oceanpayment_push",status: ["need_push","pushing"]).each do |cq|
+			begin
+				cq.tried_amount+=1
+				push_flag=ReconciliationOceanpayment.push_track_info(ReconciliationDetail.find_by(id: cq.reference_id).online_pay)
+				if push_flag==true
+					cq.status="finished_pushed"
+				else
+					if cq.tried_amount>=cq.try_amount
+						cq.status="limit_pushing"
+					else
+						cq.status="pushing"
+					end
+				end
+				cq.save!
+				p "CallQueue.oceanpayment_push_task_push [#{cq.reference_id}]  push result , [#{cq.status}]"
+			rescue=>e
+				p "CallQueue.oceanpayment_push_task_push rescue: #{e.message}"
+			end
+		end
+
+		p "CallQueue.oceanpayment_push_task_push end [#{Time.now}]"
 	end
 end

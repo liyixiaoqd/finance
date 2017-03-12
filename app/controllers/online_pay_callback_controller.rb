@@ -497,7 +497,7 @@ class OnlinePayCallbackController < ApplicationController
 			online_pay.set_status_by_callback!()
 			online_pay.reason=use_params['payment_details']
 
-			online_pay.reconciliation_id=online_pay.trade_no
+			online_pay.reconciliation_id=use_params['payment_id']
 
 			ret_hash['status']=online_pay.status
 			ret_hash['status_reason']=online_pay.reason
