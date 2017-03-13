@@ -144,7 +144,7 @@ class CallQueue < ActiveRecord::Base
 	#oceanpayment_push_task - 2
 	def self.oceanpayment_push_task_get_info()
 		p "CallQueue.oceanpayment_push_task_get_info start [#{Time.now}]"
-		max_call_num=10
+		max_call_num=30
 		count=0
 		cq_array=[]
 		CallQueue.where(callback_interface: "oceanpayment_push",status: ["init","get_track_info"]).each do |cq|
@@ -222,6 +222,7 @@ class CallQueue < ActiveRecord::Base
 							end
 							opti.ishpmt_nums=track_info["ishpmt_num"]
 							opti.tracking_urls=track_info["tracking_url"]
+							opti.online_pay_id=rd.online_pay_id
 
 							opti.save!
 						else

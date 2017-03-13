@@ -92,7 +92,7 @@ class ReconciliationOceanpayment
 					account = Settings.oceanpayment_wechatpay.account
 					terminal =  Settings.oceanpayment_wechatpay.terminal
 					secure_code = Settings.oceanpayment_wechatpay.secure_code
-					secure_code = Settings.oceanpayment_wechatpay.query_api_url
+					query_api_url = Settings.oceanpayment_wechatpay.query_api_url
 				end
 			end
 				
@@ -199,9 +199,10 @@ class ReconciliationOceanpayment
 				end
 			end
 
-			gen_callback_task(payinfo,rd) if rd.reconciliation_flag==RECONCILIATIONDETAIL_FLAG['SUCC']
-
-			rd.save!() if rd.present?
+			if rd.present?
+				gen_callback_task(payinfo,rd) if rd.reconciliation_flag==ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC']
+				rd.save!() 
+			end
 		rescue=>e
 			msg=e.message
 		end
