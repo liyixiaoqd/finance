@@ -249,8 +249,8 @@ class ReconciliationOceanpayment
 				"terminal"=>terminal,
 				"signValue"=>"",
 				"payment_id"=>online_pay.reconciliation_detail.transactionid,
-				"tracking_number"=>online_pay.online_pay_track_info.ishpmt_nums,
-				"tracking_site"=>online_pay.online_pay_track_info.tracking_urls,
+				"tracking_number"=>online_pay.online_pay_track_info.ishpmt_nums[0,200],
+				"tracking_site"=>online_pay.online_pay_track_info.tracking_urls[0,200],
 				"tracking_handler"=>Settings.oceanpayment_unionpay.track_handler
 			}
 
