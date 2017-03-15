@@ -20,6 +20,8 @@ namespace :finance do
 		@interface_logger.info("---------------------------------")
 		Rake::Task["finance:reconciliation_paypal"].invoke
 		@interface_logger.info("---------------------------------")
+		Rake::Task["finance:reconciliation_oceanpayment"].invoke
+		@interface_logger.info("---------------------------------")
 		@interface_logger.info("=================== reconciliation end:#{@beg} -- #{@end}===================\n\n\n\n")
 	end
 
@@ -77,12 +79,12 @@ namespace :finance do
 			@interface_logger = Logger.new("log/reconciliation.log")
 		end
 		@interface_logger.info("reconciliation_oceanpayment start")
-		["unionpay_b2c,","unionpay_b2b","wechatpay"].each do |subtype|
+		["unionpay_b2c","unionpay_b2b","wechatpay"].each do |subtype|
 			@interface_logger.info("mypost4u #{subtype} start")
 			reconciliation=ReconciliationOceanpayment.new(subtype,"mypost4u")
 			message=reconciliation.finance_reconciliation()
 			@interface_logger.info(out_message(message))
-			@interface_logger.info("mypost4u #{subtype} end")
+			@interface_logger.info("mypost4u #{subtype} end [#{message}]")
 		end
 		["unionpay_b2c","wechatpay"].each do |subtype|
 			@interface_logger.info("quaie #{subtype} start")
@@ -91,7 +93,7 @@ namespace :finance do
 			@interface_logger.info(out_message(message))
 			@interface_logger.info("quaie #{subtype} end")
 		end
-		@interface_logger.info("reconciliation_oceanpayment end")
+		@interface_logger.info("reconciliation_oceanpayment end [#{message}]")
 	end
 
 	def out_message(message)

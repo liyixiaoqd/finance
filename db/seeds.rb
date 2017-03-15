@@ -354,3 +354,18 @@ OnlinePay.where(system: "mypost4u").where("created_at>='2017-01-01'").each do |o
 end
 
 ReconciliationDetail.where("order_type is null").update_all(order_type: "parcel")
+
+LockSequence.manually_init_record("invoice","GSD-",0,"%06d")
+LockSequence.manually_init_record("invoice","CFN-",0,"%06d")
+LockSequence.manually_init_record("invoice","CNG-",0,"%06d")
+LockSequence.manually_init_record("invoice","GSEU-",0,"%06d")
+LockSequence.manually_init_record("invoice","RND-",0,"%06d")
+LockSequence.manually_init_record("invoice","FTN-",0,"%06d")
+LockSequence.manually_init_record("invoice","DNG-",0,"%06d")
+LockSequence.manually_init_record("invoice","RNEU-",0,"%06d")
+
+
+LockSequence.manually_init_record("invoice","RND-PM24",0,"%04d")
+LockSequence.manually_init_record("invoice","GSD-PM24",0,"%04d")
+LockSequence.manually_init_record("invoice","FTN-PM24",0,"%04d")
+LockSequence.manually_init_record("invoice","CFN-PM24",0,"%04d")

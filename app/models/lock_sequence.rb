@@ -23,7 +23,7 @@ class LockSequence < ActiveRecord::Base
 	#rd - ReconciliationDetail record
 	def self.judge_system_and_get_invoice(rd)
 		if isNewMypost4uRecord?(rd)
-			get_next_seq!("invoice",get_subtype("invoice",rd.send_country,rd.batch_id))
+			get_next_seq!("invoice",get_subtype("invoice",rd.send_country,rd.batch_id,rd.order_type))
 		else
 			""
 		end
@@ -57,7 +57,7 @@ class LockSequence < ActiveRecord::Base
 		isflag
 	end
 
-	def self.get_subtype(maintype,country,paytype)
+	def self.get_subtype(maintype,country,paytype,order_type)
 		subtype=nil
 
 		begin
@@ -68,16 +68,24 @@ class LockSequence < ActiveRecord::Base
 					raise "no country for #{maintype}"
 				end
 
+				subtype=nil
 				if paytype=="refund_parcel" || paytype=="refund_order"
-					subtype={"de"=>"GSD-", "nl"=>"CFN-","gb"=>"CNG-", "at"=>"GSEU-"}[country.downcase]
-					if subtype.blank?
-						raise "no country map"
+					if order_type=="parcel"
+						subtype={"de"=>"GSD-", "nl"=>"CFN-","gb"=>"CNG-", "at"=>"GSEU-"}[country.downcase]
+					elsif order_type=="package_material"
+						subtype={"de"=>"GSD-PM24", "nl"=>"CFN-PM24"}[country.downcase]
 					end
+
 				else
-					subtype={"de"=>"RND-", "nl"=>"FTN-","gb"=>"DNG-", "at"=>"RNEU-"}[country.downcase]
-					if subtype.blank?
-						raise "no country map"
+					if order_type=="parcel"
+						subtype={"de"=>"RND-", "nl"=>"FTN-","gb"=>"DNG-", "at"=>"RNEU-"}[country.downcase]
+					elsif order_type=="package_material"
+						subtype={"de"=>"RND-PM24", "nl"=>"FTN-PM24"}[country.downcase]
 					end
+				end
+
+				if subtype.blank?
+					raise "type[#{maintype}] : [#{country}][#{paytype}][#{order_type}] - no subtype mapping"
 				end
 			end
 		rescue=>e

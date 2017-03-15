@@ -1,6 +1,6 @@
 class PaypalDetail
 	include PayDetailable
-	attr_accessor :ip,:country,:amount,:description,:currency,:order_no
+	attr_accessor :ip,:country,:amount,:description,:currency,:order_no,:order_type
 
 	 SPEC_PARAMS_COUNTRY=%w(de nl gb at)
 	#PAY_PAYPAL_PARAMS=%w{amount currency success_url abort_url order_no description ip country}
@@ -13,46 +13,70 @@ class PaypalDetail
 	end
 
 	def submit
-		if @country == "de"
-			response = EXPRESS_GATEWAY_DE.setup_purchase( (@amount.to_f*100).round,
-			:ip                => @ip,
-			:currency          => @currency,
-			:return_url        => Settings.paypal.return_url,
-			:cancel_return_url => Settings.paypal.cancel_url,
-			:items             => [ { :name => @order_no,
-					    :amount   => price_in_cents(@amount),
-					    :description => @description} ]
-			)
-		elsif @country == "nl"
-			response = EXPRESS_GATEWAY_NL.setup_purchase( (@amount.to_f*100).round,
-			:ip                => @ip,
-			:currency          => @currency,
-			:return_url        => Settings.paypal.return_url,
-			:cancel_return_url => Settings.paypal.cancel_url,
-			:items             => [ { :name => @order_no,
-					    :amount   => price_in_cents(@amount),
-					    :description => @description} ]
-			)
-		elsif @country == "gb"
-			response = EXPRESS_GATEWAY_GB.setup_purchase( (@amount.to_f*100).round,
-			:ip                => @ip,
-			:currency          => @currency,
-			:return_url        => Settings.paypal.return_url,
-			:cancel_return_url => Settings.paypal.cancel_url,
-			:items             => [ { :name => @order_no,
-					    :amount   => price_in_cents(@amount),
-					    :description => @description} ]
-			)
-		elsif @country == "at"
-			response = EXPRESS_GATEWAY_AT.setup_purchase( (@amount.to_f*100).round,
-			:ip                => @ip,
-			:currency          => @currency,
-			:return_url        => Settings.paypal.return_url,
-			:cancel_return_url => Settings.paypal.cancel_url,
-			:items             => [ { :name => @order_no,
-					    :amount   => price_in_cents(@amount),
-					    :description => @description} ]
-			)
+		if @order_type=="parcel"
+			if @country == "de"
+				response = EXPRESS_GATEWAY_DE.setup_purchase( (@amount.to_f*100).round,
+				:ip                => @ip,
+				:currency          => @currency,
+				:return_url        => Settings.paypal.return_url,
+				:cancel_return_url => Settings.paypal.cancel_url,
+				:items             => [ { :name => @order_no,
+						    :amount   => price_in_cents(@amount),
+						    :description => @description} ]
+				)
+			elsif @country == "nl"
+				response = EXPRESS_GATEWAY_NL.setup_purchase( (@amount.to_f*100).round,
+				:ip                => @ip,
+				:currency          => @currency,
+				:return_url        => Settings.paypal.return_url,
+				:cancel_return_url => Settings.paypal.cancel_url,
+				:items             => [ { :name => @order_no,
+						    :amount   => price_in_cents(@amount),
+						    :description => @description} ]
+				)
+			elsif @country == "gb"
+				response = EXPRESS_GATEWAY_GB.setup_purchase( (@amount.to_f*100).round,
+				:ip                => @ip,
+				:currency          => @currency,
+				:return_url        => Settings.paypal.return_url,
+				:cancel_return_url => Settings.paypal.cancel_url,
+				:items             => [ { :name => @order_no,
+						    :amount   => price_in_cents(@amount),
+						    :description => @description} ]
+				)
+			elsif @country == "at"
+				response = EXPRESS_GATEWAY_AT.setup_purchase( (@amount.to_f*100).round,
+				:ip                => @ip,
+				:currency          => @currency,
+				:return_url        => Settings.paypal.return_url,
+				:cancel_return_url => Settings.paypal.cancel_url,
+				:items             => [ { :name => @order_no,
+						    :amount   => price_in_cents(@amount),
+						    :description => @description} ]
+				)
+			end
+		elsif @order_type=="package_material"
+			if @country == "de"
+				response = EXPRESS_GATEWAY_DE_PM.setup_purchase( (@amount.to_f*100).round,
+				:ip                => @ip,
+				:currency          => @currency,
+				:return_url        => Settings.paypal.return_url,
+				:cancel_return_url => Settings.paypal.cancel_url,
+				:items             => [ { :name => @order_no,
+						    :amount   => price_in_cents(@amount),
+						    :description => @description} ]
+				)
+			elsif @country == "nl"
+				response = EXPRESS_GATEWAY_NL_PM.setup_purchase( (@amount.to_f*100).round,
+				:ip                => @ip,
+				:currency          => @currency,
+				:return_url        => Settings.paypal.return_url,
+				:cancel_return_url => Settings.paypal.cancel_url,
+				:items             => [ { :name => @order_no,
+						    :amount   => price_in_cents(@amount),
+						    :description => @description} ]
+				)
+			end
 		end
 
 		#return  flag   redirect_url    trade_no    is_credit    errmsg
@@ -68,14 +92,22 @@ class PaypalDetail
 		details=''
 		begin
 			Timeout::timeout(22){
-				if @country == "de"
-					details=EXPRESS_GATEWAY_DE.details_for(trade_no)
-				elsif @country == "nl"
-					details=EXPRESS_GATEWAY_NL.details_for(trade_no)
-				elsif @country == "gb"
-					details=EXPRESS_GATEWAY_GB.details_for(trade_no)
-				elsif @country == "at"
-					details=EXPRESS_GATEWAY_AT.details_for(trade_no)
+				if @order_type=="parcel"
+					if @country == "de"
+						details=EXPRESS_GATEWAY_DE.details_for(trade_no)
+					elsif @country == "nl"
+						details=EXPRESS_GATEWAY_NL.details_for(trade_no)
+					elsif @country == "gb"
+						details=EXPRESS_GATEWAY_GB.details_for(trade_no)
+					elsif @country == "at"
+						details=EXPRESS_GATEWAY_AT.details_for(trade_no)
+					end
+				elsif @order_type=="package_material"
+					if @country == "de"
+						details=EXPRESS_GATEWAY_DE_PM.details_for(trade_no)
+					elsif @country == "nl"
+						details=EXPRESS_GATEWAY_NL_PM.details_for(trade_no)
+					end
 				end
 			}
 			Rails.logger.info("get_pay_details:#{@country} - #{trade_no}:#{details.payer_id}")
@@ -100,14 +132,22 @@ class PaypalDetail
 		begin
 			response=''
 			Timeout::timeout(22){
-				if online_pay.country == "de"
-					response=EXPRESS_GATEWAY_DE.purchase(price_in_cents(online_pay.amount), express_purchase_options(online_pay,"EUR"))
-				elsif online_pay.country == "nl"
-					response=EXPRESS_GATEWAY_NL.purchase(price_in_cents(online_pay.amount), express_purchase_options(online_pay,"EUR"))
-				elsif online_pay.country == "gb"
-					response=EXPRESS_GATEWAY_GB.purchase(price_in_cents(online_pay.amount), express_purchase_options(online_pay,"GBP"))
-				elsif online_pay.country == "at"
-					response=EXPRESS_GATEWAY_AT.purchase(price_in_cents(online_pay.amount), express_purchase_options(online_pay,"EUR"))
+				if @order_type=="parcel"
+					if online_pay.country == "de"
+						response=EXPRESS_GATEWAY_DE.purchase(price_in_cents(online_pay.amount), express_purchase_options(online_pay,"EUR"))
+					elsif online_pay.country == "nl"
+						response=EXPRESS_GATEWAY_NL.purchase(price_in_cents(online_pay.amount), express_purchase_options(online_pay,"EUR"))
+					elsif online_pay.country == "gb"
+						response=EXPRESS_GATEWAY_GB.purchase(price_in_cents(online_pay.amount), express_purchase_options(online_pay,"GBP"))
+					elsif online_pay.country == "at"
+						response=EXPRESS_GATEWAY_AT.purchase(price_in_cents(online_pay.amount), express_purchase_options(online_pay,"EUR"))
+					end
+				elsif @order_type=="package_material"
+					if online_pay.country == "de"
+						response=EXPRESS_GATEWAY_DE_PM.purchase(price_in_cents(online_pay.amount), express_purchase_options(online_pay,"EUR"))
+					elsif online_pay.country == "nl"
+						response=EXPRESS_GATEWAY_NL_PM.purchase(price_in_cents(online_pay.amount), express_purchase_options(online_pay,"EUR"))
+					end
 				end
 			}
 

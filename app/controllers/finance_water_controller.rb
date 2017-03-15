@@ -608,6 +608,8 @@ class FinanceWaterController < ApplicationController
 				reconciliation_detail.amt -= reconciliation_detail.feeamt
 			end
 
+			reconciliation_detail.order_type = params["order_type"] if params["order_type"].present?
+
 			reconciliation_detail
 		end
 

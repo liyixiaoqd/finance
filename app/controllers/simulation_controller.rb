@@ -186,7 +186,7 @@ class SimulationController < ApplicationController
 		simulate_order_no=create_pay_order_no(payway,new_serial)
 
 		case payway
-		when 'paypal' then simulate_params=init_paypal_submit_params(simulate_order_no,amount,request.remote_ip) 
+		when 'paypal' then simulate_params=init_paypal_submit_params(simulate_order_no,amount,request.remote_ip,params['order_type'],params['country']) 
 		when 'sofort' then simulate_params=init_sofort_submit_params(simulate_order_no,amount) 
 		when 'alipay_oversea' then simulate_params=init_alipay_oversea_submit_params(simulate_order_no,amount) 
 		when 'alipay_transaction' then simulate_params=init_alipay_transaction_submit_params(simulate_order_no,amount)
@@ -487,7 +487,7 @@ class SimulationController < ApplicationController
 			}
 		end
 
-		def init_paypal_submit_params(order_no,amount,ip)
+		def init_paypal_submit_params(order_no,amount,ip,order_type,country)
 			paypal_submit_params={
 				'system'=>'mypost4u',
 				'payway'=>'paypal',
@@ -500,7 +500,8 @@ class SimulationController < ApplicationController
 				'success_url'=>"#{CALL_HOST}/simulation/callback_return",
 				'abort_url'=>"#{CALL_HOST}/simulation/callback_return",
 				'notification_url'=>"#{CALL_HOST}/simulation/callback_notify",
-				'country'=>'de'
+				'country'=>country,
+				'order_type'=>order_type
 			}
 
 			init_online_pay_params.merge!(paypal_submit_params)

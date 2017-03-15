@@ -250,13 +250,17 @@ class CallQueue < ActiveRecord::Base
 	#oceanpayment_push_task - 3
 	def self.oceanpayment_push_task_push()
 		p "CallQueue.oceanpayment_push_task_push start [#{Time.now}]"
+		succ=0
+		fail=0
 		CallQueue.where(callback_interface: "oceanpayment_push",status: ["need_push","pushing"]).each do |cq|
 			begin
 				cq.tried_amount+=1
 				push_flag=ReconciliationOceanpayment.push_track_info(ReconciliationDetail.find_by(id: cq.reference_id).online_pay)
 				if push_flag==true
+					succ+=1
 					cq.status="finished_pushed"
 				else
+					fail+=1
 					if cq.tried_amount>=cq.try_amount
 						cq.status="limit_pushing"
 					else
@@ -270,6 +274,6 @@ class CallQueue < ActiveRecord::Base
 			end
 		end
 
-		p "CallQueue.oceanpayment_push_task_push end [#{Time.now}]"
+		p "CallQueue.oceanpayment_push_task_push end [#{Time.now}] , succ[#{succ}],fail[#{fail}]"
 	end
 end

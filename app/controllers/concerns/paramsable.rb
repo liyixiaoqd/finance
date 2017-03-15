@@ -2,9 +2,9 @@ module Paramsable extend ActiveSupport::Concern
 	REGISTE_CREATE_PARAMS=%w{system channel userid username email accountInitAmount accountInitReason scoreInitAmount scoreInitReason operator datetime}
 	REGISTE_OBTAIN_PARAMS=%w{system channel userid}
 	FINANCE_WATER_MODIFY_PARAMS=%w{system channel userid operator datetime oper}
-	ONLINE_PAY_SUBMIT_PARAMS=%w{system payway paytype userid amount currency order_no success_url notification_url notification_email abort_url timeout_url ip description country quantity logistics_name send_country}
+	ONLINE_PAY_SUBMIT_PARAMS=%w{system payway paytype userid amount currency order_no success_url notification_url notification_email abort_url timeout_url ip description country quantity logistics_name send_country} #order_type
 	ONLINE_PAY_SUBMIT_CREDITCARD_PARAMS=%w{payway paytype trade_no amount currency ip brand number verification_value month year first_name last_name}
-	FINANCE_WATER_REFUND_PARAMS=%w{payway paytype order_no datetime amount parcel_no}
+	FINANCE_WATER_REFUND_PARAMS=%w{payway paytype order_no datetime amount parcel_no} #order_type
 	FINANCE_WATER_OBTAIN_PARAMS=%w{system channel userid water_no}
 	FINANCE_WATER_CORRECT_PARAMS=%w{system channel user_id oper}
 	FINANCE_WATER_INVOICE_MERCHANT_PARAMS=%w{system channel user_id oper}

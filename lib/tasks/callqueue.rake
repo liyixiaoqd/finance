@@ -18,18 +18,18 @@ namespace :callqueue do
 
 	desc "获取支付包裹的物流信息及推送"
 	task :track_info_proc=>[:environment] do 
-		@interface_logger = Logger.new("log/cron_track_info_proc.log")
+		@interface_logger = Logger.new("log/track_info_proc.log")
 		@interface_logger.level=Logger::INFO
 		@interface_logger.datetime_format="%Y-%m-%d %H:%M:%S"
 		@interface_logger.formatter=proc{|severity,datetime,progname,msg|
 			"[#{datetime}] :#{msg}\n"
 		}
-		@interface_logger.info("callqueue online_pay_is_succ start")
+		@interface_logger.info("callqueue track_info_proc start")
 
 		CallQueue.oceanpayment_push_task_get_info()
 		CallQueue.oceanpayment_push_task_push()
 		
-		@interface_logger.info("callqueue  online_pay_is_succ end")
+		@interface_logger.info("callqueue  track_info_proc end")
 	end
 end
 

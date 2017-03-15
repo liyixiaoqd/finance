@@ -25,7 +25,10 @@
           
           <%= label_tag(:label3, "amount") %>
           <%= text_field_tag(:amount, 0.01) %>
-          <%= text_field_tag(:serial, "#{SimulationController.get_simulation_num}") %> </br>
+          <%= text_field_tag(:serial, "#{SimulationController.get_simulation_num}") %> 
+          <%= select_tag(:country,options_for_select([["德国","de"],["荷兰","nl"]],"de")) %>  
+          <%= select_tag(:order_type,options_for_select([["包裹","parcel"],["包材","package_material"]],"parcel")) %>
+          </br>
           <%= label_tag(:label4, "银联or微信填写") %>
           <%= text_field_tag(:system, "mypost4u",placeholder: "系统 mypost4u or quaie") %> </br>
           <%= text_field_tag(:consumer_name,"",placeholder: "消费者name") %>
