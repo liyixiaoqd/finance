@@ -129,7 +129,7 @@ class CallQueue < ActiveRecord::Base
 			cq.callback_interface="oceanpayment_push"
 			cq.reference_id=reconciliation_detail_id
 			cq.status="init"
-			cq.try_amount=10
+			cq.try_amount=20
 			cq.tried_amount=0
 			cq.run_batch=oceanpayment_payment_id
 			cq.start_call_time=Time.now.utc.to_s[0,19]	#5分钟后才允许调用 UTC
