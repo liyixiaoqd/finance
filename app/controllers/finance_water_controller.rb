@@ -72,6 +72,9 @@ class FinanceWaterController < ApplicationController
 
 				# finance_water=new_finance_water_params(user,params)
 				for finance_each in finance_arrays
+					#重复交易判断
+					check_finance_water_by_params(user,finance_each,params)
+
 					finance_water=new_finance_water_each(user,finance_each,params)
 
 					if(finance_water.watertype=="score")
@@ -613,6 +616,16 @@ class FinanceWaterController < ApplicationController
 			reconciliation_detail
 		end
 
+		def check_finance_water_by_params(user,finance_each,params)
+			#退费等财务流水交易控制
+			if finance_each['is_pay'] != "Y" and finance_each['order_no'].present?
+				reason = "#{finance_each['order_no']}_#{finance_each['reason']}"
+				if user.finance_water.find_by(reason: reason).present?
+					raise "不可重复操作积分 : [#{reason}]"
+				end
+			end
+		end
+
 		#interface use
 		def new_finance_water_each(user,finance_each,params)
 			finance_water=user.finance_water.build()
@@ -625,7 +638,11 @@ class FinanceWaterController < ApplicationController
 			finance_water.symbol=finance_each["symbol"]
 			finance_water.amount=finance_each["amount"]
 			finance_water.watertype=finance_each["watertype"]
-			finance_water.reason=finance_each["reason"]
+			if finance_each['order_no'].present?
+				finance_water.reason="#{finance_each['order_no']}_#{finance_each['reason']}"
+			else
+				finance_water.reason=finance_each["reason"]
+			end
 			finance_water.confirm_flag="1"
 
 			finance_water.set_all_amount!(user.score,user.e_cash)
