@@ -17,7 +17,7 @@ class ReconciliationOceanpayment
 		end
 
 		if(enddate.blank?)
-			@enddate=Time.now.at_beginning_of_day-post_day.day+1.day
+			@enddate=Time.now.at_beginning_of_day-post_day.day
 		else
 			@enddate=enddate.to_time
 		end	

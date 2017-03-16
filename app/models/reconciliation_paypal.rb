@@ -19,7 +19,7 @@ class ReconciliationPaypal
 		end
 
 		if(enddate.blank?)
-			@enddate=Time.now.at_beginning_of_day-post_day.day+1.day
+			@enddate=Time.now.at_beginning_of_day-post_day.day
 		else
 			@enddate=enddate.to_time
 		end		
@@ -28,7 +28,7 @@ class ReconciliationPaypal
 		@reconciliation_date=current_time_format("%Y%m%d",0)
 		@batch_id=1	# 001
 		@country=country
-		Rails.logger.info("TRANSACTION SEARCH : #{@startdate} -- #{@enddate}")
+		Rails.logger.info("TRANSACTION SEARCH : [#{@country}] #{@startdate} -- #{@enddate}")
 	end
 
 	def get_reconciliation(startdate,enddate,options_hash={})
@@ -40,12 +40,16 @@ class ReconciliationPaypal
 			# 'AMT' => 105,
 			'ENDDATE' => enddate
 		}.merge(options_hash)
-		Rails.logger.info("get_reconciliation:#{options}")
+		Rails.logger.info("get_reconciliation: [#{@country}] - [#{options}]")
 
 		if @country=="de"
 			options['USER']=Settings.paypal.login_de
 			options['PWD']=Settings.paypal.password_de
 			options['SIGNATURE']=Settings.paypal.signature_de
+		if @country=="de_pm"
+			options['USER']=Settings.paypal.login_de_pm
+			options['PWD']=Settings.paypal.password_de_pm
+			options['SIGNATURE']=Settings.paypal.signature_de_pm
 		elsif @country=="at"
 			options['USER']=Settings.paypal.login_at
 			options['PWD']=Settings.paypal.password_at
@@ -58,6 +62,10 @@ class ReconciliationPaypal
 			options['USER']=Settings.paypal.login_nl
 			options['PWD']=Settings.paypal.password_nl
 			options['SIGNATURE']=Settings.paypal.signature_nl
+		elsif @country=="nl_pm"
+			options['USER']=Settings.paypal.login_nl_pm
+			options['PWD']=Settings.paypal.password_nl_pm
+			options['SIGNATURE']=Settings.paypal.signature_nl_pm
 		else
 			Rails.logger.warn("NO COUNTRY SET:#{country}")
 		end
@@ -71,14 +79,15 @@ class ReconciliationPaypal
 	end
 
 	def finance_reconciliation()
+		post_day=BasicData.get_value("00A","001","paypal","").to_i
 		hour_step=BasicData.get_value("00A","002","paypal","").to_i
-		message="#{@startdate} - #{@enddate} </br> "
-		for h in (0...24/hour_step)
-			Rails.logger.info("#{@startdate},#{h},#{hour_step}")
+		message="[#{@country}] #{@startdate} - #{@enddate} </br> "
+		for h in (0...24*post_day/hour_step)
+			Rails.logger.info("[#{@country}] #{@startdate},#{h},#{hour_step}")
 			tmp_start = (@startdate+ (h*hour_step).hour).strftime("%Y-%m-%dT%H:%M:%SZ")
 			tmp_end =  (@startdate+ ((h+1)*hour_step).hour).strftime("%Y-%m-%dT%H:%M:%SZ")
 
-			Rails.logger.info("#{h}: #{tmp_start} - #{tmp_end}")
+			Rails.logger.info("[#{@country}] #{h}: #{tmp_start} - #{tmp_end}")
 			message=message+valid_reconciliation(get_reconciliation(tmp_start,tmp_end,{}))
 
 			@batch_id=@batch_id+1
@@ -146,9 +155,9 @@ class ReconciliationPaypal
 		reconciliation_id=''
 		callback_status=''
 
-		if @country == "de"
+		if @country == "de" || @country == "de_pm"
 			currencycode="EUR"
-		elsif @country == "nl"
+		elsif @country == "nl" || @country == "nl_pm"
 			currencycode="EUR"
 		elsif @country == "gb"
 			currencycode="GBP"

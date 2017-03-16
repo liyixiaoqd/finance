@@ -57,7 +57,7 @@ namespace :finance do
 	desc "对账:paypal"
 	task :reconciliation_paypal=>[:environment] do
 		@interface_logger.info("reconciliation_paypal start")
-		country_arr=%w(de at nl gb)
+		country_arr=%w(de at nl gb de_pm nl_pm)
 		country_arr.each do |country|
 			@interface_logger.info("country #{country} start")
 			reconciliation=ReconciliationPaypal.new("TransactionSearch",country)

@@ -9,11 +9,11 @@
 BasicData.delete_all
 BasicData.create!(:basic_type=>"00A",:desc=>"financial reconciliation interface configuration",
 	                   :basic_sub_type=>"001",:sub_desc=>"postpone the date - day",
-	                   :payway=>"paypal",:paytype=>"",:value=>"1")
+	                   :payway=>"paypal",:paytype=>"",:value=>"2")
 
 BasicData.create!(:basic_type=>"00A",:desc=>"financial reconciliation interface configuration",
 	                   :basic_sub_type=>"002",:sub_desc=>"time interval frequency - hour",
-	                   :payway=>"paypal",:paytype=>"",:value=>"12")
+	                   :payway=>"paypal",:paytype=>"",:value=>"6")
 
 BasicData.create!(:basic_type=>"00A",:desc=>"financial reconciliation interface configuration",
 	                   :basic_sub_type=>"001",:sub_desc=>"postpone the date - day",
@@ -334,7 +334,7 @@ AccessAuthority.create!(:controller=>"OnlinePayCallbackController",:action=>"oce
 
 BasicData.create!(:basic_type=>"00A",:desc=>"financial reconciliation interface configuration",
 	                   :basic_sub_type=>"001",:sub_desc=>"postpone the date - day",
-	                   :payway=>"oceanpayment",:paytype=>"",:value=>"1")
+	                   :payway=>"oceanpayment",:paytype=>"",:value=>"2")
 
 AccessAuthority.create!(:controller=>"OnlinePayCallbackController",:action=>"oceanpayment_wechatpay_return",
 			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>false,
