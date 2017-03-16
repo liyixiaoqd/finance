@@ -46,7 +46,7 @@ class ReconciliationPaypal
 			options['USER']=Settings.paypal.login_de
 			options['PWD']=Settings.paypal.password_de
 			options['SIGNATURE']=Settings.paypal.signature_de
-		if @country=="de_pm"
+		elsif @country=="de_pm"
 			options['USER']=Settings.paypal.login_de_pm
 			options['PWD']=Settings.paypal.password_de_pm
 			options['SIGNATURE']=Settings.paypal.signature_de_pm
