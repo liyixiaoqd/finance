@@ -441,9 +441,9 @@ class OnlinePayController < ApplicationController
 				next unless CONDITION_PARAMS.include?(k)
 
 				if(k=="start_time")
-					t_sql="left(created_at,10)>=:#{k}"
+					t_sql="left(convert_tz(created_at,'+08:00','Europe/Berlin'),10)>=:#{k}"
 				elsif (k=="end_time")
-					t_sql="left(created_at,10)<=:#{k}"
+					t_sql="left(convert_tz(created_at,'+08:00','Europe/Berlin'),10)<=:#{k}"
 				elsif(k=="user_id")
 					t_sql="user_id in (#{v.join(',')})"
 				elsif(k=="online_pay_status")

@@ -177,7 +177,7 @@ class TransactionReconciliationController < ApplicationController
 		end
 
 		sql="reconciliation_flag=#{ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC']} and confirm_flag=#{ReconciliationDetail::CONFIRM_FLAG['INIT']} "
-		sql+=" and transaction_date=:start_time " unless params['start_time'].blank?
+		sql+=" and left(convert_tz(timestamp,'+08:00','Europe/Berlin'),10)=:start_time " unless params['start_time'].blank?
 		sql+=" and system=:system " unless params['system'].blank?
 		sql+=" and send_country=:send_country " unless params['send_country'].blank?
 		sql+=" and order_type=:order_type " unless params['order_type'].blank?
@@ -222,7 +222,7 @@ class TransactionReconciliationController < ApplicationController
 
 			sql="reconciliation_flag=#{ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC']} and confirm_flag=#{ReconciliationDetail::CONFIRM_FLAG['INIT']} "
 			sql+=" and updated_at<=:max_updated_at "  
-			sql+=" and transaction_date=:start_time " unless params['start_time'].blank?
+			sql+=" and left(convert_tz(timestamp,'+08:00','Europe/Berlin'),10)=:start_time " unless params['start_time'].blank?
 			sql+=" and system=:system " unless params['system'].blank?
 			sql+=" and send_country=:send_country " unless params['send_country'].blank?
 			if params['reconciliation_type']=="out"
@@ -397,10 +397,10 @@ class TransactionReconciliationController < ApplicationController
 				next if v.blank? 
 				next unless CONDITION_PARAMS.include?(k)
 				
-				if( k=="start_time")
-					t_sql="left(timestamp,10)>=:#{k}"
+				if(k=="start_time")
+					t_sql="left(convert_tz(timestamp,'+08:00','Europe/Berlin'),10)>=:#{k}"
 				elsif (k=="end_time")
-					t_sql="left(timestamp,10)<=:#{k}"
+					t_sql="left(convert_tz(timestamp,'+08:00','Europe/Berlin'),10)<=:#{k}"
 				# elsif(k=="online_pay_id")
 				# 	t_sql="online_pay_id in (#{v.join(',')})"
 				else

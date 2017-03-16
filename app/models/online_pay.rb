@@ -336,7 +336,7 @@ class OnlinePay < ActiveRecord::Base
 			sql_condition=condition
 		end
 
-		op_tj=OnlinePay.select("count(*) as c,sum(amount) as s").where("left(created_at,10)>=? and left(created_at,10)<=? #{sql_condition}",datatime_beg,datatime_end)
+		op_tj=OnlinePay.select("count(*) as c,sum(amount) as s").where("left(convert_tz(created_at,'+08:00','Europe/Berlin'),10)>=? and left(convert_tz(created_at,'+08:00','Europe/Berlin'),10)<=? #{sql_condition}",datatime_beg,datatime_end)
 		if(op_tj[0]['s'].blank?)
 			[op_tj[0]['c'],0.00]
 		else
