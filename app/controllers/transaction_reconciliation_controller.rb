@@ -225,6 +225,8 @@ class TransactionReconciliationController < ApplicationController
 			sql+=" and left(convert_tz(timestamp,'+08:00','Europe/Berlin'),10)=:start_time " unless params['start_time'].blank?
 			sql+=" and system=:system " unless params['system'].blank?
 			sql+=" and send_country=:send_country " unless params['send_country'].blank?
+			sql+=" and order_type=:order_type " unless params['order_type'].blank?
+
 			if params['reconciliation_type']=="out"
 				sql+=" and batch_id in('refund_order','refund_parcel') "
 			else

@@ -26,3 +26,7 @@ Things you may want to cover:
 
 Please feel free to use a different markup language if you do not plan to run
 <tt>rake doc:app</tt>.
+
+database use mysql and must set data_time_zone:
+1. my.cnf : default-time-zone = '+8:00'
+2. mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -p -D mysql
