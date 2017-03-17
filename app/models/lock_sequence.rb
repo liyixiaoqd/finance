@@ -17,6 +17,8 @@ class LockSequence < ActiveRecord::Base
 			"RNEU-"=>"奥地利发票",
 			"FTN-PM24"=>"荷兰包材发票",
 			"RND-PM24"=>"德国包材发票",
+			"GSD-PM24"=>"德国包材退费发票",
+			"CFN-PM24"=>"荷兰包材退费发票",
 		}
 	}
 
