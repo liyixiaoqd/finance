@@ -43,7 +43,7 @@ class LockSequence < ActiveRecord::Base
 				order_no=rd.order_no
 			end
 
-			if order_no.length==20
+			if order_no.length==20 || order_no[0,2]=="MO"
 				isflag=true
 			else
 				isflag=false
