@@ -244,7 +244,7 @@ class TransactionReconciliationController < ApplicationController
 					all_amount+=rd.amt
 				end
 
-				if all_amount - params['confirm_amount'].to_f < 0.001 && all_amount - params['confirm_amount'].to_f > -0.001
+				if all_amount - params['confirm_amount'].to_f > 0.001 || all_amount - params['confirm_amount'].to_f < -0.001
 					raise "数据已变更,请重新确认! 金额 #{params['confirm_amount']} => #{all_amount}"
 				end
 
