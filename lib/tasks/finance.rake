@@ -93,7 +93,7 @@ namespace :finance do
 			@interface_logger.info(out_message(message))
 			@interface_logger.info("quaie #{subtype} end")
 		end
-		@interface_logger.info("reconciliation_oceanpayment end [#{message}]")
+		@interface_logger.info("reconciliation_oceanpayment end")
 	end
 
 	def out_message(message)
