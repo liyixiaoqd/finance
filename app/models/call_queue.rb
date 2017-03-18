@@ -220,8 +220,8 @@ class CallQueue < ActiveRecord::Base
 							if opti.blank?
 								opti=OnlinePayTrackInfo.new(order_no: rd.order_no)
 							end
-							opti.ishpmt_nums=track_info["ishpmt_num"]
-							opti.tracking_urls=track_info["tracking_url"]
+							opti.ishpmt_nums=track_info["ishpmt_num"].blank? ? "" : track_info["ishpmt_num"][0,850]
+							opti.tracking_urls=track_info["tracking_url"].blank? ? "" : track_info["tracking_url"][0,850]
 							opti.online_pay_id=rd.online_pay_id
 
 							opti.save!
