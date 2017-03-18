@@ -19,7 +19,7 @@ class ReconciliationPaypal
 		end
 
 		if(enddate.blank?)
-			@enddate=Time.now.at_beginning_of_day-post_day.day
+			@enddate=Time.now.at_beginning_of_day
 		else
 			@enddate=enddate.to_time
 		end		
