@@ -74,14 +74,14 @@ class LockSequence < ActiveRecord::Base
 
 				subtype=nil
 				if paytype=="refund_parcel" || paytype=="refund_order"
-					if order_type=="parcel"
+					if order_type=="parcel" || order_type.blank?
 						subtype={"de"=>"GSD-", "nl"=>"CFN-","gb"=>"CNG-", "at"=>"GSEU-"}[country.downcase]
 					elsif order_type=="package_material"
 						subtype={"de"=>"GSD-PM24", "nl"=>"CFN-PM24"}[country.downcase]
 					end
 
 				else
-					if order_type=="parcel"
+					if order_type=="parcel" || order_type.blank?
 						subtype={"de"=>"RND-", "nl"=>"FTN-","gb"=>"DNG-", "at"=>"RNEU-"}[country.downcase]
 					elsif order_type=="package_material"
 						subtype={"de"=>"RND-PM24", "nl"=>"FTN-PM24"}[country.downcase]

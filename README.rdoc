@@ -6,18 +6,41 @@ application up and running.
 Things you may want to cover:
 
 * Ruby version
+ruby2.1.1@rails4.1.8
 
 * System dependencies
 
 * Configuration
+config/database.yml
+config/settings.yml
+config/secrets.yml --> production:secret_key
+environments/development.rb  
+environments/production.rb  
+environments/test.rb
 
 * Database creation
+mysql:
+  CREATE DATABASE IF NOT EXISTS finance_production DEFAULT CHARSET utf8 COLLATE utf8_general_ci;
+  grant all privileges on finance_production.* to finance@"%" identified by "***************";
+  flush privileges;
 
 * Database initialization
+set data_time_zone:
+  1. my.cnf : default-time-zone = '+8:00'
+  2. mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -p -D mysql
 
 * How to run the test suite
 
 * Services (job queues, cache servers, search engines, etc.)
+crontab : (please change the sh file's project)
+  0 0 1,15 * * /opt/rails-app/epp/lib/shell/clean_log.sh 2> /opt/rails-app/epp/log/cron_clean_log.log
+  15 9,14 * * * /opt/rails-app/epp/lib/shell/finance.sh 2> /opt/rails-app/epp/log/cron_finance.log
+  10 8 * * * /opt/rails-app/epp/lib/shell/sync_file.sh finance_water 2> /opt/rails-app/epp/log/cron_sync_file.log
+  10 0,3,6,9,12,15,18,21 * * * /opt/rails-app/epp/lib/shell/sync_file.sh finance_invoice 2> /opt/rails-app/epp/log/cron_sync_file.log
+  */10 * * * * /opt/rails-app/epp/lib/shell/async_notice.sh 2> /opt/rails-app/epp/log/cron_async_notice.log
+  */10 * * * * /opt/rails-app/epp/lib/shell/callqueue.sh 2> /opt/rails-app/epp/log/cron_callqueue.log
+  */5 9-11 * * * /bin/bash -l -c 'source ~/.bashrc && source ~/.bash_profile && rvm use 2.1.1@rails418 && cd /opt/rails-app/epp && rails runner -e production 'ExchangeRate.getExchangeRate' >> /opt/rails-app/epp/log/cron_get_exchange_rate.log 2>&1'
+  15 2,10 * * * /opt/rails-app/epp/lib/shell/track_info.sh 2> /opt/rails-app/epp/log/cron_track_info_proc.log
 
 * Deployment instructions
 
@@ -26,7 +49,3 @@ Things you may want to cover:
 
 Please feel free to use a different markup language if you do not plan to run
 <tt>rake doc:app</tt>.
-
-database use mysql and must set data_time_zone:
-1. my.cnf : default-time-zone = '+8:00'
-2. mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root -p -D mysql
