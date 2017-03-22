@@ -441,11 +441,9 @@ class OnlinePayController < ApplicationController
 				next unless CONDITION_PARAMS.include?(k)
 
 				if(k=="start_time")
-					#t_sql="left(convert_tz(created_at,'+08:00','Europe/Berlin'),10)>=:#{k}"
-					t_sql="created_at>='#{v.in_time_zone(Rails.configuration.time_zone)}'"
+					t_sql="left(convert_tz(created_at,'+08:00','Europe/Berlin'),10)>=:#{k}"
 				elsif (k=="end_time")
-					#t_sql="left(convert_tz(created_at,'+08:00','Europe/Berlin'),10)<=:#{k}"
-					t_sql="created_at<'#{v.in_time_zone(Rails.configuration.time_zone)+1.day}'"
+					t_sql="left(convert_tz(created_at,'+08:00','Europe/Berlin'),10)<=:#{k}"
 				elsif(k=="user_id")
 					t_sql="user_id in (#{v.join(',')})"
 				elsif(k=="online_pay_status")
