@@ -114,7 +114,7 @@ namespace :sync_file do
 						rd.update_attributes!({'invoice_date'=>@end,'invoice_no'=>invoice_no})
 						@interface_logger.info("SUCC : #{rd.batch_id},#{order_no},#{invoice_no},#{@end}")
 
-						outline=[order_no,rd.transaction_date.to_s[0,10],invoice_no]
+						outline=[order_no,rd.timestamp.to_s[0,10],invoice_no]
 						file_hash[rd.system].puts "#{outline.join(split)}"
 					rescue=>e
 						fail_num+=1
