@@ -178,7 +178,7 @@ class OnlinePayController < ApplicationController
 			#alipay trade_no is nil so use  system_orderno
 			if(online_pay.trade_no.blank? && flag=="success")
 				#online_pay.trade_no="finance_#{online_pay.created_at.strftime("%y%m%d%H%M%S") }_#{online_pay.id}"
-				online_pay.trade_no="#{online_pay.system}_#{online_pay.order_no}_#{Time.now.to_datetime.strftime '%Q'}"
+				online_pay.trade_no="#{online_pay.system}_#{online_pay.order_no}_#{Time.zone.now.to_datetime.strftime '%Q'}"
 			end
 			online_pay.update_attributes!({})
 
@@ -441,9 +441,11 @@ class OnlinePayController < ApplicationController
 				next unless CONDITION_PARAMS.include?(k)
 
 				if(k=="start_time")
-					t_sql="left(convert_tz(created_at,'+08:00','Europe/Berlin'),10)>=:#{k}"
+					#t_sql="left(convert_tz(created_at,'+08:00','Europe/Berlin'),10)>=:#{k}"
+					t_sql="created_at>='#{v.in_time_zone(Rails.configuration.time_zone)}'"
 				elsif (k=="end_time")
-					t_sql="left(convert_tz(created_at,'+08:00','Europe/Berlin'),10)<=:#{k}"
+					#t_sql="left(convert_tz(created_at,'+08:00','Europe/Berlin'),10)<=:#{k}"
+					t_sql="created_at<'#{v.in_time_zone(Rails.configuration.time_zone)+1.day}'"
 				elsif(k=="user_id")
 					t_sql="user_id in (#{v.join(',')})"
 				elsif(k=="online_pay_status")

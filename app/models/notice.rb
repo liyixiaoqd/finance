@@ -15,7 +15,7 @@ class Notice < ActiveRecord::Base
 		notice.content=fail_msg
 		notice.flag="0"
 		notice.notice_type="invoice"
-		notice.opertime=Time.now
+		notice.opertime=Time.zone.now
 
 		notice		
 	end

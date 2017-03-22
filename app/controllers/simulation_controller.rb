@@ -581,9 +581,9 @@ class SimulationController < ApplicationController
 
 		def current_time_ymdHMS(format="")
 			if (format.blank?)
-				Time.now.strftime("%Y-%m-%d %H:%M:%S")
+				Time.zone.now.strftime("%Y-%m-%d %H:%M:%S")
 			else
-				Time.now.strftime(format)
+				Time.zone.now.strftime(format)
 			end
 		end
 end

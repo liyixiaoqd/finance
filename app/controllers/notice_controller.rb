@@ -18,7 +18,7 @@ class NoticeController < ApplicationController
 					{
 						'flag'=>'1',
 						'proc_user'=>session['admin'],
-						'proc_time'=>Time.now
+						'proc_time'=>Time.zone.now
 					}
 				) 
 				flash[:notice]="处理成功"

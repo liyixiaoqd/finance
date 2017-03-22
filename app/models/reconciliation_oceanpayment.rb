@@ -11,13 +11,13 @@ class ReconciliationOceanpayment
 		post_day=BasicData.get_value("00A","001","oceanpayment","").to_i
 
 		if(startdate.blank?)
-			@startdate=Time.now.at_beginning_of_day-post_day.day
+			@startdate=Time.zone.now.at_beginning_of_day-post_day.day
 		else
 			@startdate=startdate.to_time
 		end
 
 		if(enddate.blank?)
-			@enddate=Time.now.at_beginning_of_day
+			@enddate=Time.zone.now.at_beginning_of_day
 		else
 			@enddate=enddate.to_time
 		end	

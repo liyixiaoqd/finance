@@ -292,7 +292,7 @@ class OnlinePay < ActiveRecord::Base
 			'payway' => self.payway,
 			'batch_id' => 'pay_success',
 			'transaction_date' =>  current_time_format("%Y-%m-%d"),
-			'timestamp'=> Time.now,
+			'timestamp'=> Time.zone.now,
 			'transactionid' => self.reconciliation_id,
 			'transaction_status' => 'PEND',
 			'online_pay_status' => self.status,
@@ -324,7 +324,7 @@ class OnlinePay < ActiveRecord::Base
 	def self.get_count_sum_by_day_condition(datatime_beg="",datatime_end="",condition="")
 		if datatime_beg.blank? || datatime_end.blank?
 			datatime_beg=current_time_format("%Y-%m-%d",0)
-			datatime_end=current_time_format("%Y-%m-%d",0)
+			datatime_end=current_time_format("%Y-%m-%d",1)
 		end
 		#Rails.logger.info("get_count_sum_by_day_condition:#{datatime_beg}-#{datatime_end}")
 		case condition
@@ -336,7 +336,8 @@ class OnlinePay < ActiveRecord::Base
 			sql_condition=condition
 		end
 
-		op_tj=OnlinePay.select("count(*) as c,sum(amount) as s").where("left(convert_tz(created_at,'+08:00','Europe/Berlin'),10)>=? and left(convert_tz(created_at,'+08:00','Europe/Berlin'),10)<=? #{sql_condition}",datatime_beg,datatime_end)
+		#op_tj=OnlinePay.select("count(*) as c,sum(amount) as s").where("left(convert_tz(created_at,'+08:00','Europe/Berlin'),10)>=? and left(convert_tz(created_at,'+08:00','Europe/Berlin'),10)<=? #{sql_condition}",datatime_beg,datatime_end)
+		op_tj=OnlinePay.select("count(*) as c,sum(amount) as s").where("created_at>=? and created_at <? #{sql_condition}",datatime_beg.in_time_zone(Rails.configuration.time_zone),datatime_end.in_time_zone(Rails.configuration.time_zone))
 		if(op_tj[0]['s'].blank?)
 			[op_tj[0]['c'],0.00]
 		else

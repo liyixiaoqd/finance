@@ -21,7 +21,7 @@ class CallQueue < ActiveRecord::Base
 			cq.try_amount=1
 			cq.tried_amount=0
 			cq.run_batch=""
-			cq.start_call_time=(Time.now.utc+5*60).to_s[0,19]	#5分钟后才允许调用 UTC
+			cq.start_call_time=(Time.zone.now.utc+5*60).to_s[0,19]	#5分钟后才允许调用 UTC
 
 			unless cq.save
 				Rails.logger.info("CallQueue save failure:#{cq.errors.full_messages}")
@@ -36,8 +36,8 @@ class CallQueue < ActiveRecord::Base
 	end
 
 	def self.polling(callback_interface,reference_id="")
-		start_time=Time.now.utc.to_s[0,19]	
-		batch=Time.now.strftime("%Y%m%d%H%M%S")
+		start_time=Time.zone.now.utc.to_s[0,19]	
+		batch=Time.zone.now.strftime("%Y%m%d%H%M%S")
 		where_condition={"callback_interface"=>callback_interface}
 		unless reference_id.blank?
 			where_condition["reference_id"]=reference_id
@@ -69,7 +69,7 @@ class CallQueue < ActiveRecord::Base
 					pay_detail=OnlinePay.get_instance_pay_detail(online_pay)
 
 					cq.tried_amount+=1
-					cq.last_callback_time=Time.now
+					cq.last_callback_time=Time.zone.now
 					flag,message,reconciliation_id,callback_status=pay_detail.is_succ_pay_by_call?(online_pay,cq.start_call_time)
 
 					if flag
@@ -132,7 +132,7 @@ class CallQueue < ActiveRecord::Base
 			cq.try_amount=20
 			cq.tried_amount=0
 			cq.run_batch=oceanpayment_payment_id
-			cq.start_call_time=Time.now.utc.to_s[0,19]	#5分钟后才允许调用 UTC
+			cq.start_call_time=Time.zone.now.utc.to_s[0,19]	#5分钟后才允许调用 UTC
 
 			unless cq.save
 				raise "CallQueue.save_oceanpayment_push_task excepiton: #{cq.errors.full_messages}"
@@ -143,7 +143,7 @@ class CallQueue < ActiveRecord::Base
 
 	#oceanpayment_push_task - 2
 	def self.oceanpayment_push_task_get_info()
-		p "CallQueue.oceanpayment_push_task_get_info start [#{Time.now}]"
+		p "CallQueue.oceanpayment_push_task_get_info start [#{Time.zone.now}]"
 		max_call_num=30
 		count=0
 		cq_array=[]
@@ -163,7 +163,7 @@ class CallQueue < ActiveRecord::Base
 			cq_array=[]
 		end
 
-		p "CallQueue.oceanpayment_push_task_get_info end [#{Time.now}]"
+		p "CallQueue.oceanpayment_push_task_get_info end [#{Time.zone.now}]"
 	end
 
 	def self.oceanpayment_push_task_get_info_proc(cq_array)
@@ -249,7 +249,7 @@ class CallQueue < ActiveRecord::Base
 
 	#oceanpayment_push_task - 3
 	def self.oceanpayment_push_task_push()
-		p "CallQueue.oceanpayment_push_task_push start [#{Time.now}]"
+		p "CallQueue.oceanpayment_push_task_push start [#{Time.zone.now}]"
 		succ=0
 		fail=0
 		CallQueue.where(callback_interface: "oceanpayment_push",status: ["need_push","pushing"]).each do |cq|
@@ -274,6 +274,6 @@ class CallQueue < ActiveRecord::Base
 			end
 		end
 
-		p "CallQueue.oceanpayment_push_task_push end [#{Time.now}] , succ[#{succ}],fail[#{fail}]"
+		p "CallQueue.oceanpayment_push_task_push end [#{Time.zone.now}] , succ[#{succ}],fail[#{fail}]"
 	end
 end
