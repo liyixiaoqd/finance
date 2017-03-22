@@ -127,9 +127,9 @@ module PayDetailable extend ActiveSupport::Concern
 		end
 
 		if step!=0
-			(Time.now+step.day).strftime(format)
+			(Time.zone.now+step.day).strftime(format)
 		else
-			Time.now.strftime(format)
+			Time.zone.now.strftime(format)
 		end
 	end
 	
@@ -141,9 +141,9 @@ module PayDetailable extend ActiveSupport::Concern
 			end
 
 			if step!=0
-				(Time.now+step.day).strftime(format)
+				(Time.zone.now+step.day).strftime(format)
 			else
-				Time.now.strftime(format)
+				Time.zone.now.strftime(format)
 			end
 		end
 

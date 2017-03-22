@@ -187,8 +187,8 @@ class ReconciliationOceanpayment
 						op.save!()
 					end
 					rd=op.set_reconciliation
-					rd.transaction_date = payinfo['payment_dateTime'].in_time_zone("Beijing")
-					rd.timestamp = rd.transaction_date
+					rd.timestamp = payinfo['payment_dateTime'].in_time_zone("Beijing").in_time_zone(Rails.configuration.time_zone)
+					rd.transaction_date = rd.timestamp.to_s[0,10]
 
 					rd.set_flag!(ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['FAIL'],"#{rd.payway} is success_pay but online_pay is #{rd.online_pay_status}")
 				end

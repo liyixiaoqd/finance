@@ -95,7 +95,7 @@ class ReconciliationAlipayOversea
 			# TIME140147826|32.20|EUR|20150405000123|20150407141217|P|0.39|L|???TIME140147826???????
 			array_detail=oversea_detail.split("|")
 
-			{
+			ret_hash={
 				'timestamp'=>array_detail[3],
 				'transaction_type'=>array_detail[5],
 				'transactionid'=>array_detail[0],
@@ -107,9 +107,13 @@ class ReconciliationAlipayOversea
 				'netamt'=>array_detail[1].to_f - array_detail[6].to_f,
 				'payway'=>'alipay',
 				'paytype'=>'oversea',
-				'transaction_date'=>array_detail[3][0,4]+"-"+array_detail[3][4,2]+"-"+array_detail[3][6,2],
+				'timestamp'=>array_detail[3].in_time_zone("Beijing").in_time_zone(Rails.configuration.time_zone),
 				'batch_id'=>@reconciliation_date+"_"+sprintf("%03d",@batch_id),
 				'reconciliation_flag'=>ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['INIT']
 			}
+			ret_hash['transaction_date'] = ret_hash['timestamp'].to_s[0,10]
+
+
+			ret_hash
 		end
 end

@@ -291,7 +291,9 @@ class ReconciliationPaypal
 			# else
 			# 	single_reconciliation_hash['timestamp']=@paypal_reconciliation_hash['l_timestamp'][i]
 			# end
-			single_reconciliation_hash['transaction_date']=single_reconciliation_hash['timestamp'].to_time.to_s[0,10]
+			#timestamp - utc
+			single_reconciliation_hash['timestamp'] = single_reconciliation_hash['timestamp'].in_time_zone(Rails.configuration.time_zone)
+			single_reconciliation_hash['transaction_date']=single_reconciliation_hash['timestamp'].to_s[0,10]
 
 			#Rails.logger.info("#{@paypal_reconciliation_hash['l_transactionid'][i]}.timezone:#{@paypal_reconciliation_hash['l_timezone'][i]},timestamp[#{@paypal_reconciliation_hash['l_timestamp'][i]}]=>[#{single_reconciliation_hash['timestamp']}]")
 			single_reconciliation_hash

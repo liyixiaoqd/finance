@@ -194,8 +194,8 @@ class ReconciliationAlipayTransaction
 			while child
 				case child.name
 				when "trans_date" then 
-					hash_alipay["timestamp"]=child.text
-					hash_alipay["transaction_date"]=child.text[0,10]
+					hash_alipay["timestamp"]=child.text.in_time_zone("Beijing").in_time_zone(Rails.configuration.time_zone)
+					hash_alipay["transaction_date"]=hash_alipay["timestamp"].to_s[0,10]
 				when "sub_trans_code_msg" then hash_alipay["transaction_type"]=child.text
 				when "trans_code_msg" then hash_alipay["transaction_type"]=child.text+" - "+hash_alipay["transaction_type"]
 				when "trade_no" then hash_alipay["transactionid"]=child.text
