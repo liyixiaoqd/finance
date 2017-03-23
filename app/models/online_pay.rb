@@ -335,8 +335,8 @@ class OnlinePay < ActiveRecord::Base
 		else
 			sql_condition=condition
 		end
-
-		op_tj=OnlinePay.select("count(*) as c,sum(amount) as s").where("left(convert_tz(created_at,'+08:00','Europe/Berlin'),10)>=? and left(convert_tz(created_at,'+08:00','Europe/Berlin'),10)<=? #{sql_condition}",datatime_beg,datatime_end)
+		# op_tj=OnlinePay.select("count(*) as c,sum(amount) as s").where("left(convert_tz(created_at,'+08:00','Europe/Berlin'),10)>=? and left(convert_tz(created_at,'+08:00','Europe/Berlin'),10)<=? #{sql_condition}",datatime_beg,datatime_end)
+		op_tj=OnlinePay.select("count(*) as c,sum(amount) as s").where("created_at>=? and created_at<? #{sql_condition}",datatime_beg.in_time_zone(Rails.configuration.time_zone).in_time_zone("Beijing"),datatime_end.in_time_zone(Rails.configuration.time_zone).in_time_zone("Beijing")+1.day)
 		if(op_tj[0]['s'].blank?)
 			[op_tj[0]['c'],0.00]
 		else
