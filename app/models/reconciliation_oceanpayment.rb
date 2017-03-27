@@ -212,7 +212,7 @@ class ReconciliationOceanpayment
 
 	#
 	def gen_callback_task(payinfo,reconciliation_detail)
-		CallQueue.oceanpayment_push_task_save!(reconciliation_detail.id,payinfo['payment_id'])
+		CallQueue.oceanpayment_push_task_save!(reconciliation_detail.id,payinfo['payment_id'],reconciliation_detail.system)
 	end
 
 	def get_sign_value(post_params,secure_code)

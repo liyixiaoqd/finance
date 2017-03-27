@@ -369,3 +369,5 @@ LockSequence.manually_init_record("invoice","RND-PM24",0,"%04d")
 LockSequence.manually_init_record("invoice","GSD-PM24",0,"%04d")
 LockSequence.manually_init_record("invoice","FTN-PM24",0,"%04d")
 LockSequence.manually_init_record("invoice","CFN-PM24",0,"%04d")
+
+CallQueue.where(callback_interface: ["oceanpayment_push_","oceanpayment_push"]).update_all({callback_interface: "oceanpayment_push_mypost4u"})

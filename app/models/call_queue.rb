@@ -119,14 +119,19 @@ class CallQueue < ActiveRecord::Base
 	end
 
 	#oceanpayment_push_task - 1
-	def self.oceanpayment_push_task_save!(reconciliation_detail_id,oceanpayment_payment_id)
+	def self.oceanpayment_push_task_save!(reconciliation_detail_id,oceanpayment_payment_id,system)
 		if reconciliation_detail_id.blank? or oceanpayment_payment_id.blank?
 			raise "CallQueue.save_oceanpayment_push_task excepiton: params null"
+		end
+		if system.blank?
+			use_system = "mypost4u"
+		else
+			use_system = system
 		end
 
 		if CallQueue.find_by_callback_interface_and_reference_id("oceanpayment_push",reconciliation_detail_id).blank?	
 			cq=CallQueue.new
-			cq.callback_interface="oceanpayment_push"
+			cq.callback_interface="oceanpayment_push_#{use_system}"
 			cq.reference_id=reconciliation_detail_id
 			cq.status="init"
 			cq.try_amount=20
@@ -142,23 +147,23 @@ class CallQueue < ActiveRecord::Base
 
 
 	#oceanpayment_push_task - 2
-	def self.oceanpayment_push_task_get_info()
+	def self.oceanpayment_push_task_get_info(system)
 		p "CallQueue.oceanpayment_push_task_get_info start [#{Time.zone.now}]"
 		max_call_num=30
 		count=0
 		cq_array=[]
-		CallQueue.where(callback_interface: "oceanpayment_push",status: ["init","get_track_info"]).each do |cq|
+		CallQueue.where(callback_interface: "oceanpayment_push_#{system}",status: ["init","get_track_info"]).each do |cq|
 			count+=1
 			cq_array<<cq
 			if count>=max_call_num
-				oceanpayment_push_task_get_info_proc(cq_array)
+				oceanpayment_push_task_get_info_proc(cq_array,system)
 				count=0
 				cq_array=[]
 			end
 		end
 
 		if count>0
-			oceanpayment_push_task_get_info_proc(cq_array)
+			oceanpayment_push_task_get_info_proc(cq_array,system)
 			count=0
 			cq_array=[]
 		end
@@ -166,7 +171,7 @@ class CallQueue < ActiveRecord::Base
 		p "CallQueue.oceanpayment_push_task_get_info end [#{Time.zone.now}]"
 	end
 
-	def self.oceanpayment_push_task_get_info_proc(cq_array)
+	def self.oceanpayment_push_task_get_info_proc(cq_array,system)
 		begin
 			post_params={"order_numbers"=>[]}
 			cq_array.each do |cq|
@@ -190,7 +195,12 @@ class CallQueue < ActiveRecord::Base
 			end
 
 			p "CallQueue.oceanpayment_push_task_get_info_proc post_params : [#{post_params}]"
-			response=method_url_call_http_auth("post",Settings.mypost4u.get_track_info_url,Settings.authenticate.username,Settings.authenticate.passwd,post_params)
+			if system == "quaie"
+				url = Settings.quaie.get_track_info_url
+			else
+				url = Settings.mypost4u.get_track_info_url
+			end
+			response=method_url_call_http_auth("post",url,Settings.authenticate.username,Settings.authenticate.passwd,post_params)
 			if response.code!="200" 
 				raise "call [#{Settings.mypost4u.get_track_info_url}] failure: [#{response.code}]"
 			end
@@ -248,11 +258,11 @@ class CallQueue < ActiveRecord::Base
 
 
 	#oceanpayment_push_task - 3
-	def self.oceanpayment_push_task_push()
+	def self.oceanpayment_push_task_push(system)
 		p "CallQueue.oceanpayment_push_task_push start [#{Time.zone.now}]"
 		succ=0
 		fail=0
-		CallQueue.where(callback_interface: "oceanpayment_push",status: ["need_push","pushing"]).each do |cq|
+		CallQueue.where(callback_interface: "oceanpayment_push_#{system}",status: ["need_push","pushing"]).each do |cq|
 			begin
 				cq.tried_amount+=1
 				push_flag=ReconciliationOceanpayment.push_track_info(ReconciliationDetail.find_by(id: cq.reference_id).online_pay)

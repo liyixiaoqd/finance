@@ -26,8 +26,10 @@ namespace :callqueue do
 		}
 		@interface_logger.info("callqueue track_info_proc start")
 
-		CallQueue.oceanpayment_push_task_get_info()
-		CallQueue.oceanpayment_push_task_push()
+		["mypost4u", "quaie"].each do |system|
+			CallQueue.oceanpayment_push_task_get_info(system)
+			CallQueue.oceanpayment_push_task_push(system)
+		end
 		
 		@interface_logger.info("callqueue  track_info_proc end")
 	end
