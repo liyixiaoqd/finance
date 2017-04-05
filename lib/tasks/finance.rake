@@ -79,14 +79,14 @@ namespace :finance do
 			@interface_logger = Logger.new("log/reconciliation.log")
 		end
 		@interface_logger.info("reconciliation_oceanpayment start")
-		["unionpay_b2c","unionpay_b2b","wechatpay"].each do |subtype|
+		["unionpay_b2c", "unionpay_b2b", "wechatpay"].each do |subtype|
 			@interface_logger.info("mypost4u #{subtype} start")
 			reconciliation=ReconciliationOceanpayment.new(subtype,"mypost4u")
 			message=reconciliation.finance_reconciliation()
 			@interface_logger.info(out_message(message))
 			@interface_logger.info("mypost4u #{subtype} end [#{message}]")
 		end
-		["unionpay_b2c","wechatpay"].each do |subtype|
+		["unionpay_b2c", "wechatpay", "alipay"].each do |subtype|
 			@interface_logger.info("quaie #{subtype} start")
 			reconciliation=ReconciliationOceanpayment.new(subtype,"quaie")
 			message=reconciliation.finance_reconciliation()

@@ -22,6 +22,8 @@
           <%= label_tag(:payway_alipay_transaction, "OCEANPAYMENT_UNIONPAY_B2B") %> </br>
           <%= radio_button_tag(:payway, "oceanpayment_wechatpay") %>
           <%= label_tag(:payway_alipay_transaction, "OCEANPAYMENT_WECHATPAY") %> </br>
+          <%= radio_button_tag(:payway, "oceanpayment_alipay") %>
+          <%= label_tag(:payway_alipay_transaction, "OCEANPAYMENT_ALIPAY") %> </br>
           
           <%= label_tag(:label3, "amount") %>
           <%= text_field_tag(:amount, 0.01) %>

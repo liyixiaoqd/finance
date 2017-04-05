@@ -199,6 +199,9 @@ class SimulationController < ApplicationController
 		when 'oceanpayment_wechatpay' then 
 			simulate_params=init_oceanpayment_submit_params(simulate_order_no,amount,"wechatpay",params)
 			callpath="/pay/#{userid}/submit_post"
+		when 'oceanpayment_alipay' then 
+			simulate_params=init_oceanpayment_submit_params(simulate_order_no,amount,"alipay",params)
+			callpath="/pay/#{userid}/submit_post"
 		else
 			simulate_params={}
 		end
@@ -457,6 +460,7 @@ class SimulationController < ApplicationController
 			when 'oceanpayment_unionpay_b2c' then order_no="oceanpayment_unionpay_b2c_#{calldate}_#{callnum}"
 			when 'oceanpayment_unionpay_b2b' then order_no="oceanpayment_unionpay_b2b_#{calldate}_#{callnum}"
 			when 'oceanpayment_wechatpay' then order_no="oceanpayment_wechatpay_#{calldate}_#{callnum}"
+			when 'oceanpayment_alipay' then order_no="oceanpayment_alipay_#{calldate}_#{callnum}"
 			else
 				order_no="unmatch_#{payway}_#{calldate}_#{callnum}"
 			end

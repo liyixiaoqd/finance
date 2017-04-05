@@ -63,6 +63,13 @@ class OnlinePay < ActiveRecord::Base
 		'1' => 9 
 	}
 
+	# 0: 失败
+	# 1: 成功
+	OCEANPAYMENT_ALIPAY_STATUS = {
+		'0' => 0,
+		'1' => 9 
+	}
+
 	def set_channel!()
 		if (self.channel.blank?)
 			self.channel="web"
@@ -250,7 +257,13 @@ class OnlinePay < ActiveRecord::Base
 					has_updated=true
 				elsif OCEANPAYMENT_WECHATPAY_STATUS[self.callback_status]>=OCEANPAYMENT_WECHATPAY_STATUS[new_callback_status]
 					has_updated=true
-				end				
+				end
+			elsif(self.payway=="oceanpayment" && self.paytype=="alipay")
+				if OCEANPAYMENT_ALIPAY_STATUS[self.callback_status]==9
+					has_updated=true
+				elsif OCEANPAYMENT_ALIPAY_STATUS[self.callback_status]>=OCEANPAYMENT_ALIPAY_STATUS[new_callback_status]
+					has_updated=true
+				end
 			end	
 		end
 
@@ -308,7 +321,7 @@ class OnlinePay < ActiveRecord::Base
 			'order_type' => self.order_type
 		}
 
-		rd=ReconciliationDetail.init(reconciliation_params)
+		ReconciliationDetail.init(reconciliation_params)
 	end
 
 	def find_reconciliation()
@@ -374,6 +387,7 @@ class OnlinePay < ActiveRecord::Base
 				when 'oceanpayment_unionpay_b2c' then trade_no=params["order_number"]
 				when 'oceanpayment_unionpay_b2b' then trade_no=params["order_number"]
 				when 'oceanpayment_wechatpay' then trade_no=params["order_number"]
+				when 'oceanpayment_alipay' then trade_no=params["order_number"]
 				else
 					logger.warn("ONLINE_PAY CALLBACK:get_online_pay_instance:#{pay_combine}=#{payway}+#{paytype}!")
 				end
@@ -384,7 +398,7 @@ class OnlinePay < ActiveRecord::Base
 			end
 
 			# 特殊处理支付宝
-			if pay_combine=="alipay_transaction" || pay_combine=="alipay_oversea" || pay_combine[0,21]=="oceanpayment_unionpay" || pay_combine=="oceanpayment_wechatpay"
+			if pay_combine=="alipay_transaction" || pay_combine=="alipay_oversea" || pay_combine[0,13]=="oceanpayment_"
 				# op=OnlinePay.find_by_payway_and_paytype_and_order_no(payway,paytype,trade_no)
 				# if op.blank?
 				# 	raise "spec alipay get onlinepay wrong!"

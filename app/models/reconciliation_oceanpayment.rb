@@ -71,11 +71,16 @@ class ReconciliationOceanpayment
 					terminal=Settings.oceanpayment_unionpay.quaie.terminal
 					secure_code=Settings.oceanpayment_unionpay.quaie.secure_code
 					query_api_url = Settings.oceanpayment_unionpay.quaie.query_api_url
-				else
+				elsif @paytype=="wechatpay"
 					account=Settings.oceanpayment_wechatpay.quaie.account
 					terminal=Settings.oceanpayment_wechatpay.quaie.terminal
 					secure_code=Settings.oceanpayment_wechatpay.quaie.secure_code
 					query_api_url = Settings.oceanpayment_wechatpay.quaie.query_api_url
+				elsif @paytype=="alipay"
+					account=Settings.oceanpayment_alipay.quaie.account
+					terminal=Settings.oceanpayment_alipay.quaie.terminal
+					secure_code=Settings.oceanpayment_alipay.quaie.secure_code
+					query_api_url = Settings.oceanpayment_alipay.quaie.query_api_url
 				end
 			else
 				if @paytype=="unionpay_b2c"
@@ -88,11 +93,16 @@ class ReconciliationOceanpayment
 					terminal = Settings.oceanpayment_unionpay.terminal_b2b
 					secure_code = Settings.oceanpayment_unionpay.secure_code_b2b
 					query_api_url = Settings.oceanpayment_unionpay.query_api_url_b2b
-				else
+				elsif @paytype=="wechatpay"
 					account = Settings.oceanpayment_wechatpay.account
 					terminal =  Settings.oceanpayment_wechatpay.terminal
 					secure_code = Settings.oceanpayment_wechatpay.secure_code
 					query_api_url = Settings.oceanpayment_wechatpay.query_api_url
+				elsif @paytype=="alipay"
+					account = Settings.oceanpayment_alipay.account
+					terminal =  Settings.oceanpayment_alipay.terminal
+					secure_code = Settings.oceanpayment_alipay.secure_code
+					query_api_url = Settings.oceanpayment_alipay.query_api_url
 				end
 			end
 				
@@ -126,14 +136,14 @@ class ReconciliationOceanpayment
 					end
 				end
 			else
-				result_infos['response']['paymentInfo'].each do |payinfo|
-					valid_flag,valid_msg=valid_reconciliation_process(payinfo)
+				result_infos['response']['paymentInfo'].each do |payinfo_loop|
+					valid_flag,valid_msg=valid_reconciliation_process(payinfo_loop)
 					if valid_msg.present?
-						check_file << "[#{payinfo['order_number']}] - [#{valid_msg}]\n"
+						check_file << "[#{payinfo_loop['order_number']}] - [#{valid_msg}]\n"
 						valid_rescue_num+=1
 					else
 						valid_complete_num+=1
-						check_file<< "[#{payinfo['order_number']}] - [#{valid_flag}]\n"
+						check_file<< "[#{payinfo_loop['order_number']}] - [#{valid_flag}]\n"
 						if valid_flag==true
 							valid_succ_num+=1
 						else

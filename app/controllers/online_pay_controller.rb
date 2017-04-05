@@ -136,7 +136,7 @@ class OnlinePayController < ApplicationController
 		pay_detail=nil
 		
 		#ID转换
-		old_userid=params['userid']
+		# old_userid=params['userid']
 		params['userid']=interface_userid_zh(params['system'],params['userid'])
 
 		begin
@@ -222,7 +222,7 @@ class OnlinePayController < ApplicationController
 		pay_detail=nil
 		
 		#ID转换
-		old_userid=params['userid']
+		# old_userid=params['userid']
 		params['userid']=interface_userid_zh(params['system'],params['userid'])
 
 		begin
@@ -249,6 +249,8 @@ class OnlinePayController < ApplicationController
 				pay_detail = OceanpaymentUnionpayDetail.new(online_pay)
 			elsif online_pay.payway=="oceanpayment" && online_pay.paytype=="wechatpay"
 				pay_detail = OceanpaymentWechatpayDetail.new(online_pay)
+			elsif online_pay.payway=="oceanpayment" && online_pay.paytype=="alipay"
+				pay_detail = OceanpaymentAlipayDetail.new(online_pay)
 			else
 				raise "not support ! [#{online_pay.payway}][#{online_pay.paytype}]"
 			end

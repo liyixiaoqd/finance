@@ -91,7 +91,10 @@ Rails.application.routes.draw do
   get 'pay/callback/oceanpayment_wechatpay_return' => 'online_pay_callback#oceanpayment_wechatpay_return'
   post 'pay/callback/oceanpayment_wechatpay_return' => 'online_pay_callback#oceanpayment_wechatpay_return'
   post 'pay/callback/oceanpayment_wechatpay_notify' => 'online_pay_callback#oceanpayment_wechatpay_notify'
- 
+   get 'pay/callback/oceanpayment_alipay_return' => 'online_pay_callback#oceanpayment_alipay_return'
+  post 'pay/callback/oceanpayment_alipay_return' => 'online_pay_callback#oceanpayment_alipay_return'
+  post 'pay/callback/oceanpayment_alipay_notify' => 'online_pay_callback#oceanpayment_alipay_notify'
+
   #web display  ---  simulate interface 
   get 'simulation' => 'simulation#index'
   post 'simulation/simulate_pay' => 'simulation#simulate_pay'

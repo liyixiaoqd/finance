@@ -5,7 +5,7 @@ module PayDetailable extend ActiveSupport::Concern
 	PAY_ALIPAY_TRANSACTION_PARAMS=%w{system quantity amount logistics_name description order_no success_url notification_url}
 	PAY_OCEANPAYMENT_UNIONPAY_PARAMS=%w{system country amount currency order_no success_url notification_url description userid paytype other_params}
 	PAY_OCEANPAYMENT_WECHATPAY_PARAMS=%w{system country amount currency order_no success_url notification_url description userid paytype other_params}
-
+	PAY_OCEANPAYMENT_ALIPAY_PARAMS=%w{system country amount currency order_no success_url notification_url description userid paytype other_params}
 
 	def payparams_valid(detail_name,online_pay)
 		valid_flag=true;
@@ -18,6 +18,7 @@ module PayDetailable extend ActiveSupport::Concern
 			when 'PAY_ALIPAY_TRANSACTION_PARAMS' then valid_flag=check_payparams(params_val,online_pay)
 			when 'PAY_OCEANPAYMENT_UNIONPAY_PARAMS' then valid_flag=check_payparams(params_val,online_pay)
 			when 'PAY_OCEANPAYMENT_WECHATPAY_PARAMS' then valid_flag=check_payparams(params_val,online_pay)
+			when 'PAY_OCEANPAYMENT_ALIPAY_PARAMS' then valid_flag=check_payparams(params_val,online_pay)
 			else
 				valid_flag=false
 				Rails.logger.warn("match #{valid_flag} #{detail_name} - #{match_name}")
@@ -100,7 +101,7 @@ module PayDetailable extend ActiveSupport::Concern
 			tr_content=table_content.scan(/<tr>.*?<\/tr>/m)[tr_num]
 			td_content=tr_content.scan(/<td.*?<\/td>/)[td_num]
 			#去除td标签内的所有html格式,防止死循环,做多处理10此
-			for i in 0...10 do
+			10.times do
 				td_content_match = td_content.match(/>(.*)<\//) 
 				if td_content_match.blank?
 					content=td_content
