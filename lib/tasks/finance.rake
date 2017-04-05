@@ -79,7 +79,7 @@ namespace :finance do
 			@interface_logger = Logger.new("log/reconciliation.log")
 		end
 		@interface_logger.info("reconciliation_oceanpayment start")
-		["unionpay_b2c", "unionpay_b2b", "wechatpay"].each do |subtype|
+		["unionpay_b2c", "unionpay_b2b", "wechatpay", "alipay"].each do |subtype|
 			@interface_logger.info("mypost4u #{subtype} start")
 			reconciliation=ReconciliationOceanpayment.new(subtype,"mypost4u")
 			message=reconciliation.finance_reconciliation()
