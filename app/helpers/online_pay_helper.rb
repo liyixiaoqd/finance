@@ -36,9 +36,10 @@ module OnlinePayHelper
 		'Sofort'=>'sofort',
 		'Score'=>'积分',
 		'ECash'=>'电子现金',
-		"OceanpaymentUnionpayB2c"=>"银联-b2c",
-		"OceanpaymentUnionpayB2b"=>"银联-b2b",
-		"OceanpaymentWechatpay"=>"微信",
+		"OceanpaymentUnionpayB2c"=>"银联-b2c(钱海)",
+		"OceanpaymentUnionpayB2b"=>"银联-b2b(钱海)",
+		"OceanpaymentWechatpay"=>"微信(钱海)",
+		"OceanpaymentAlipay"=>"支付宝(钱海)"
 	}
 
 	SYSTEM_MAPPING={

@@ -371,3 +371,11 @@ LockSequence.manually_init_record("invoice","FTN-PM24",0,"%04d")
 LockSequence.manually_init_record("invoice","CFN-PM24",0,"%04d")
 
 CallQueue.where(callback_interface: ["oceanpayment_push_","oceanpayment_push"]).update_all({callback_interface: "oceanpayment_push_mypost4u"})
+
+
+AccessAuthority.create!(:controller=>"OnlinePayCallbackController",:action=>"oceanpayment_alipay_return",
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>false,
+			:describe=>'oceanpayment_alipay支付同步回调接口')
+AccessAuthority.create!(:controller=>"OnlinePayCallbackController",:action=>"oceanpayment_alipay_notify",
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>false,
+			:describe=>'oceanpayment_alipay支付异步回调接口')
