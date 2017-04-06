@@ -509,6 +509,8 @@ class OnlinePayCallbackController < ApplicationController
 				online_pay.save!()
 				if online_pay.is_success?() && online_pay.find_reconciliation().blank?
 					online_pay.set_reconciliation.save!()
+					fw=FinanceWater.save_by_online_pay(online_pay)
+					ret_hash['water_no']=fw.id unless fw.blank?
 					cq.online_pay_is_succ_set() unless cq.blank?
 				end
 				# response_code=online_pay.method_url_response_code("post",redirect_url,false,ret_hash)
@@ -598,6 +600,8 @@ class OnlinePayCallbackController < ApplicationController
 				online_pay.save!()
 				if online_pay.is_success?() && online_pay.find_reconciliation().blank?
 					online_pay.set_reconciliation.save!()
+					fw=FinanceWater.save_by_online_pay(online_pay)
+					ret_hash['water_no']=fw.id unless fw.blank?
 					cq.online_pay_is_succ_set() unless cq.blank?
 				end
 				# response_code=online_pay.method_url_response_code("post",redirect_url,false,ret_hash)
@@ -684,6 +688,8 @@ class OnlinePayCallbackController < ApplicationController
 				online_pay.save!()
 				if online_pay.is_success?() && online_pay.find_reconciliation().blank?
 					online_pay.set_reconciliation.save!()
+					fw=FinanceWater.save_by_online_pay(online_pay)
+					ret_hash['water_no']=fw.id unless fw.blank?
 					cq.online_pay_is_succ_set() unless cq.blank?
 				end
 				# response_code=online_pay.method_url_response_code("post",redirect_url,false,ret_hash)
