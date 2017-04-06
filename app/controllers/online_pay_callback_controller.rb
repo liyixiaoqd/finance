@@ -738,10 +738,14 @@ class OnlinePayCallbackController < ApplicationController
 			valid_flag=false
 
 			begin
-				if subtype=="b2c"
-					secure_code = Settings.oceanpayment_unionpay.secure_code_b2c
+				if params['order_number'][0,6]=="quaie_"
+					secure_code = Settings.oceanpayment_unionpay.quaie.secure_code
 				else
-					secure_code = Settings.oceanpayment_unionpay.secure_code_b2b
+					if subtype=="b2c"
+						secure_code = Settings.oceanpayment_unionpay.secure_code_b2c
+					else
+						secure_code = Settings.oceanpayment_unionpay.secure_code_b2b
+					end
 				end
 				
 				sha_result=Digest::SHA256.hexdigest(
@@ -774,6 +778,12 @@ class OnlinePayCallbackController < ApplicationController
 			valid_flag=false
 
 			begin
+				if params['order_number'][0,6]=="quaie_"
+					secure_code = Settings.oceanpayment_wechatpay.quaie.secure_code
+				else
+					secure_code = Settings.oceanpayment_wechatpay.secure_code
+				end
+
 				sha_result=Digest::SHA256.hexdigest(
 					params['account'].to_s +
 					params['terminal'].to_s +
@@ -786,7 +796,7 @@ class OnlinePayCallbackController < ApplicationController
 					params['payment_status'].to_s +
 					params['payment_details'].to_s +
 					params['payment_risk'].to_s +
-					Settings.oceanpayment_wechatpay.secure_code
+					secure_code
 				)
 
 				valid_flag = sha_result.upcase == params['signValue']
@@ -803,6 +813,12 @@ class OnlinePayCallbackController < ApplicationController
 			valid_flag=false
 
 			begin
+				if params['order_number'][0,6]=="quaie_"
+					secure_code = Settings.oceanpayment_alipay.quaie.secure_code
+				else
+					secure_code = Settings.oceanpayment_alipay.secure_code
+				end
+
 				sha_result=Digest::SHA256.hexdigest(
 					params['account'].to_s +
 					params['terminal'].to_s +
@@ -815,7 +831,7 @@ class OnlinePayCallbackController < ApplicationController
 					params['payment_status'].to_s +
 					params['payment_details'].to_s +
 					params['payment_risk'].to_s +
-					Settings.oceanpayment_alipay.secure_code
+					secure_code
 				)
 
 				valid_flag = sha_result.upcase == params['signValue']
