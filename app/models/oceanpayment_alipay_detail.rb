@@ -57,7 +57,7 @@ class OceanpaymentAlipayDetail
 			"billing_email"=>consumer_email,
 			"billing_phone"=>consumer_phone,
 			"billing_country"=>"N/A",
-			"productName"=>"N/A"
+			"billing_state"=>"N/A"
 		}
 
 		post_params["signValue"]=get_sign_value(post_params,secure_code)
