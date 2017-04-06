@@ -204,6 +204,12 @@ class OnlinePay < ActiveRecord::Base
 			else
 				self.status="success_notify"
 			end
+		elsif(self.payway=="oceanpayment" && self.paytype=="alipay")
+			if(self.callback_status=="0")
+				self.status="cancel_notify"
+			else
+				self.status="success_notify"
+			end
 		end
 	end
 
