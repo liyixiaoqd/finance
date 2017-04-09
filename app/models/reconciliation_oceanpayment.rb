@@ -240,18 +240,38 @@ class ReconciliationOceanpayment
 			raise "push_track_info failure: no online_pay input" if online_pay.blank?
 			raise "[#{online_pay.order_no}] no track_info get" if online_pay.online_pay_track_info.blank?
 
-			if online_pay.paytype=="unionpay_b2c"
-				account = Settings.oceanpayment_unionpay.account_b2c
-				terminal = Settings.oceanpayment_unionpay.terminal_b2c
-				secure_code = Settings.oceanpayment_unionpay.secure_code_b2c	
-			elsif online_pay.paytype=="unionpay_b2b"
-				account = Settings.oceanpayment_unionpay.account_b2b
-				terminal = Settings.oceanpayment_unionpay.terminal_b2b
-				secure_code = Settings.oceanpayment_unionpay.secure_code_b2b
+			if online_pay.system=="quaie"
+				if online_pay.paytype=="unionpay_b2c"
+					account = Settings.oceanpayment_unionpay.quaie.account
+					terminal = Settings.oceanpayment_unionpay.quaie.terminal
+					secure_code = Settings.oceanpayment_unionpay.quaie.secure_code
+				elsif online_pay.paytype=="wechatpay"
+					account = Settings.oceanpayment_wechatpay.quaie.account
+					terminal = Settings.oceanpayment_wechatpay.quaie.terminal
+					secure_code = Settings.oceanpayment_wechatpay.quaie.secure_code
+				elsif online_pay.paytype=="alipay"
+					account = Settings.oceanpayment_alipay.quaie.account
+					terminal = Settings.oceanpayment_alipay.quaie.terminal
+					secure_code = Settings.oceanpayment_alipay.quaie.secure_code
+				end
 			else
-				account = Settings.oceanpayment_wechatpay.account
-				terminal =  Settings.oceanpayment_wechatpay.terminal
-				secure_code = Settings.oceanpayment_wechatpay.secure_code
+				if online_pay.paytype=="unionpay_b2c"
+					account = Settings.oceanpayment_unionpay.account_b2c
+					terminal = Settings.oceanpayment_unionpay.terminal_b2c
+					secure_code = Settings.oceanpayment_unionpay.secure_code_b2c	
+				elsif online_pay.paytype=="unionpay_b2b"
+					account = Settings.oceanpayment_unionpay.account_b2b
+					terminal = Settings.oceanpayment_unionpay.terminal_b2b
+					secure_code = Settings.oceanpayment_unionpay.secure_code_b2b
+				elsif online_pay.paytype=="wechatpay"
+					account = Settings.oceanpayment_wechatpay.account
+					terminal =  Settings.oceanpayment_wechatpay.terminal
+					secure_code = Settings.oceanpayment_wechatpay.secure_code
+				elsif online_pay.paytype=="alipay"
+					account = Settings.oceanpayment_alipay.account
+					terminal =  Settings.oceanpayment_alipay.terminal
+					secure_code = Settings.oceanpayment_alipay.secure_code
+				end
 			end
 
 			post_params={
