@@ -5,83 +5,83 @@
 	<% content_for :breadcrumb do %>
 		<li> <%=link_to t('交易查询'),index_online_pay_path,method: :get%> <span class="divider">/</span></li>
 	<% end %>
-	 -->
-	<div class="row-fluid">
-		<div class="well">
-			<table class="table" style="table-layout:fixed;word-wrap:break-word;">
-				<tbody>
-					<tr>
-						<td>订单号/补款号 </td>
-						<td ><%= @online_pay.order_no %></td>
-					</tr>
-					<tr>
-						<td>交易号</td>
-						<td><%= @online_pay.reconciliation_id %></td>
-					</tr>
-					<tr>
-						<td>金额</td>
-						<td><%= @online_pay.amount %></td>
-					</tr>
-					<tr>
-						<td>货币</td>
-						<td><%= @online_pay.get_convert_currency() %></td>
-					</tr>
-					<tr>
-						<td>交易状态</td>
-						<td><%= status_mapping(@online_pay.status) %></td>
-					</tr>
-					<tr>
-						<td>支付类型与子类型</td>
-						<td><%= payway_paytype_mapping(@online_pay.payway.camelize + @online_pay.paytype.camelize) %> </td>
-					</tr>
-					<tr>
-						<td>交易发起日期</td>
-						<td><%= @online_pay.created_at %></td>
-					</tr>
-					<tr>
-						<td>交易完成日期</td>
-						<td>
-							<%= @online_pay.get_transaction_timestamp() %>
-						</td>
-					</tr>
-					<tr>
-						<td>交易备注</td>
-						<td><%= @online_pay.reason %></td>
-					</tr>
-					<tr>
-						<td>订单类型</td>
-						<td><%= order_type_mapping(@online_pay.order_type) %></td>
-					</tr>
-					<tr>
-						<td>对账备注</td>
-						<td><%= @online_pay.get_transaction_desc() %></td>
-					</tr>
-					<tr>
-						<td>交易来源系统</td>
-						<td><%= system_mapping(@online_pay.system) %></td>
-					</tr>
-					<tr>
-						<td>包裹发送国家</td>
-						<td><%= @online_pay.send_country %></td>
-					</tr>
-					<tr>
-						<td>用户名</td>
-						<td><%= @online_pay.user.username %></td>
-					</tr>
-					<tr>
-						<td>注册E-Mail</td>
-						<td><%= @online_pay.user.email %></td>
-					</tr>
-					<tr>
-						<td>发票号</td>
-						<td>
-							<% if @online_pay.reconciliation_detail.present? %>
-							<%= "#{@online_pay.reconciliation_detail.invoice_no} (#{@online_pay.reconciliation_detail.invoice_date})" %>
-							<% end %>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
+-->
+<div class="row-fluid">
+	<div class="well">
+		<table class="table" style="table-layout:fixed;word-wrap:break-word;">
+			<tbody>
+				<tr>
+					<td>订单号/补款号 </td>
+					<td ><%= @online_pay.order_no %></td>
+				</tr>
+				<tr>
+					<td>交易号</td>
+					<td><%= @online_pay.reconciliation_id %></td>
+				</tr>
+				<tr>
+					<td>金额</td>
+					<td><%= @online_pay.amount %></td>
+				</tr>
+				<tr>
+					<td>货币</td>
+					<td><%= @online_pay.get_convert_currency() %></td>
+				</tr>
+				<tr>
+					<td>交易状态</td>
+					<td><%= status_mapping(@online_pay.status) %></td>
+				</tr>
+				<tr>
+					<td>支付类型与子类型</td>
+					<td><%= payway_paytype_mapping(@online_pay.payway.camelize + @online_pay.paytype.camelize) %> </td>
+				</tr>
+				<tr>
+					<td>交易发起日期</td>
+					<td><%= @online_pay.created_at %></td>
+				</tr>
+				<tr>
+					<td>交易完成日期</td>
+					<td>
+						<%= @online_pay.get_transaction_timestamp() %>
+					</td>
+				</tr>
+				<tr>
+					<td>交易备注</td>
+					<td><%= @online_pay.reason %></td>
+				</tr>
+				<tr>
+					<td>订单类型</td>
+					<td><%= order_type_mapping(@online_pay.order_type) %></td>
+				</tr>
+				<tr>
+					<td>对账备注</td>
+					<td><%= @online_pay.get_transaction_desc() %></td>
+				</tr>
+				<tr>
+					<td>交易来源系统</td>
+					<td><%= system_mapping(@online_pay.system) %></td>
+				</tr>
+				<tr>
+					<td>包裹发送国家</td>
+					<td><%= @online_pay.send_country %></td>
+				</tr>
+				<tr>
+					<td>用户名</td>
+					<td><%= @online_pay.user.username %></td>
+				</tr>
+				<tr>
+					<td>注册E-Mail</td>
+					<td><%= @online_pay.user.email %></td>
+				</tr>
+				<tr>
+					<td>发票号</td>
+					<td>
+						<% if @online_pay.reconciliation_detail.present? && @online_pay.reconciliation_detail.invoice_no.present? %>
+						<%= "#{@online_pay.reconciliation_detail.invoice_no} (#{@online_pay.reconciliation_detail.invoice_date})" %>
+						<% end %>
+					</td>
+				</tr>
+			</tbody>
+		</table>
 	</div>
+</div>
 </div>
