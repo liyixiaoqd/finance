@@ -72,6 +72,14 @@
 						<td>注册E-Mail</td>
 						<td><%= @online_pay.user.email %></td>
 					</tr>
+					<tr>
+						<td>发票号</td>
+						<td>
+							<% if @online_pay.reconciliation_detail.present? %>
+							<%= "#{@online_pay.reconciliation_detail.invoice_no} (#{@online_pay.reconciliation_detail.invoice_date})" %>
+							<% end %>
+						</td>
+					</tr>
 				</tbody>
 			</table>
 		</div>
