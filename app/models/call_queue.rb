@@ -68,15 +68,15 @@ class CallQueue < ActiveRecord::Base
 						next
 					end
 
-					pay_detail=OnlinePay.get_instance_pay_detail(online_pay)
-
 					cq.tried_amount+=1
 					cq.last_callback_time=Time.zone.now
 
 					if online_pay.payway == "paypal"
+						pay_detail=OnlinePay.get_instance_pay_detail(online_pay)
 						result_array = pay_detail.is_succ_pay_by_call?(online_pay,cq.start_call_time)
 						flag, reconciliation_id = result_array[0], result_array[2]
 					elsif online_pay.payway == "sofort"
+						pay_detail=OnlinePay.get_instance_pay_detail(online_pay)
 						flag, reconciliation_id = pay_detail.is_succ_pay_by_call?(online_pay)
 					elsif online_pay.payway == "oceanpayment"
 						ro = ReconciliationOceanpayment.new(online_pay.paytype,online_pay.system)
