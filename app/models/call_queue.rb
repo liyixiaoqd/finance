@@ -110,19 +110,16 @@ class CallQueue < ActiveRecord::Base
 
 						cq.save
 					end
+					p("order_no[#{online_pay.order_no}] process: #{cq.status},#{cq.last_callback_result}")
 				rescue=>e
 					cq.status="failure"
 					cq.last_callback_result=e.message
 					cq.save
 					Rails.logger.info("failure: #{e.message}")
+					p("cq_id[#{cq.reference_id}] process: #{cq.status},#{cq.last_callback_result}")
 				end
 			end
 			Rails.logger.info("#{cq.reference_id} process: #{cq.status},#{cq.last_callback_result}")
-			if online_pay.present?
-				p("order_no[#{online_pay.order_no}] process: #{cq.status},#{cq.last_callback_result}")
-			else
-				p("cq_id[#{cq.reference_id}] process: #{cq.status},#{cq.last_callback_result}")
-			end
 		end
 		p("online_pay_is_succ end, run [#{start_time}]")
 	end
