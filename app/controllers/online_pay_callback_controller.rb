@@ -369,7 +369,13 @@ class OnlinePayCallbackController < ApplicationController
 			ret_hash=init_notify_ret_hash(online_pay)
 			rollback_callback_status,online_pay.reason=pay_detail.identify_transaction(online_pay.trade_no,online_pay.country)
 			#check is status has updated
-			logger.warn("sofort_notify:identify_transaction failure") if rollback_callback_status.blank?
+			# 网络问题，进行二次调用
+			if rollback_callback_status.blank?
+				rollback_callback_status,online_pay.reason=pay_detail.identify_transaction(online_pay.trade_no,online_pay.country)
+				if rollback_callback_status.blank?
+					logger.warn("sofort_notify:identify_transaction failure") 
+				end
+			end
 			render :text=>'success' and return if online_pay.check_has_updated?(rollback_callback_status)
 
 			online_pay.callback_status,rollback_callback_status=rollback_callback_status,online_pay.callback_status

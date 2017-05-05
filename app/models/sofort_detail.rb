@@ -112,10 +112,10 @@ class SofortDetail
 			doc = Nokogiri::XML(res.body.force_encoding("UTF-8"))
 			if doc.xpath("//errors/error").size == 0
 				transaction_no = doc.xpath("//transactions/transaction_details/transaction").text
-				test_mode = doc.xpath("//transactions/transaction_details/test").text
+				# test_mode = doc.xpath("//transactions/transaction_details/test").text
 				status = doc.xpath("//transactions/transaction_details/status").text
 				status_reason = doc.xpath("//transactions/transaction_details/status_reason").text
-				amount = doc.xpath("//transactions/transaction_details/amount").text
+				# amount = doc.xpath("//transactions/transaction_details/amount").text
 
 				if(trade_no==transaction_no)
 					identify_status=status
@@ -133,13 +133,19 @@ class SofortDetail
 		[identify_status,identify_status_reason] 
 	end
 
-	def is_succ_pay_by_call?(online_pay,call_time)
-		# starttime=((call_time+" UTC").to_time-5*60-60).strftime("%Y-%m-%dT%H:%M:%SZ")
-		# endtime=((call_time+" UTC").to_time+60).strftime("%Y-%m-%dT%H:%M:%SZ")
-		# rp=ReconciliationPaypal.new("TransactionSearch",online_pay.country)
-		# flag,message,reconciliation_id,callback_status=rp.has_pay_order(online_pay.credit_email,online_pay.amount,starttime,endtime)
+	def is_succ_pay_by_call?(online_pay)
+		rollback_callback_status = pay_detail.identify_transaction(online_pay.trade_no,online_pay.country)[0]
 
-		# [flag,message,reconciliation_id,callback_status]
+		flag = false
+		if(rollback_callback_status=="received")
+			flag = true
+		elsif(rollback_callback_status=="untraceable")
+			flag = true
+		else
+			flag = false
+		end
+
+		[flag,online_pay.trade_no]
 	end
 
 	def self.getStatusFromXml(body)

@@ -42,7 +42,7 @@ class CallQueue < ActiveRecord::Base
 		unless reference_id.blank?
 			where_condition["reference_id"]=reference_id
 		end
-
+		p("online_pay_is_succ start, run [#{start_time}]")
 		cqs=CallQueue.where(where_condition).where("status in ('init') and start_call_time<='#{start_time}'")
 		cqs.where(run_batch: "").update_all(run_batch: batch)
 		cqs.where(run_batch: batch).each do |cq|
@@ -56,13 +56,15 @@ class CallQueue < ActiveRecord::Base
 					cq.run_batch=""
 					if online_pay.is_success_self?
 						cq.online_pay_is_succ_set()
+						p("order_no[#{online_pay.order_no}] process: #{cq.status},#{cq.last_callback_result}")
 						next
 					end
 
-					unless online_pay.payway=="paypal"
+					if online_pay.payway != "paypal" and online_pay.payway != "sofort" and online_pay.payway != "oceanpayment"
 						cq.status="wait"
 						cq.last_callback_result="尚不支持交易#{online_pay.payway}判断是否成功"
 						cq.save
+						p("order_no[#{online_pay.order_no}] process: #{cq.status},#{cq.last_callback_result}")
 						next
 					end
 
@@ -70,16 +72,29 @@ class CallQueue < ActiveRecord::Base
 
 					cq.tried_amount+=1
 					cq.last_callback_time=Time.zone.now
-					flag,message,reconciliation_id,callback_status=pay_detail.is_succ_pay_by_call?(online_pay,cq.start_call_time)
 
-					if flag
+					if online_pay.payway == "paypal"
+						result_array = pay_detail.is_succ_pay_by_call?(online_pay,cq.start_call_time)
+						flag, reconciliation_id = result_array[0], result_array[2]
+					elsif online_pay.payway == "sofort"
+						flag, reconciliation_id = pay_detail.is_succ_pay_by_call?(online_pay)
+					elsif online_pay.payway == "oceanpayment"
+						ro = ReconciliationOceanpayment.new(online_pay.paytype,online_pay.system)
+						flag, reconciliation_id = ro.verify_single_order(online_pay)
+					end
+
+					if flag == true
 						online_pay.set_status!("success_notify","")
-						online_pay.reconciliation_id=reconciliation_id
+						online_pay.reconciliation_id = reconciliation_id
 						online_pay.save!()
 						online_pay.set_reconciliation.save!()
 
-						ret_hash=init_return_ret_hash(online_pay)
+						ret_hash=init_notify_ret_hash(online_pay)
 						ret_hash['status']="success_notify"
+
+						fw=FinanceWater.save_by_online_pay(online_pay)
+						ret_hash['water_no']=fw.id unless fw.blank?
+
 						redirect_notify_url=OnlinePay.redirect_url_replace("post",online_pay.notification_url)
 						logger.info("paypal post async url:#{redirect_notify_url}")
 						unless online_pay.method_url_success?("post",redirect_notify_url,false,ret_hash)
@@ -103,10 +118,16 @@ class CallQueue < ActiveRecord::Base
 				end
 			end
 			Rails.logger.info("#{cq.reference_id} process: #{cq.status},#{cq.last_callback_result}")
+			if online_pay.present?
+				p("order_no[#{online_pay.order_no}] process: #{cq.status},#{cq.last_callback_result}")
+			else
+				p("cq_id[#{cq.reference_id}] process: #{cq.status},#{cq.last_callback_result}")
+			end
 		end
+		p("online_pay_is_succ end, run [#{start_time}]")
 	end
 
-	def self.init_return_ret_hash(online_pay)
+	def self.init_notify_ret_hash(online_pay)
 		{
 			'trade_no'=>online_pay.trade_no,
 			'status'=>"",
@@ -114,7 +135,8 @@ class CallQueue < ActiveRecord::Base
 			'amount'=>online_pay.amount,
 			'payway'=>online_pay.payway,
 			'paytype'=>online_pay.paytype,
-			'sign'=>Digest::MD5.hexdigest("#{online_pay.trade_no}#{Settings.authenticate.signkey}")
+			'water_no'=>'',
+			'sign'=>Digest::MD5.hexdigest("#{online_pay.trade_no}#{Settings.authenticate.signkey}")		
 		}
 	end
 

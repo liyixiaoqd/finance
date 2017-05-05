@@ -27,6 +27,20 @@ class ReconciliationOceanpayment
 		@batch_id=1
 	end
 
+	def verify_single_order(online_pay)
+		flag, reconciliation_id = false, online_pay.reconciliation_id
+		result_infos = valid_reconciliation( [online_pay.trade_no] ,"verify" )
+		Rails.logger.info(result_infos)
+		payinfo = result_infos['response']['paymentInfo']
+		if payinfo['payment_results'].to_s=="1"	
+			flag = true
+			reconciliation_id = payinfo['payment_id'] if payinfo['payment_id'].present?
+		else
+			flag = false
+		end
+
+		[flag,reconciliation_id]
+	end
 
 	def finance_reconciliation
 		count=0
@@ -52,9 +66,13 @@ class ReconciliationOceanpayment
 		message
 	end
 
-	def valid_reconciliation(order_nos)
-		check_filename=WARN_FILE_PATH+"/oceampayment_finance_reconciliation_warn_"+@reconciliation_date+".log"
-		Rails.logger.info("check_filename:#{check_filename}")
+	def valid_reconciliation(order_nos,valid_method="reconciliation")
+		if valid_method == "verify" 
+			check_filename = WARN_FILE_PATH+"/oceampayment_finance_reconciliation_warn_cron.log"
+		else
+			check_filename=WARN_FILE_PATH+"/oceampayment_finance_reconciliation_warn_"+@reconciliation_date+".log"
+			Rails.logger.info("check_filename:#{check_filename}")
+		end
 		check_file=File.open(check_filename,"a")
 
 		valid_all_num=order_nos.size
@@ -118,8 +136,15 @@ class ReconciliationOceanpayment
 			if response.code!="200"
 				raise "main rescue:get web failure, #{query_api_url} , response.code"
 			end
-
+			
 			result_infos=Hash.from_xml(response.body)
+
+			# 特殊调用 -- 单个验证是否成功支付
+			if valid_method == "verify" 
+				check_file.close
+				return result_infos
+			end
+
 			#单条记录
 			if result_infos['response']['paymentInfo'].class.to_s=="Hash"
 				payinfo = result_infos['response']['paymentInfo']
