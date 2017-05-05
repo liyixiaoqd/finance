@@ -76,6 +76,8 @@ class ExpectionHandlingController < ApplicationController
 			transactionid=op.trade_no
 		elsif op.payway=="paypal"
 			transactionid=params[:transactionid]
+		elsif op.payway=="oceanpayment"
+			transactionid=op.trade_no
 		else
 			transactionid="EXPECTION_UNDEFINED"
 		end
@@ -113,7 +115,10 @@ class ExpectionHandlingController < ApplicationController
 
 				op.status='success_notify'
 				op.callback_status='TRADE_FINISHED'
-				op.reconciliation_id=transactionid
+				# 可能存在交易号与第三方系统不匹配情况
+				if op.reconciliation_id.blank?
+					op.reconciliation_id=transactionid
+				end
 				op.reason=desc
 				ret_hash={
 					'trade_no'=>op.trade_no,

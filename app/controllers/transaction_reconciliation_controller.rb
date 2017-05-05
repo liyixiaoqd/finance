@@ -123,6 +123,13 @@ class TransactionReconciliationController < ApplicationController
 					redirect_to transaction_reconciliation_index_path(payway: reconciliation_detail.payway,paytype: reconciliation_detail.paytype,transactionid: reconciliation_detail.transactionid) and return
 				end
 
+				 if reconciliation_detail.online_pay.present? 
+				 	if reconciliation_detail.online_pay.is_success? == false
+				 		flash[:notice]="#{reconciliation_detail.online_pay.order_no} 支付状态未成功,请先操作'交易查询->手动支付'"
+				 		redirect_to transaction_reconciliation_index_path(payway: reconciliation_detail.payway,paytype: reconciliation_detail.paytype,transactionid: reconciliation_detail.transactionid) and return
+				 	end
+				 end
+
 				if (reconciliation_detail.reconciliation_flag==ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC'])
 					#已财务确认的不可撤销
 					if reconciliation_detail.confirm_flag==ReconciliationDetail::CONFIRM_FLAG['SUCC']
