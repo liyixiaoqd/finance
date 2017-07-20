@@ -60,6 +60,11 @@ class OceanpaymentUnionpayDetail
 		#BUG BUG!
 		Rails.logger.info("other_params: #{@other_params}")
 
+		# 字段去空格
+		billing_name.strip! if billing_name.present?
+		consumer_email.strip! if consumer_email.present?
+		consumer_phone.strip! if consumer_phone.present?
+		
 		post_params={
 			"account"=>account,
 			"terminal"=>terminal,

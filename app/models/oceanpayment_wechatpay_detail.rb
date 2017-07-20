@@ -40,7 +40,11 @@ class OceanpaymentWechatpayDetail
 			use_currency=@currency
 		end
 
-
+		# 字段去空格
+		consumer_name.strip! if consumer_name.present?
+		consumer_email.strip! if consumer_email.present?
+		consumer_phone.strip! if consumer_phone.present?
+		
 		post_params={
 			"account"=>account,
 			"terminal"=>terminal,
