@@ -81,7 +81,7 @@ class ExchangeRate < ActiveRecord::Base
 
                 # 最后一次获取 且 未获取成功 , 使用上一次成功数据
                 if( isLast == true && !er.isGetSuccess?() )
-                    pre_er = ExchangeRate.where(currency: "GBP",flag: [7,8,9]).order(:rate_date).last
+                    pre_er = ExchangeRate.where(currency: "GBP",flag: IS_SUCC_FLAG).order(:rate_date).last
                     if per_er.present?
                         er.rate = pre_er.rate
                         er.rate_datetime = Time.now
