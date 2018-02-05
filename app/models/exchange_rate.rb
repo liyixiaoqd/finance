@@ -150,7 +150,6 @@ class ExchangeRate < ActiveRecord::Base
             get_num=0
             for i in 1...table_num
                 tmp_time=tmp_er.get_content_from_table(table_content,i,time_index)
-
                 if tmp_time.blank? || threshold_time>tmp_time
                     break
                 end
@@ -166,8 +165,8 @@ class ExchangeRate < ActiveRecord::Base
                 today_flag = false
 
                 if isLast == true
-                    tmp_time=tmp_er.get_content_from_table(table_content, table_num-1, time_index)
-                    value=tmp_er.get_content_from_table(table_content, table_num-1, value_index).to_f
+                    tmp_time=tmp_er.get_content_from_table(table_content, 1, time_index)
+                    value=tmp_er.get_content_from_table(table_content, 1, value_index).to_f
                     #
                     if time.present?
                         time = Time.parse(tmp_time).in_time_zone("Beijing").utc
