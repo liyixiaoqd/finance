@@ -82,14 +82,14 @@ class ExchangeRate < ActiveRecord::Base
                 # 最后一次获取 且 未获取成功 , 使用上一次成功数据
                 if( isLast == true && !er.isGetSuccess?() )
                     pre_er = ExchangeRate.where(currency: "GBP",flag: IS_SUCC_FLAG).order(:rate_date).last
-                    if per_er.present?
+                    if pre_er.present?
                         er.rate = pre_er.rate
                         er.rate_datetime = Time.now
                         er.flag = 7
-                        er.remark = "No success was achieved on the day, using the last exchange rate [#{per_er.rate_date}]"
+                        er.remark = "No success was achieved on the day, using the last exchange rate [#{pre_er.rate_date}]"
                         er.save!
 
-                         puts("isLast use pre exchange rate record rate:[#{er.rate}], pre_time:[#{per_er.rate_date}]")
+                         puts("isLast use pre exchange rate record rate:[#{er.rate}], pre_time:[#{pre_er.rate_date}]")
                     end
                 end
             rescue=>e
@@ -107,8 +107,9 @@ class ExchangeRate < ActiveRecord::Base
 
         begin
             post_params={
-                "erectDate"=>get_date,
-                "pjname"=>CURRENCY_WEB_MAPPING[currency]
+                "erectDate" => get_date,
+                "nothing" => get_date,
+                "pjname" => CURRENCY_WEB_MAPPING[currency]
             }
             if post_params['pjname'].blank?
                 raise "no mapping to [#{currency}] in ExchangeRate::CURRENCY_WEB_MAPPING"
@@ -149,13 +150,13 @@ class ExchangeRate < ActiveRecord::Base
 
             get_num=0
             for i in 1...table_num
-                tmp_time=tmp_er.get_content_from_table(table_content,i,time_index)
-                if tmp_time.blank? || threshold_time>tmp_time
+                time = tmp_er.get_content_from_table(table_content,i,time_index)
+                if time.blank? || threshold_time > time
                     break
                 end
                 get_num+=1
 
-                time=Time.parse(tmp_time).in_time_zone("Beijing").utc
+                # time=Time.parse(tmp_time).in_time_zone("Beijing").utc
                 #puts("value:[#{value}],tmp_time:[#{tmp_time}]==>time:[#{time}]")
                 value=tmp_er.get_content_from_table(table_content,i,value_index).to_f
             end
@@ -165,11 +166,10 @@ class ExchangeRate < ActiveRecord::Base
                 today_flag = false
 
                 if isLast == true
-                    tmp_time=tmp_er.get_content_from_table(table_content, 1, time_index)
-                    value=tmp_er.get_content_from_table(table_content, 1, value_index).to_f
+                    time = tmp_er.get_content_from_table(table_content, 1, time_index)
+                    value = tmp_er.get_content_from_table(table_content, 1, value_index).to_f
                     #
-                    if time.present?
-                        time = Time.parse(tmp_time).in_time_zone("Beijing").utc
+                    if time.present? && value > 0.01
                         today_flag = true
                         puts("isLast use today last web record value:[#{value}], time:[#{time}]")
                     end
@@ -185,7 +185,8 @@ class ExchangeRate < ActiveRecord::Base
             end
 
             rate_info['rate']=(value/100*1.015).round(4)
-            rate_info['rate_datetime']=time
+            # 2018.02.11
+            rate_info['rate_datetime']=time + " +08:00"
 
             puts("value:[#{value}],rate:[#{rate_info['rate']}],time:[#{time}]")
         rescue=>e
