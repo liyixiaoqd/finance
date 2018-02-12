@@ -59,6 +59,7 @@ class ExchangeRate < ActiveRecord::Base
     #           由于要获取每天9点后的最近一条数据,因此crontab需要配置从9点开始到11点结束，每5分钟执行
     #           */5 9-11 * * * /bin/bash -l -c 'source ~/.bashrc && source ~/.bash_profile && cd /opt/rails-app/finance && rails runner -e test 'ExchangeRate.getExchangeRate' >> /opt/rails-app/finance/log/cron_get_exchange_rate.log 2>&1'
     def self.getExchangeRate(isLast=false, get_date=Time.now.strftime("%Y-%m-%d"))
+        puts("====== getExchangeRate start #{Time.now} -- #{isLast} =======")
         CURRENCY_WEB_MAPPING.keys.each do |currency|
             begin
                 er=ExchangeRate.find_by(currency: currency,rate_date: get_date)
@@ -96,6 +97,8 @@ class ExchangeRate < ActiveRecord::Base
                 puts("[#{get_date}],[#{currency}] obtain rescue: [#{e.message}]")
             end
         end
+
+        puts("====== getExchangeRate end #{Time.now} -- #{isLast} =======\n\n")
     end
 
     def self.getCurrencyRateFromWeb(currency, get_date, isLast)
@@ -131,34 +134,30 @@ class ExchangeRate < ActiveRecord::Base
                 raise "table info get failure:[#{table_content}]"
             end
 
-            # for i in 0...8
-            #   if tmp_er.get_content_from_table(table_content,0,i)=="现汇卖出价"
-            #       value_index=i
-            #   elsif tmp_er.get_content_from_table(table_content,0,i)=="发布时间"
-            #       time_index=i
-            #   end
-
-            #   if time_index>=0 && value_index>=0
-            #       break
-            #   end
-            # end
-
             #获取超过9点的第一条
-            value_index,time_index=3,7  #现汇卖出价,发布时间
-            value,time=-1,nil
-            threshold_time="#{get_date.gsub("-",".")} 09:00:00"
+            value_index,time_index = 3,7  #现汇卖出价,发布时间
+            value,time = -1, nil
+            threshold_time = "#{get_date.gsub("-",".")} 09:00:00"
 
+            # 0为标题,table_num-1为样式都不进行获取
             get_num=0
-            for i in 1...table_num
-                time = tmp_er.get_content_from_table(table_content,i,time_index)
-                if time.blank? || threshold_time > time
-                    break
-                end
-                get_num+=1
+            for i in 1...table_num-1
+                begin
+                    tmp_time, tmp_value = -1, nil
+                    tmp_time = tmp_er.get_content_from_table(table_content,i,time_index)
+                    if tmp_time.blank? || threshold_time > tmp_time
+                        puts("break ===> [#{threshold_time}] > [#{tmp_time}]")
+                        break
+                    end
+                    get_num+=1
 
-                # time=Time.parse(tmp_time).in_time_zone("Beijing").utc
-                #puts("value:[#{value}],tmp_time:[#{tmp_time}]==>time:[#{time}]")
-                value=tmp_er.get_content_from_table(table_content,i,value_index).to_f
+                    # time=Time.parse(tmp_time).in_time_zone("Beijing").utc
+                    tmp_value = tmp_er.get_content_from_table(table_content,i,value_index).to_f
+                    time, value = tmp_time, tmp_value
+                    puts("[#{get_num}] ===>  value:[#{value}],time:[#{time}]")
+                rescue=>e
+                    puts("for rescue: #{e.message}")
+                end
             end
 
             if get_num==0
@@ -166,10 +165,13 @@ class ExchangeRate < ActiveRecord::Base
                 today_flag = false
 
                 if isLast == true
-                    time = tmp_er.get_content_from_table(table_content, 1, time_index)
-                    value = tmp_er.get_content_from_table(table_content, 1, value_index).to_f
+                    puts("isLast == true !!")
+                    tmp_time, tmp_value = -1, nil
+                    tmp_time = tmp_er.get_content_from_table(table_content, 1, time_index)
+                    tmp_value = tmp_er.get_content_from_table(table_content, 1, value_index).to_f
                     #
-                    if time.present? && value > 0.01
+                    if tmp_time.present? && tmp_value > 0.01
+                        time, value = tmp_time, tmp_value
                         today_flag = true
                         puts("isLast use today last web record value:[#{value}], time:[#{time}]")
                     end
@@ -180,7 +182,7 @@ class ExchangeRate < ActiveRecord::Base
                 end
             end
 
-            if time.blank? || value.blank? || value<0.0000
+            if time.blank? || value.blank? || value<0.001
                 raise "get value,time into failure: [#{table_content}],[#{table_num}]"
             end
 
@@ -212,11 +214,11 @@ class ExchangeRate < ActiveRecord::Base
 
         if self.rate<0.0001
             self.flag=1
-        elsif self.rate_datetime.in_time_zone("Beijing").to_s[11,2] < "09"
+        elsif self.rate_datetime.in_time_zone("Beijing").to_s[11,2] != "09"
             # 获取到的为当天9点前的数据
             self.flag = 7
-            puts("Getting exchange rate is less than 9 points [#{self.rate_datetime.in_time_zone('Beijing')}]")
-            self.remark="Getting exchange rate is less than 9 points [#{self.rate_datetime.in_time_zone('Beijing')}]"
+            puts("Getting exchange rate not equal to 9 points [#{self.rate_datetime.in_time_zone('Beijing')}]")
+            self.remark="Getting exchange rate not equal to 9 points [#{self.rate_datetime.in_time_zone('Beijing')}]"
         else
             #获取前一天汇率,判断是否汇率异常
             begin
