@@ -96,6 +96,21 @@ namespace :finance do
 		@interface_logger.info("reconciliation_oceanpayment end")
 	end
 
+	# 2018.08.15 新增微信支付对账 -- 与微信直接对接
+	desc "对账:wechat"
+	task :reconciliation_wechat=>[:environment] do
+		if @interface_logger.blank?
+			@interface_logger = Logger.new("log/reconciliation.log")
+		end
+
+		@interface_logger.info("reconciliation_wechat start")
+		reconciliation=ReconciliationWechat.new(Time.now-1.days)
+		message=reconciliation.finance_reconciliation()
+		#message.split('</br>').each do |t| @interface_logger.info t end
+		@interface_logger.info(out_message(message))
+		@interface_logger.info("reconciliation_wechat end")
+	end
+
 	def out_message(message)
 		out=""
 		pre="\t\t"

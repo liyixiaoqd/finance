@@ -16,7 +16,6 @@ class ReconciliationWechat
 	end
 
 	def finance_reconciliation()
-		response = nil
 		message = "[#{@bill_date}] </br> "
 		all_num, succ_num, fail_num, rescue_num = 0, 0, 0, 0
 
@@ -87,8 +86,7 @@ class ReconciliationWechat
 		end
 
 		Rails.logger.info(message)
-		[message, response]
-		
+		message
 	end
 
 	private
