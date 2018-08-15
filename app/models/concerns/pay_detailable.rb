@@ -37,7 +37,7 @@ module PayDetailable extend ActiveSupport::Concern
 		end
 	end
 
-	def method_url_response(method,url_path,https_boolean,params={})
+	def method_url_response(method,url_path,https_boolean,params={}, body_str=nil)
 		uri = URI.parse(url_path)
 		http = Net::HTTP.new(uri.host, uri.port)
 
@@ -47,8 +47,10 @@ module PayDetailable extend ActiveSupport::Concern
 			request = Net::HTTP::Get.new(uri.request_uri) 
 		else
 			request = Net::HTTP::Post.new(uri.request_uri) 
-			request.set_form_data(params)
+			request.set_form_data(params) 
 		end
+
+		request.body = body_str if body_str.present?
 
 		#test !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		response=nil

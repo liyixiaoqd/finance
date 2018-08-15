@@ -30,7 +30,8 @@ class ReconciliationDetail < ActiveRecord::Base
 		'ALIPAY_OVERSEA_L' => 'SUCC',
 		'ALIPAY_OVERSEA_W' => 'PEND',
 		'ALIPAY_OVERSEA_F' => 'FAIL',
-		'SOFORT_SUCC' => 'SUCC'
+		'SOFORT_SUCC' => 'SUCC',
+		'WECHAT_MOBILE_PAY_PEND' => 'SUCC'
 	}
 
 	CONFIRM_FLAG={
@@ -207,6 +208,13 @@ class ReconciliationDetail < ActiveRecord::Base
 				self.order_type= ""
 			end
 		end
+	end
+
+	# INPUT UTC time
+	# pay_date should be "yyyy-mm-dd hh:mm:ss"  2018-07-31 09:29:24
+	def set_transaction_date!(pay_date)
+		self.timestamp = Time.zone.parse("#{pay_date} UTC")
+		self.transaction_date = self.timestamp.to_s[0,10]
 	end
 
 	def warn_to_file(errmsg="unknow")

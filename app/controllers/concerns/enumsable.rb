@@ -20,7 +20,8 @@ module Enumsable extend ActiveSupport::Concern
 		"支付宝"=>"alipay",
 		"积分"=>"score",
 		"电子现金"=>"e_cash",
-		"钱海"=>"oceanpayment"
+		"钱海"=>"oceanpayment",
+		"微信"=>"wechat"
 	}
 
 	PAYTYPE_MAPPING_TO_DISPLAY={
@@ -30,7 +31,8 @@ module Enumsable extend ActiveSupport::Concern
 		"银联-b2c"=>"unionpay_b2c",
 		"银联-b2b"=>"unionpay_b2b",
 		"微信"=>"wechatpay",
-		"支付宝"=>"alipay"
+		"支付宝"=>"alipay",
+		"移动支付"=>"mobile_pay"
 	}
 
 	ORDER_TYPE_MAPPING_TO_DISPLAY={

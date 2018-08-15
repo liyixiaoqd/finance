@@ -21,11 +21,20 @@ module AlipayDetailable extend ActiveSupport::Concern
 	end
 
 	def generate_sign(params,secret)
-		query = params.sort.map do |key, value|
+		query = generate_sign_info(params)
+		Digest::MD5.hexdigest("#{query}#{secret}")
+	end
+
+	def generate_sign_add_key(params,secret)
+		query = generate_sign_info(params)
+		Rails.logger.info("generate_sign [#{query}&key=#{secret}]")
+		Digest::MD5.hexdigest("#{query}&key=#{secret}")
+	end
+
+	def generate_sign_info(params)
+		params.sort.map do |key, value|
 			"#{key}=#{value}"
 		end.join('&')
-		Rails.logger.info("generate_sign [#{query}#{secret}]")
-		Digest::MD5.hexdigest("#{query}#{secret}")
 	end
 
 	def verify_sign?(params,secret)

@@ -154,6 +154,71 @@ namespace :sync_file do
 	end
 
 
+	# 根据文件内容生成 支付数据与对账数据
+	desc "第三方支付文件数据同步"
+	# 样例数据:  
+	# userid|&|payway|&|paytype   |&|amount|&|currency|&|order_no            |&|description|&|country|&|reconciliation_id    |&|order_type|&|pay_date
+	# 25802 |&|wechat|&|mobile_pay|&|35.5  |&|RMB     |&|TM180502001137060950|&|parcel pay |&|de     |&|180502165621000050818|&|parcel    |&|2018-07-30 12:00:20
+	task :third_payment =>[:environment] do
+		init_interface_logger
+		@interface_logger.info("finance_invoice sync file proc start")
+		Adapter::ArrTransHash
+			
+		begin
+			split = "|&|"
+			arr_format = ["userid", "payway", "paytype", "amount", "currency", "order_no", \
+				"description", "country", "reconciliation_id", "order_type", "null", "system"]
+
+			filepath = Settings.sync_file.rootpath+Settings.sync_file.third_payment+"/"
+			Dir.foreach(filepath) do |filename|
+				begin
+					next if filename.start_with?(".")
+					raise "wrong file format" unless filename.end_with?("txt")
+					f_system = filename.split("_")[0]
+
+					raise "wrong file format" unless ["mypost4u", "quaie"].include?(f_system)
+
+					index = 0
+					File.open(filepath+filename, "r") do |file|
+						while line = file.gets
+							ActiveRecord::Base.transaction do 
+								index += 1
+								begin
+									pay_arr = line.chomp.split(split)
+									pay_arr << f_system
+									ath_op = Adapter::ATHOnlinePaySF.new(arr_format)
+									op = OnlinePay.new(ath_op.arr_to_hash(pay_arr))
+									op.save()
+									if op.errors.present?
+										raise "#{op.errors.full_messages}"
+									end
+									rd = op.set_reconciliation
+									rd.set_transaction_date!(pay_arr[10].strip)
+									# is need to dui zhang 
+									rd.set_flag_by_status_and_amount!()
+									rd.save()
+									if rd.errors.present?
+										raise "#{rd.errors.full_messages}"
+									end
+									@interface_logger.info("proc op record #{filename}[#{index}] - succ")
+								rescue=>e
+									@interface_logger.info("proc #{filename}[#{index}] - #{line.chomp} failure #{e.message}")
+									raise ActiveRecord::Rollback,"rollback!"
+								end
+							end
+						end
+					end
+
+					File.rename(filepath+filename,filepath+filename+".end")
+				rescue=>e
+					@interface_logger.info("proc #{filename} failure #{e.message}")
+				end
+			end
+		rescue=>e
+			@interface_logger.info("ERROR: third_payment proc failure #{e.message}")
+		end
+	end
+
 	def init_interface_logger
 		if @interface_logger.blank?
 			@interface_logger = Logger.new("log/sync_file.log")
