@@ -161,7 +161,7 @@ namespace :sync_file do
 	# 25802 |&|wechat|&|mobile_pay|&|35.5  |&|RMB     |&|TM180502001137060950|&|parcel pay |&|de     |&|180502165621000050818|&|parcel    |&|2018-07-30 12:00:20
 	task :third_payment =>[:environment] do
 		init_interface_logger
-		@interface_logger.info("finance_invoice sync file proc start")
+		@interface_logger.info("third_payment sync file proc start")
 		Adapter::ArrTransHash
 			
 		begin
@@ -172,6 +172,7 @@ namespace :sync_file do
 			filepath = Settings.sync_file.rootpath+Settings.sync_file.third_payment+"/"
 			Dir.foreach(filepath) do |filename|
 				begin
+					@interface_logger.info("filename: #{filename}")
 					next if filename.start_with?(".")
 					raise "wrong file format" unless filename.end_with?("txt")
 					f_system = filename.split("_")[0]
@@ -217,6 +218,8 @@ namespace :sync_file do
 		rescue=>e
 			@interface_logger.info("ERROR: third_payment proc failure #{e.message}")
 		end
+
+		@interface_logger.info("third_payment sync file proc end")
 	end
 
 	def init_interface_logger
