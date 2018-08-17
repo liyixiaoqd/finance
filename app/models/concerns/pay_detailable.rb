@@ -104,6 +104,7 @@ module PayDetailable extend ActiveSupport::Concern
 			td_content=tr_content.scan(/<td.*?<\/td>/)[td_num]
 			#去除td标签内的所有html格式,防止死循环,做多处理10此
 			10.times do
+				# puts("td_content: [#{tr_num} - #{td_num}] -- [#{tr_content}][#{td_content}]")
 				td_content_match = td_content.match(/>(.*)<\//) 
 				if td_content_match.blank?
 					content=td_content
@@ -119,6 +120,29 @@ module PayDetailable extend ActiveSupport::Concern
 		content
 	end
 
+	def get_content_th_from_table(table_content,tr_num,th_num)
+		content=nil
+		begin
+			#贪婪模式匹配tr
+			tr_content=table_content.scan(/<tr>.*?<\/tr>/m)[tr_num]
+			th_content=tr_content.scan(/<th.*?<\/th>/)[th_num]
+
+			10.times do
+				# puts("td_content: [#{tr_num} - #{th_num}] -- [#{tr_content}][#{th_content}]")
+				th_content_match = th_content.match(/>(.*)<\//) 
+				if th_content_match.blank?
+					content=th_content
+					break
+				end
+				th_content=th_content_match[1]
+			end 
+		rescue=>e
+			Rails.logger.info("get_content_from_table rescue: [#{e.message}]")
+			content=nil
+		end
+
+		content
+	end
 
 	def price_in_cents(price)
 		(price*100).round

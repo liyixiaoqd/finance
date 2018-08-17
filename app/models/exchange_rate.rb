@@ -135,7 +135,26 @@ class ExchangeRate < ActiveRecord::Base
             end
 
             #获取超过9点的第一条
-            value_index,time_index = 3,7  #现汇卖出价,发布时间
+            #2018.08.17 页面存在调整,因此使用最后一位
+            # 页面存在调整,因此根据标题判断位置
+            # value_index,time_index = 3,7  #现汇卖出价,发布时间
+            value_index,time_index = -1, -1
+            for field_i in 0...10
+                field_name = tmp_er.get_content_th_from_table(table_content,0,field_i)
+                field_name.force_encoding(Encoding::UTF_8)
+                puts("#{field_i} : #{field_name}")
+                if field_name == "现汇卖出价"
+                    value_index = field_i
+                elsif field_name == "发布时间"
+                    time_index = field_i
+                end
+
+                if value_index > -1 && time_index > -1
+                    break
+                end
+            end
+            puts("value_index:[#{value_index}] and time_index:[#{time_index}]")
+            
             value,time = -1, nil
             threshold_time = "#{get_date.gsub("-",".")} 09:00:00"
 
