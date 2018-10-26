@@ -11,7 +11,7 @@ namespace :async_notice do
         }
 
         @interface_logger.info("=================== async_notice online_pay start===================")
-        ops=OnlinePay.where("status='failure_notify_third'")
+        ops=OnlinePay.where("status='failure_notify_third' and updated_at<'#{Time.now-50}'")
         @interface_logger.info("re notice: #{ops.size} ")
         fail_num = ops.size
         ops.each do |op|
