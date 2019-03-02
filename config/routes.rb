@@ -62,6 +62,10 @@ Rails.application.routes.draw do
   post 'finance_water/correct' => 'finance_water#correct'
   post 'finance_water/invoice_merchant' => 'finance_water#invoice_merchant'
 
+  # cash_coupon
+  post '/finance_water/:userid/cash_coupon/list' => "cash_coupon#list"
+  post '/finance_water/:userid/cash_coupon' => "cash_coupon#create"
+
   post 'pay/:userid/submit' => 'online_pay#submit'
   # post 'pay/:userid/submit_creditcard' => 'online_pay#submit_creditcard'
 

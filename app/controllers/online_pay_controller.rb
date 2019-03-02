@@ -154,6 +154,20 @@ class OnlinePayController < ApplicationController
 				# 	render json:{},status:400 and return
 				# end
 				online_pay.save!
+
+				# 代金券处理
+				if params['cash_coupons'].blank?
+					params['cash_coupons'].each do |cc_info|
+						cc_id, cc_quantity = cc_info.split("_")
+						cc_id = cc_id.to_i
+						cc_quantity = cc_quantity.to_i
+
+						cc = CashCoupon.lock().find_by(id: cc_id, user_id: user.id)
+						raise "无此优惠券信息[#{cc.id}]" if cc.blank?
+
+						cc.use_quantity_to_frozen!(cc_quantity, params['order_no'])
+					end
+				end
 			end
 			logger.info("ONLINE PAY SUBMIT LOCK USER END:#{user.username} - #{online_pay.order_no} - #{online_pay.id}")
 
@@ -240,6 +254,20 @@ class OnlinePayController < ApplicationController
 				# 	render json:{},status:400 and return
 				# end
 				online_pay.save!
+
+				# 代金券处理
+				if params['cash_coupons'].blank?
+					params['cash_coupons'].each do |cc_info|
+						cc_id, cc_quantity = cc_info.split("_")
+						cc_id = cc_id.to_i
+						cc_quantity = cc_quantity.to_i
+
+						cc = CashCoupon.lock().find_by(id: cc_id, user_id: user.id)
+						raise "无此优惠券信息[#{cc.id}]" if cc.blank?
+
+						cc.use_quantity_to_frozen!(cc_quantity, params['order_no'])
+					end
+				end
 			end
 			logger.info("ONLINE PAY SUBMIT_POST LOCK USER END:#{user.username} - #{online_pay.order_no} - #{online_pay.id}")
 
@@ -420,6 +448,7 @@ class OnlinePayController < ApplicationController
 			online_pay.set_currency!()
 			online_pay.set_country!()
 			online_pay.set_ip!(request.remote_ip)
+			online_pay.cash_coupon = true if params["cash_coupons"].present?
 
 			online_pay
 		end

@@ -72,8 +72,11 @@ class FinanceWaterController < ApplicationController
 
 				# finance_water=new_finance_water_params(user,params)
 				for finance_each in finance_arrays
-					#重复交易判断
+					# 重复交易判断
 					check_finance_water_by_params(user,finance_each,params)
+
+					# 代金券校验与处理
+					cash_coupon_check_and_proc(user, finance_each)
 
 					finance_water=new_finance_water_each(user,finance_each,params)
 
@@ -540,6 +543,7 @@ class FinanceWaterController < ApplicationController
 				online_pay.reason=finance_each["reason"]
 				online_pay.trade_no=online_pay.order_no
 				online_pay.reconciliation_id=online_pay.order_no
+				online_pay.cash_coupon = true if finance_each["cash_coupons"].present?
 				online_pay
 			else
 				nil
@@ -623,6 +627,22 @@ class FinanceWaterController < ApplicationController
 				if user.finance_water.find_by(reason: reason).present?
 					raise "不可重复操作积分 : [#{reason}]"
 				end
+			end
+		end
+
+		def cash_coupon_check_and_proc(user, finance_each)
+			return if finance_each['cash_coupons'].blank?
+
+			cc_id, cc_quantity = nil, nil
+			finance_each['cash_coupons'].each do |cc_info|
+				cc_id, cc_quantity = cc_info.split("_")
+				cc_id = cc_id.to_i
+				cc_quantity = cc_quantity.to_i
+
+				cc = CashCoupon.lock().find_by(id: cc_id, user_id: user.id)
+				raise "无此优惠券信息[#{cc.id}]" if cc.blank?
+
+				cc.use_quantity_direct!(cc_quantity, finance_each['order_no'])
 			end
 		end
 

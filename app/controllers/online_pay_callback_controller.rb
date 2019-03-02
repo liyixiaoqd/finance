@@ -57,6 +57,10 @@ class OnlinePayCallbackController < ApplicationController
 						ret_hash['water_no']=fw.id unless fw.blank?
 					end
 
+					if online_pay.is_success?() && online_pay.cash_coupon == true
+						CashCouponDetail.proc_by_order_no!(online_pay.order_no, CashCouponDetail::USE)
+					end
+
 					if !online_pay.method_url_success?("post",redirect_url,false,ret_hash)
 						if online_pay.status=='success_notify'
 							online_pay.set_status!("failure_notify_third","call notify_url wrong") 
@@ -167,6 +171,11 @@ class OnlinePayCallbackController < ApplicationController
 							logger.info("#{online_pay.order_no},#{online_pay.callback_status} alipay transaction do not insert into reconciliation!! #{online_pay.callback_status} and #{rollback_callback_status}")
 						end
 					end
+
+					if online_pay.is_success?() && online_pay.cash_coupon == true
+						CashCouponDetail.proc_by_order_no!(online_pay.order_no, CashCouponDetail::USE)
+					end
+
 					# response_code=online_pay.method_url_response_code("post",redirect_url,false,ret_hash)
 					# unless response_code=="200"
 					# 	raise "call #{redirect_url} failure : #{response_code}"
@@ -265,6 +274,10 @@ class OnlinePayCallbackController < ApplicationController
 				if online_pay.is_success?() && online_pay.find_reconciliation().blank?
 					online_pay.set_reconciliation.save!()
 					cq.online_pay_is_succ_set() unless cq.blank?
+				end
+
+				if online_pay.is_success?() && online_pay.cash_coupon == true
+					CashCouponDetail.proc_by_order_no!(online_pay.order_no, CashCouponDetail::USE)
 				end
 
 				ret_hash['status']="success_notify"
@@ -395,6 +408,11 @@ class OnlinePayCallbackController < ApplicationController
 					online_pay.set_reconciliation.save!()
 					cq.online_pay_is_succ_set() unless cq.blank?
 				end
+
+				if online_pay.is_success?() && online_pay.cash_coupon == true
+					CashCouponDetail.proc_by_order_no!(online_pay.order_no, CashCouponDetail::USE)
+				end
+
 				# response_code=online_pay.method_url_response_code("post",redirect_url,false,ret_hash)
 				# unless response_code=="200"
 				# 	raise "call #{redirect_url} failure : #{response_code}"
@@ -519,6 +537,11 @@ class OnlinePayCallbackController < ApplicationController
 					ret_hash['water_no']=fw.id unless fw.blank?
 					cq.online_pay_is_succ_set() unless cq.blank?
 				end
+
+				if online_pay.is_success?() && online_pay.cash_coupon == true
+					CashCouponDetail.proc_by_order_no!(online_pay.order_no, CashCouponDetail::USE)
+				end
+
 				# response_code=online_pay.method_url_response_code("post",redirect_url,false,ret_hash)
 				# unless response_code=="200"
 				# 	raise "call #{redirect_url} failure : #{response_code}"
@@ -610,6 +633,11 @@ class OnlinePayCallbackController < ApplicationController
 					ret_hash['water_no']=fw.id unless fw.blank?
 					cq.online_pay_is_succ_set() unless cq.blank?
 				end
+
+				if online_pay.is_success?() && online_pay.cash_coupon == true
+					CashCouponDetail.proc_by_order_no!(online_pay.order_no, CashCouponDetail::USE)
+				end
+
 				# response_code=online_pay.method_url_response_code("post",redirect_url,false,ret_hash)
 				# unless response_code=="200"
 				# 	raise "call #{redirect_url} failure : #{response_code}"
@@ -698,6 +726,11 @@ class OnlinePayCallbackController < ApplicationController
 					ret_hash['water_no']=fw.id unless fw.blank?
 					cq.online_pay_is_succ_set() unless cq.blank?
 				end
+
+				if online_pay.is_success?() && online_pay.cash_coupon == true
+					CashCouponDetail.proc_by_order_no!(online_pay.order_no, CashCouponDetail::USE)
+				end
+				
 				# response_code=online_pay.method_url_response_code("post",redirect_url,false,ret_hash)
 				# unless response_code=="200"
 				# 	raise "call #{redirect_url} failure : #{response_code}"

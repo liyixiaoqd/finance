@@ -379,3 +379,12 @@ AccessAuthority.create!(:controller=>"OnlinePayCallbackController",:action=>"oce
 AccessAuthority.create!(:controller=>"OnlinePayCallbackController",:action=>"oceanpayment_alipay_notify",
 			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>false,
 			:describe=>'oceanpayment_alipay支付异步回调接口')
+
+
+AccessAuthority.create!(:controller=>"CashCouponController",:action=>"create",
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>false,
+			:describe=>'现金券创建接口')
+AccessAuthority.create!(:controller=>"CashCouponController",:action=>"list",
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>false,
+			:describe=>'现金券批量查询接口')
+
