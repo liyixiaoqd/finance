@@ -33,5 +33,20 @@ namespace :callqueue do
 		
 		@interface_logger.info("callqueue  track_info_proc end")
 	end
+
+	desc "冻结代金券取消"
+	task :cash_coupon_cancel=>[:environment] do 
+		@interface_logger = Logger.new("log/cash_coupon_cancel.log")
+		@interface_logger.level=Logger::INFO
+		@interface_logger.datetime_format="%Y-%m-%d %H:%M:%S"
+		@interface_logger.formatter=proc{|severity,datetime,progname,msg|
+			"[#{datetime}] :#{msg}\n"
+		}
+		@interface_logger.info("callqueue cash_coupon_cancel start")
+
+		CashCouponDetail.cron_cancel_state()
+		
+		@interface_logger.info("callqueue cash_coupon_cancel end")
+	end
 end
 
