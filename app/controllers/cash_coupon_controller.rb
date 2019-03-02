@@ -20,7 +20,7 @@ class CashCouponController < ApplicationController
 
 		ret_hash={
 			'status'=> "failure",
-			'resason' => ''
+			'reason' => ''
 		}
 
 		begin

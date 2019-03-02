@@ -382,9 +382,9 @@ AccessAuthority.create!(:controller=>"OnlinePayCallbackController",:action=>"oce
 
 
 AccessAuthority.create!(:controller=>"CashCouponController",:action=>"create",
-			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>false,
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>true,
 			:describe=>'现金券创建接口')
 AccessAuthority.create!(:controller=>"CashCouponController",:action=>"list",
-			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>false,
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>true,
 			:describe=>'现金券批量查询接口')
 
