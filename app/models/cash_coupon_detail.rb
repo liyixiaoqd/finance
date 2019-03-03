@@ -63,7 +63,14 @@ class CashCouponDetail < ActiveRecord::Base
 				cc = CashCoupon.find_by(id: ccd.cash_coupon_id)
 				raise "no cash_coupon record[#{ccd.cash_coupon_id}]" if cc.blank?
 				cc.with_lock do 
-					cc.fr_quantity_proc!(ccd.quantity, CANCEL)
+					op = OnlinePay.find_by(system: cc.system, order_no: ccd.order_no)
+					if op.blank?
+						raise "无对应online_pay记录"
+					elsif op.is_success_self?()
+						raise "对应online_pay为支付成功状态[#{op.status}]"
+					else
+						cc.fr_quantity_proc!(ccd.quantity, CANCEL)
+					end
 				end
 
 				ccd.state = CANCEL
