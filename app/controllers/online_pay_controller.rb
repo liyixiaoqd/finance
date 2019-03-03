@@ -220,7 +220,7 @@ class OnlinePayController < ApplicationController
 				online_pay.set_status!("failure_submit",e.message)
 				online_pay.save
 			end
-			render json:{reason: e.message},status:400 and return
+			render json:{reason: e.message}.to_json,status:400 and return
 		end
 
 		logger.info("ONLINE_PAY SUBMIT RET:#{ret_hash}")
@@ -314,7 +314,7 @@ class OnlinePayController < ApplicationController
 				online_pay.set_status!("failure_submit",e.message)
 				online_pay.save
 			end
-			render json:{reason: e.message},status:400 and return
+			render json:{reason: e.message}.to_json,status:400 and return
 		end
 
 		logger.info("ONLINE_PAY SUBMIT_POST RET:#{ret_hash}")
