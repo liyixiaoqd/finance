@@ -170,7 +170,7 @@ class OnlinePayController < ApplicationController
 						cc = CashCoupon.lock().find_by(id: cc_id, user_id: user.id)
 						raise "无此优惠券信息[#{cc.id}]" if cc.blank?
 
-						cc.use_quantity_to_frozen!(cc_quantity, params['order_no'])
+						cc.use_quantity_to_frozen!(cc_quantity, online_pay.order_no)
 					end
 				end
 			end
@@ -273,7 +273,7 @@ class OnlinePayController < ApplicationController
 						cc = CashCoupon.lock().find_by(id: cc_id, user_id: user.id)
 						raise "无此优惠券信息[#{cc.id}]" if cc.blank?
 
-						cc.use_quantity_to_frozen!(cc_quantity, params['order_no'])
+						cc.use_quantity_to_frozen!(cc_quantity, online_pay.order_no)
 					end
 				end
 			end
