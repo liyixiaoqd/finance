@@ -141,9 +141,6 @@ class OnlinePayController < ApplicationController
 
 
 		begin
-			# 字符串转换
-			params['cash_coupons'] = JSON.parse(params['cash_coupons']) if params['cash_coupons'].present?
-
 			#先产生order_no
 			user=User.find_by_system_and_userid(params['system'],params['userid'])
 			if(user.blank?)
@@ -245,9 +242,6 @@ class OnlinePayController < ApplicationController
 		params['userid']=interface_userid_zh(params['system'],params['userid'])
 
 		begin
-			# 字符串转换
-			params['cash_coupons'] = JSON.parse(params['cash_coupons']) if params['cash_coupons'].present?
-
 			#先产生order_no
 			user=User.find_by_system_and_userid(params['system'],params['userid'])
 			if(user.blank?)
@@ -456,6 +450,10 @@ class OnlinePayController < ApplicationController
 			online_pay.set_currency!()
 			online_pay.set_country!()
 			online_pay.set_ip!(request.remote_ip)
+
+
+			# 字符串转换
+			params['cash_coupons'] = JSON.parse(params['cash_coupons']) if params['cash_coupons'].present?
 			online_pay.cash_coupon = params["cash_coupons"].present? ? true : false
 
 			online_pay
