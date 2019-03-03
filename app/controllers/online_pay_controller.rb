@@ -139,15 +139,19 @@ class OnlinePayController < ApplicationController
 		# old_userid=params['userid']
 		params['userid']=interface_userid_zh(params['system'],params['userid'])
 
+
 		begin
-		#先产生order_no
+			# 字符串转换
+			params['cash_coupons'] = JSON.parse(params['cash_coupons']) if params['cash_coupons'].present?
+
+			#先产生order_no
 			user=User.find_by_system_and_userid(params['system'],params['userid'])
 			if(user.blank?)
 				render json:{},status:400 and return
 			end
 
 			logger.info("ONLINE PAY SUBMIT LOCK USER START:#{user.username} - #{params['order_no']}")
-			user.with_lock do 				
+			user.with_lock do
 				online_pay=new_online_pay_params(user,params,request)
 				# if(online_pay.status=='failure_submit')
 				# 	logger.warn("no user:#{online_pay.userid} pay record save!")
@@ -157,6 +161,7 @@ class OnlinePayController < ApplicationController
 
 				# 代金券处理
 				if params['cash_coupons'].present?
+
 					params['cash_coupons'].each do |cc_info|
 						cc_id, cc_quantity = cc_info.split("_")
 						cc_id = cc_id.to_i
@@ -240,7 +245,10 @@ class OnlinePayController < ApplicationController
 		params['userid']=interface_userid_zh(params['system'],params['userid'])
 
 		begin
-		#先产生order_no
+			# 字符串转换
+			params['cash_coupons'] = JSON.parse(params['cash_coupons']) if params['cash_coupons'].present?
+
+			#先产生order_no
 			user=User.find_by_system_and_userid(params['system'],params['userid'])
 			if(user.blank?)
 				render json:{},status:400 and return
