@@ -156,7 +156,7 @@ class OnlinePayController < ApplicationController
 				online_pay.save!
 
 				# 代金券处理
-				if params['cash_coupons'].blank?
+				if params['cash_coupons'].present?
 					params['cash_coupons'].each do |cc_info|
 						cc_id, cc_quantity = cc_info.split("_")
 						cc_id = cc_id.to_i
@@ -211,7 +211,7 @@ class OnlinePayController < ApplicationController
 		rescue => e
 			#failure also save pay record!!
 			logger.info("online_pay create or call failure! : #{e.message}")
-			unless (online_pay.blank?)
+			if online_pay.present? && online_pay.id.present?
 				online_pay.set_status!("failure_submit",e.message)
 				online_pay.save
 			end
@@ -256,7 +256,7 @@ class OnlinePayController < ApplicationController
 				online_pay.save!
 
 				# 代金券处理
-				if params['cash_coupons'].blank?
+				if params['cash_coupons'].present?
 					params['cash_coupons'].each do |cc_info|
 						cc_id, cc_quantity = cc_info.split("_")
 						cc_id = cc_id.to_i
@@ -302,7 +302,7 @@ class OnlinePayController < ApplicationController
 		rescue => e
 			#failure also save pay record!!
 			logger.info("online_pay_redirect create or call failure! : #{e.message}")
-			unless (online_pay.blank?)
+			if online_pay.present? && online_pay.id.present?
 				online_pay.set_status!("failure_submit",e.message)
 				online_pay.save
 			end
@@ -448,7 +448,7 @@ class OnlinePayController < ApplicationController
 			online_pay.set_currency!()
 			online_pay.set_country!()
 			online_pay.set_ip!(request.remote_ip)
-			online_pay.cash_coupon = true if params["cash_coupons"].present?
+			online_pay.cash_coupon = params["cash_coupons"].present? ? true : false
 
 			online_pay
 		end
