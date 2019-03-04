@@ -154,7 +154,7 @@ class CashCouponController < ApplicationController
 						cc_quantity = cc_quantity.to_i
 
 						cc = CashCoupon.lock().find_by(id: cc_id, user_id: user.id, system: params['system'])
-						raise "无此优惠券信息[#{cc.id}]" if cc.blank?
+						raise "无此优惠券信息" if cc.blank?
 
 						ccd = CashCouponDetail.find_by(cash_coupon_id: cc.id, order_no: params['order_no'], status: CashCouponDetail::FROZEN)
 						raise "此订单存在对应已冻结数据,不可重复操作" if ccd.present?
