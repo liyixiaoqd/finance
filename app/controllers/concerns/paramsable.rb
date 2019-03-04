@@ -11,6 +11,7 @@ module Paramsable extend ActiveSupport::Concern
 	EXCHANGE_RATE_PARAMS=%w{currencys rate_date}
 	CASH_COUPON_CREATE_PARAMS=%w{system userid cny_amount eur_amount number enddate order_no}
 	CASH_COUPON_LIST_PARAMS=%w{system userid id state}
+	CASH_COUPON_USE_PARAMS=%w{system userid cash_coupons order_no oper}
 
 	def params_valid(action_name,params)
 		valid_flag=true;
@@ -29,6 +30,7 @@ module Paramsable extend ActiveSupport::Concern
 			when 'EXCHANGE_RATE_PARAMS' then valid_flag=check_params(params_val,params)
 			when 'CASH_COUPON_CREATE_PARAMS' then valid_flag=check_params(params_val,params)
 			when 'CASH_COUPON_LIST_PARAMS' then valid_flag=check_params(params_val,params)
+			when 'CASH_COUPON_USE_PARAMS' then valid_flag=check_params(params_val,params)
 			else
 				valid_flag=false
 				logger.warn("match #{valid_flag} #{action_name} - #{match_name}")

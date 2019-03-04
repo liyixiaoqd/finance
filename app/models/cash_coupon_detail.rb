@@ -28,7 +28,7 @@ class CashCouponDetail < ActiveRecord::Base
 	end
 
 	# 根据order_no进行处理
-	def self.proc_by_order_no!(order_no, state)
+	def self.proc_by_order_no!(order_no, state, time = Time.now)
 		begin
 			CashCouponDetail.where(order_no: order_no, state: FROZEN).each do |ccd|
 				begin
@@ -39,6 +39,11 @@ class CashCouponDetail < ActiveRecord::Base
 					end
 
 					ccd.state = state
+					if ccd.state == USE
+						ccd.use_time = time
+					elsif ccd.state == CANCEL
+						ccd.cancel_time = Time.now
+					end
 					ccd.save!
 				rescue=>e
 					ccd.state = ABNORMAL
@@ -54,7 +59,7 @@ class CashCouponDetail < ActiveRecord::Base
 	end
 
 	# 定时任务, 取消1小时前的冻结数据
-	def self.cron_cancel_state(step_hour = STEP_CANCEL_HOUR)
+	def self.cron_cancel_state(step_hour = STEP_CANCEL_HOUR, time = Time.now)
 		puts("CASH_COUPON_DETAILS CANCEL STATE START #{Time.now}")
 		cancel_count = 0
 		fail_count = 0
@@ -64,9 +69,8 @@ class CashCouponDetail < ActiveRecord::Base
 				raise "no cash_coupon record[#{ccd.cash_coupon_id}]" if cc.blank?
 				cc.with_lock do 
 					op = OnlinePay.find_by(system: cc.system, order_no: ccd.order_no)
-					if op.blank?
-						raise "无对应online_pay记录"
-					elsif op.is_success_self?()
+					# 微信支付 存在暂时无对应online_pay记录情况
+					if op.present? && op.is_success_self?()
 						raise "对应online_pay为支付成功状态[#{op.status}]"
 					else
 						cc.fr_quantity_proc!(ccd.quantity, CANCEL)
@@ -74,6 +78,7 @@ class CashCouponDetail < ActiveRecord::Base
 				end
 
 				ccd.state = CANCEL
+				ccd.cancel_time = time
 				ccd.save!
 
 				cancel_count +=1 

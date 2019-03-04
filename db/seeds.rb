@@ -387,4 +387,7 @@ AccessAuthority.create!(:controller=>"CashCouponController",:action=>"create",
 AccessAuthority.create!(:controller=>"CashCouponController",:action=>"list",
 			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>true,
 			:describe=>'现金券批量查询接口')
+AccessAuthority.create!(:controller=>"CashCouponController",:action=>"use",
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>true,
+			:describe=>'现金券直接操作接口')
 

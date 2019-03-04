@@ -158,7 +158,6 @@ class OnlinePayController < ApplicationController
 
 				# 代金券处理
 				if params['cash_coupons'].present?
-
 					params['cash_coupons'].each do |cc_info|
 						cc_id, cc_quantity = cc_info.split("_")
 						cc_id = cc_id.to_i
@@ -453,7 +452,9 @@ class OnlinePayController < ApplicationController
 
 
 			# 字符串转换
-			params['cash_coupons'] = JSON.parse(params['cash_coupons']) if params['cash_coupons'].present?
+			if params['cash_coupons'].present? && params['cash_coupons'].class == String
+				params['cash_coupons'] = JSON.parse(params['cash_coupons']) 
+			end
 			online_pay.cash_coupon = params["cash_coupons"].present? ? true : false
 
 			online_pay
