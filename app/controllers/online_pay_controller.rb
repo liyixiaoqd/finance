@@ -437,6 +437,8 @@ class OnlinePayController < ApplicationController
 
 			online_pay.set_order_type!(params.delete('order_type'))
 
+			# other_params 长度限制不记录
+			tmp_cash = params.delete('cash_coupons')
 			online_pay.other_params=params.inspect
 
 			online_pay.remote_host=request.remote_host
@@ -450,7 +452,7 @@ class OnlinePayController < ApplicationController
 			online_pay.set_country!()
 			online_pay.set_ip!(request.remote_ip)
 
-
+			params['cash_coupons'] = tmp_cash
 			# 字符串转换
 			if params['cash_coupons'].present? && params['cash_coupons'].class == String
 				params['cash_coupons'] = JSON.parse(params['cash_coupons']) 
