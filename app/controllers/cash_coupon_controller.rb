@@ -153,9 +153,12 @@ class CashCouponController < ApplicationController
 						cc_id = cc_id.to_i
 						cc_quantity = cc_quantity.to_i
 
-						cc = CashCoupon.lock().find_by(id: cc_id, user_id: user.id)
+						cc = CashCoupon.lock().find_by(id: cc_id, user_id: user.id, system: params['system'])
 						raise "无此优惠券信息[#{cc.id}]" if cc.blank?
 
+						ccd = CashCouponDetail.find_by(cash_coupon_id: cc.id, order_no: params['order_no'], status: CashCouponDetail::FROZEN)
+						raise "此订单存在对应已冻结数据,不可重复操作" if ccd.present?
+						
 						if params['oper'] == "frozen"
 							cc.use_quantity_to_frozen!(cc_quantity, params['order_no'])
 						else
@@ -163,10 +166,12 @@ class CashCouponController < ApplicationController
 						end
 					end
 				else
+					i = 0
 					CashCouponDetail.where(order_no: params['order_no'], state: CashCouponDetail::FROZEN).each do |ccd|
 						cc = CashCoupon.find_by(id: ccd.cash_coupon_id)
 						next if cc.system != params['system']
 
+						i += 1
 						if params['oper'] == "frozen_use"
 							cc.fr_quantity_proc!(ccd.quantity, CashCouponDetail::USE)
 							ccd.state = CashCouponDetail::USE
@@ -179,6 +184,10 @@ class CashCouponController < ApplicationController
 
 						ccd.remark = "interface use [#{params['oper']}]"
 						ccd.save!
+					end
+
+					if i == 0 
+						raise "no frozen cash_coupon can be use  for [#{params['order_no']}]"
 					end
 				end
 			end
