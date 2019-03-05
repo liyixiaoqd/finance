@@ -91,7 +91,7 @@ class CashCouponDetail < ActiveRecord::Base
 			end
 		end
 
-		Rails.logger.info("CASH_COUPON_DETAIL cancel record [#{cancel_count} - #{fail_count}]")
+		puts("CASH_COUPON_DETAIL cancel record [#{cancel_count} - #{fail_count}]")
 		puts("CASH_COUPON_DETAILS CANCEL STATE END #{Time.now}")
 	end
 end
