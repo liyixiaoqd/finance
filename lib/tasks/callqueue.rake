@@ -72,9 +72,9 @@ namespace :callqueue do
 			end
 
 			if warn_flag
-				check_normal += 1
-			else
 				check_abnormal += 1
+			else
+				check_normal += 1
 			end
 		end
 		
