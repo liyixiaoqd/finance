@@ -820,7 +820,7 @@ class OnlinePayCallbackController < ApplicationController
 					end
 				end
 
-				render_text="receive-ok"
+				render_text="SUCCESS"
 			rescue => e
 				online_pay.update_attributes(:status=>"failure_notify",:reason=>e.message,:callback_status=>rollback_callback_status)
 				logger.info("sofort_notify failure!! : #{e.message},[#{params}]")
