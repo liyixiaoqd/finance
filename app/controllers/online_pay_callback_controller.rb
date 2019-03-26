@@ -753,6 +753,21 @@ class OnlinePayCallbackController < ApplicationController
 		end
 	end
 
+	def helipay_return
+		render_text="failure"
+		logger.info("into helipay_return and params: [#{params}]")
+
+		#order_notes == system
+		online_pay=OnlinePay.get_online_pay_instance("helipay",params['paytype'],use_params,"",false,true)
+		render text: "#{render_text}" and return if (online_pay.blank? || online_pay.success_url.blank?)
+
+		ret_hash=init_return_ret_hash(online_pay)
+		redirect_url=OnlinePay.redirect_url_replace("get",online_pay.success_url,ret_hash)
+		logger.info("oceanpayment_alipay_return:#{redirect_url}")
+
+		redirect_to redirect_url
+	end
+
 	def helipay_notify
 		logger.info("into helipay_notify and params: [#{params}]")
 		render_text="failure"
