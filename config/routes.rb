@@ -101,6 +101,8 @@ Rails.application.routes.draw do
   post 'pay/callback/oceanpayment_alipay_notify' => 'online_pay_callback#oceanpayment_alipay_notify'
   post 'pay/callback/helipay_notify/:paytype' => 'online_pay_callback#helipay_notify'
    get 'pay/callback/helipay_notify/:paytype' => 'online_pay_callback#helipay_notify'
+   get 'pay/callback/helipay_return/:paytype' => 'online_pay_callback#helipay_return'
+
 
   #web display  ---  simulate interface 
   get 'simulation' => 'simulation#index'
