@@ -977,10 +977,10 @@ class OnlinePayCallbackController < ApplicationController
 
 			begin
 				# decrypt
-				if paytype == "alipay"
+				if params['paytype'] == "alipay"
 					content_hash = JSON.parse pay_detail.decrypt_base64(params['content'], Settings.helipay.alipay.aes_secret)
 					calc_sign = pay_detail.sha256_sort(Settings.helipay.alipay.sha_secret, content_hash)
-				elsif paytype == "wechatpay"
+				elsif params['paytype'] == "wechatpay"
 					content_hash = JSON.parse pay_detail.decrypt_base64(params['content'], Settings.helipay.wechatpay.aes_secret)
 					calc_sign = pay_detail.sha256_sort(Settings.helipay.wechatpay.sha_secret, content_hash)
 				else
