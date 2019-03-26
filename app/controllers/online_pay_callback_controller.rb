@@ -971,7 +971,7 @@ class OnlinePayCallbackController < ApplicationController
 			op = OnlinePay.find_by(order_no: params['orderNo'], payway: "helipay", paytype: params['paytype'])
 			raise "no OnlinePay record? [#{params['orderNo']}]"
 
-			pay_detail = Onlinepay.get_instance_pay_detail(op)
+			pay_detail = OnlinePay.get_instance_pay_detail(op)
 
 			begin
 				# decrypt
