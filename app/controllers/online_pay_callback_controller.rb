@@ -759,7 +759,8 @@ class OnlinePayCallbackController < ApplicationController
 
 		# 验证数据
 		begin
-			if valid_helipay_notify(params) == false
+			valid_flag, use_params = valid_helipay_notify(params)
+			if valid_flag == false
 				logger.info("into helipay_notify return ,valid failure")
 				render :text=>render_text and return 
 			end
@@ -769,7 +770,7 @@ class OnlinePayCallbackController < ApplicationController
 		end
 
 		ActiveRecord::Base.transaction do
-			online_pay=OnlinePay.get_online_pay_instance("helipay",params['paytype'],params,"",false,true)
+			online_pay=OnlinePay.get_online_pay_instance("helipay",params['paytype'],use_params,"",false,true)
 			render :text=>"#{render_text}" and return if (online_pay.blank? || online_pay.notification_url.blank?)
 			cq=CallQueue.online_pay_is_succ_record(online_pay.id)
 
@@ -779,14 +780,14 @@ class OnlinePayCallbackController < ApplicationController
 
 			rollback_callback_status = online_pay.callback_status
 
-			render :text=>'receive-ok' and return if online_pay.check_has_updated?(params['orderStatus'])
+			render :text=>'receive-ok' and return if online_pay.check_has_updated?(use_params['orderStatus'])
 
-			online_pay.callback_status=params['orderStatus']
+			online_pay.callback_status=use_params['orderStatus']
 			online_pay.set_status_by_callback!()
-			online_pay.reason=params['remark']
+			online_pay.reason=use_params['remark']
 
 			# ????
-			online_pay.reconciliation_id=params['consumeOrderId']
+			online_pay.reconciliation_id=use_params['serialNumber']
 
 			ret_hash['status']=online_pay.status
 			ret_hash['status_reason']=online_pay.reason
@@ -966,7 +967,7 @@ class OnlinePayCallbackController < ApplicationController
 		end
 
 		def valid_helipay_notify(params)
-			valid_flag = false
+			valid_flag, content_hash = false, {}
 
 			raise "params wrong" if params['orderNo'].blank?
 
@@ -999,6 +1000,6 @@ class OnlinePayCallbackController < ApplicationController
 				valid_flag=false
 			end
 			
-			valid_flag
+			[valid_flag, content_hash]
 		end
 end
