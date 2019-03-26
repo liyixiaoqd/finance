@@ -756,6 +756,19 @@ class OnlinePayCallbackController < ApplicationController
 	def helipay_return
 		render_text="failure"
 		logger.info("into helipay_return and params: [#{params}]")
+		use_params = {}
+		
+		# 验证数据
+		begin
+			valid_flag, use_params = valid_helipay_notify(params)
+			if valid_flag == false
+				logger.info("into helipay_notify return ,valid failure")
+				render :text=>render_text and return 
+			end
+		rescue=>e
+			logger.info("into helipay_notify return ,rescue #{e.message}")
+			render :text=>render_text and return 
+		end
 
 		#order_notes == system
 		online_pay=OnlinePay.get_online_pay_instance("helipay",params['paytype'],use_params,"",false,true)
