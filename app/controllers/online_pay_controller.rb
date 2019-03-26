@@ -129,7 +129,8 @@ class OnlinePayController < ApplicationController
 		ret_hash={
 			'redirect_url'=>'',
 			'trade_no'=>'',
-			'is_credit'=>''
+			'is_credit'=>'',
+			'url_type' => 0
 		}
 
 		online_pay=nil
@@ -174,15 +175,16 @@ class OnlinePayController < ApplicationController
 
 			# logger.info("ONLINE PAY SUBMIT LOCK ONLINE_PAY START:#{online_pay.id} - #{online_pay.order_no}")
 			# online_pay.with_lock do 
+
 			pay_detail=OnlinePay.get_instance_pay_detail(online_pay)
 			#flag,online_pay.redirect_url,online_pay.trade_no,online_pay.is_credit,message=pay_detail.submit()
 			if online_pay.payway=="alipay" && online_pay.paytype=="oversea"
 				raise "can not use alipay oversea"
 			end
 			if online_pay.paytype=="transaction"
-				flag,online_pay.redirect_url,online_pay.trade_no,online_pay.is_credit,message=pay_detail.submit_direct_new()
+				flag,online_pay.redirect_url,online_pay.trade_no,online_pay.is_credit,message,url_type=pay_detail.submit_direct_new()
 			else
-			 	flag,online_pay.redirect_url,online_pay.trade_no,online_pay.is_credit,message=pay_detail.submit()
+			 	flag,online_pay.redirect_url,online_pay.trade_no,online_pay.is_credit,message,url_type=pay_detail.submit()
 			end
 
 			logger.info("#{flag} - #{online_pay.redirect_url} - #{online_pay.trade_no} - #{message}")
@@ -207,6 +209,7 @@ class OnlinePayController < ApplicationController
 			ret_hash['redirect_url']=CGI.escape(online_pay.redirect_url)
 			ret_hash['trade_no']=online_pay.trade_no
 			ret_hash['is_credit']=online_pay.is_credit
+			ret_hash['url_type']=url_type.blank? ? 0 : url_type
 			# end
 			# logger.info("ONLINE PAY SUBMIT LOCK ONLINE_PAY END:#{online_pay.id} - #{online_pay.order_no}")
 		rescue => e
@@ -230,8 +233,7 @@ class OnlinePayController < ApplicationController
 		ret_hash={
 			'redirect_url'=>'',
 			'trade_no'=>'',
-			'post_params'=>{},
-			'is_png' => false
+			'post_params'=>{}
 		}
 
 		online_pay=nil
@@ -275,10 +277,7 @@ class OnlinePayController < ApplicationController
 
 			# logger.info("ONLINE PAY SUBMIT LOCK ONLINE_PAY START:#{online_pay.id} - #{online_pay.order_no}")
 			# online_pay.with_lock do 
-			if online_pay.payway=="helipay"
-				pay_detail = OnlinePay.get_instance_pay_detail(online_pay)
-				ret_hash['is_png'] = true
-			elsif online_pay.payway=="oceanpayment" && online_pay.paytype[0,8]=="unionpay"
+			if online_pay.payway=="oceanpayment" && online_pay.paytype[0,8]=="unionpay"
 				pay_detail = OceanpaymentUnionpayDetail.new(online_pay)
 			elsif online_pay.payway=="oceanpayment" && online_pay.paytype=="wechatpay"
 				pay_detail = OceanpaymentWechatpayDetail.new(online_pay)

@@ -1,7 +1,7 @@
 class HelipayAlipayDetail
 	include PayDetailable, Encrypt
 	# amount 
-	attr_accessor :system,:order_no,:amount,:currency,:description
+	attr_accessor :order_no,:amount,:currency,:description
 
 	def initialize(online_pay)
 		if !payparams_valid("helipay_alipay",online_pay) || !spec_payparams_valid(online_pay)
@@ -11,9 +11,9 @@ class HelipayAlipayDetail
 		define_var("helipay_alipay",online_pay)
 	end
 
-	def get_submit_info()
+	def submit()
 		begin
-			url,trade_no, params = get_submit_params()
+			url, params = get_submit_params()
 			response = method_url_response("post", url, true, params, nil, "helipay")
 
 			raise "call url failure [#{response.code}]" if response.code!="200"
@@ -26,18 +26,16 @@ class HelipayAlipayDetail
 			raise "no qrCode info #{body}" if body['qrCode'].blank?
 			raise "no serialNumber info #{body}" if body['serialNumber'].blank?
 
-			[body['qrCode'],body['serialNumber'],{}]
+			["success", body['qrCode'], body['serialNumber'], "false", "", 1]
 		rescue=>e
 			Rails.logger.info("HelipayAlipay get_pay_pic rescue: #{e.message}")
-			["","",{}]
+			["failure", "", "", "false", e.message, 1]
 		end
 
 	end
 
 	# 组装参数
 	def get_submit_params()
-		trade_no=@system+"_"+@order_no
-
 		# 先初始化必填项
 		post_params = {
 			"productCode" => "ALIPAYSCAN",
@@ -61,7 +59,7 @@ class HelipayAlipayDetail
 
 		Rails.logger.info("submit_post ret params: [#{post_params}]") unless Rails.env.production?
 
-		[Settings.helipay.alipay.api_url,trade_no,post_params]
+		[Settings.helipay.alipay.api_url, post_params]
 	end
 
 

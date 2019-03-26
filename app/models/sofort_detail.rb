@@ -63,7 +63,7 @@ class SofortDetail
 			Rails.logger.info("request sofort pay!")
 			res = http.request(req)
 		rescue => e
-			["failure","","","","request sofort pay failure:#{e.message}"]
+			["failure","","","","request sofort pay failure:#{e.message}",0]
 		end
 
 		redirect_url=''
@@ -84,9 +84,9 @@ class SofortDetail
 		end
 
 		unless(redirect_url.blank?)
-			["success",redirect_url,trade_no,"false",message]
+			["success",redirect_url,trade_no,"false",message,0]
 		else
-			["failure","","","",message]
+			["failure","","","",message,0]
 		end
 	end
 

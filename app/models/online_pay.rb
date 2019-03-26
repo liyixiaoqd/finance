@@ -387,8 +387,12 @@ class OnlinePay < ActiveRecord::Base
 
     #return pay_detail instance
     def self.get_instance_pay_detail(online_pay)
+        if online_pay.payway=="helipay" && online_pay.paytype[0,8]=="unionpay"
+            HelipayUnionpayDetail.new(online_pay)
+        else
         # logger.info ("#{online_pay.payway.camelize}#{online_pay.paytype.camelize}Detail.new(online_pay)")
-        eval("#{online_pay.payway.camelize}#{online_pay.paytype.camelize}Detail.new(online_pay)")
+            eval("#{online_pay.payway.camelize}#{online_pay.paytype.camelize}Detail.new(online_pay)")
+        end
     end
 
     # status => is use status condition   it's  array []
