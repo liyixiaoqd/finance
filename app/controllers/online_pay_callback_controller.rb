@@ -969,9 +969,9 @@ class OnlinePayCallbackController < ApplicationController
 			valid_flag = false
 
 			raise "params wrong" if params['orderNo'].blank?
-			
+
 			op = OnlinePay.find_by(order_no: params['orderNo'], payway: "helipay", paytype: params['paytype'])
-			raise "no OnlinePay record? [#{params['orderNo']}]"
+			raise "no OnlinePay record? [#{params['orderNo']}]" if op.blank?
 
 			pay_detail = OnlinePay.get_instance_pay_detail(op)
 
