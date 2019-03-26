@@ -49,8 +49,8 @@ class HelipayUnionpayDetail
 			"goodsName" => @description,
 			"period" => 1,
 			"periodUnit" => "HOUR",
-			"serverCallbackUrl" => Settings.helipay.unionpay.notification_url,
-			"pageCallbackUrl" => Settings.helipay.unionpay.return_url,
+			"serverCallbackUrl" => Settings.helipay.unionpay.b2c.notification_url,
+			"pageCallbackUrl" => Settings.helipay.unionpay.b2c.return_url,
 		}
 
 
