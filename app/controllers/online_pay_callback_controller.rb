@@ -968,6 +968,8 @@ class OnlinePayCallbackController < ApplicationController
 		def valid_helipay_notify(params)
 			valid_flag = false
 
+			raise "params wrong" if params['orderNo'].blank?
+			
 			op = OnlinePay.find_by(order_no: params['orderNo'], payway: "helipay", paytype: params['paytype'])
 			raise "no OnlinePay record? [#{params['orderNo']}]"
 
