@@ -70,6 +70,11 @@ class OnlinePay < ActiveRecord::Base
         '1' => 9
     }
 
+    HELIPAY_STATUS = {
+        "SUCCESS" => 9,
+        "INIT" => 0
+    }
+
     def set_channel!()
         if (self.channel.blank?)
             self.channel="web"
@@ -149,7 +154,22 @@ class OnlinePay < ActiveRecord::Base
 
     def set_status_by_callback!()
         self.reason=''
-        if(self.payway=="alipay" && self.paytype=="oversea")
+        if self.payway=="helipay"
+            if self.callback_status=="SUCCESS"
+                self.status="success_notify"
+            else
+                self.status="intermediate_notify"
+            end
+        elsif(self.payway=="paypal")
+        elsif(self.payway=="sofort")
+            if(self.callback_status=="received")
+                self.status="success_notify"
+            elsif(self.callback_status=="untraceable")
+                self.status="success_notify"
+            else
+                self.status="intermediate_notify"
+            end
+        elsif(self.payway=="alipay" && self.paytype=="oversea")
             # TRADE_FINISHED 交易结束、买家已付款
             # TRADE_CLOSED 交易关闭、买家没有付款
             if(self.callback_status=="TRADE_FINISHED")
@@ -178,15 +198,6 @@ class OnlinePay < ActiveRecord::Base
                 self.status="success_notify"
             elsif(self.callback_status=="TRADE_CLOSED")
                 self.status="cancel_notify"
-            else
-                self.status="intermediate_notify"
-            end
-        elsif(self.payway=="paypal")
-        elsif(self.payway=="sofort")
-            if(self.callback_status=="received")
-                self.status="success_notify"
-            elsif(self.callback_status=="untraceable")
-                self.status="success_notify"
             else
                 self.status="intermediate_notify"
             end
@@ -220,7 +231,20 @@ class OnlinePay < ActiveRecord::Base
             if (new_callback_status.blank?)
                 has_updated=true
             elsif !self.callback_status.blank?
-                if(self.payway=="alipay" && self.paytype=="oversea")
+                if self.payway=="helipay"
+                    if HELIPAY_STATUS[self.callback_status]==9
+                        has_updated=true
+                    elsif HELIPAY_STATUS[self.callback_status]>=HELIPAY_STATUS[new_callback_status]
+                        has_updated=true
+                    end
+                elsif(self.payway=="paypal")
+                elsif(self.payway=="sofort")
+                    if(SOFORT_CALLBACK_STATUS[self.callback_status]==9)
+                        has_updated=true
+                    elsif(SOFORT_CALLBACK_STATUS[self.callback_status]>=SOFORT_CALLBACK_STATUS[new_callback_status])
+                        has_updated=true
+                    end
+                elsif(self.payway=="alipay" && self.paytype=="oversea")
                     # TRADE_FINISHED 交易结束、买家已付款
                     # TRADE_CLOSED 交易关闭、买家没有付款
                     if(ALIPAY_OVERSEA_CALLBACK_STATUS[self.callback_status]==9)
@@ -244,13 +268,6 @@ class OnlinePay < ActiveRecord::Base
                     if(ALIPAY_TRANSACTION_CALLBACK_STATUS[self.callback_status]==9)
                         has_updated=true
                     elsif(ALIPAY_TRANSACTION_CALLBACK_STATUS[self.callback_status]>=ALIPAY_TRANSACTION_CALLBACK_STATUS[new_callback_status])
-                        has_updated=true
-                    end
-                elsif(self.payway=="paypal")
-                elsif(self.payway=="sofort")
-                    if(SOFORT_CALLBACK_STATUS[self.callback_status]==9)
-                        has_updated=true
-                    elsif(SOFORT_CALLBACK_STATUS[self.callback_status]>=SOFORT_CALLBACK_STATUS[new_callback_status])
                         has_updated=true
                     end
                 elsif(self.payway=="oceanpayment"  && self.paytype[0,8]=="unionpay")
@@ -399,6 +416,8 @@ class OnlinePay < ActiveRecord::Base
                 when 'oceanpayment_unionpay_b2b' then trade_no=params["order_number"]
                 when 'oceanpayment_wechatpay' then trade_no=params["order_number"]
                 when 'oceanpayment_alipay' then trade_no=params["order_number"]
+                when 'helipay_alipay' then trade_no=params["serialNumber"]
+                when 'helipay_wechatpay' then trade_no=params["serialNumber"]
                 else
                     logger.warn("ONLINE_PAY CALLBACK:get_online_pay_instance:#{pay_combine}=#{payway}+#{paytype}!")
                 end

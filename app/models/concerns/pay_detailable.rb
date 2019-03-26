@@ -6,6 +6,7 @@ module PayDetailable extend ActiveSupport::Concern
 	PAY_OCEANPAYMENT_UNIONPAY_PARAMS=%w{system country amount currency order_no success_url notification_url description userid paytype other_params}
 	PAY_OCEANPAYMENT_WECHATPAY_PARAMS=%w{system country amount currency order_no success_url notification_url description userid paytype other_params}
 	PAY_OCEANPAYMENT_ALIPAY_PARAMS=%w{system country amount currency order_no success_url notification_url description userid paytype other_params}
+	PAY_HELIPAY_ALIPAY_PARAMS=%w{system order_no amount currency description}
 
 	def payparams_valid(detail_name,online_pay)
 		valid_flag=true;
@@ -19,6 +20,7 @@ module PayDetailable extend ActiveSupport::Concern
 			when 'PAY_OCEANPAYMENT_UNIONPAY_PARAMS' then valid_flag=check_payparams(params_val,online_pay)
 			when 'PAY_OCEANPAYMENT_WECHATPAY_PARAMS' then valid_flag=check_payparams(params_val,online_pay)
 			when 'PAY_OCEANPAYMENT_ALIPAY_PARAMS' then valid_flag=check_payparams(params_val,online_pay)
+			when 'PAY_HELIPAY_ALIPAY_PARAMS' then valid_flag=check_payparams(params_val,online_pay)
 			else
 				valid_flag=false
 				Rails.logger.warn("match #{valid_flag} #{detail_name} - #{match_name}")
@@ -32,12 +34,12 @@ module PayDetailable extend ActiveSupport::Concern
 		match_name="PAY_"+detail_name.upcase+"_PARAMS"
 		params_val=eval(match_name)
 		params_val.each do |param|
-			#Rails.logger.info("@#{param}=online_pay['#{param}']")
+			# Rails.logger.info("@#{param}=online_pay['#{param}']")
 			eval("@#{param}=online_pay['#{param}']")
 		end
 	end
 
-	def method_url_response(method,url_path,https_boolean,params={}, body_str=nil)
+	def method_url_response(method,url_path,https_boolean,params={}, body_str=nil, spec=nil)
 		uri = URI.parse(url_path)
 		http = Net::HTTP.new(uri.host, uri.port)
 
@@ -47,12 +49,18 @@ module PayDetailable extend ActiveSupport::Concern
 			request = Net::HTTP::Get.new(uri.request_uri) 
 		else
 			request = Net::HTTP::Post.new(uri.request_uri) 
-			request.set_form_data(params) 
+			request.set_form_data(params) if spec.present?
 		end
 
 		request.body = body_str if body_str.present?
 
+		if spec == "helipay"
+			request.content_type = "application/json;charset=UTF-8"
+			request.body = params.to_json
+			Rails.logger.info("body: #{request.body}")
+		end
 		#test !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		Rails.logger.info("url call :#{url_path}")
 		response=nil
 		begin
 			Timeout::timeout(22){

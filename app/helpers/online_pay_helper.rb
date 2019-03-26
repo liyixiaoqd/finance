@@ -40,7 +40,9 @@ module OnlinePayHelper
 		"OceanpaymentUnionpayB2b"=>"银联-b2b(钱海)",
 		"OceanpaymentWechatpay"=>"微信(钱海)",
 		"OceanpaymentAlipay"=>"支付宝(钱海)",
-		"WechatMobilePay" => "微信(移动支付)"
+		"WechatMobilePay" => "微信(移动支付)",
+		"HelipayWechatpay"=>"微信(合利宝)",
+		"HelipayAlipay"=>"支付宝(合利宝)",
 	}
 
 	SYSTEM_MAPPING={
