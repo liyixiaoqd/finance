@@ -60,7 +60,7 @@ class CallQueue < ActiveRecord::Base
 						next
 					end
 
-					if online_pay.payway != "paypal" and online_pay.payway != "sofort" and online_pay.payway != "oceanpayment"
+					if online_pay.payway != "paypal" and online_pay.payway != "sofort" and online_pay.payway != "oceanpayment" && online_pay.payway != "helipay"
 						cq.status="wait"
 						cq.last_callback_result="尚不支持交易#{online_pay.payway}判断是否成功"
 						cq.save
@@ -81,6 +81,9 @@ class CallQueue < ActiveRecord::Base
 					elsif online_pay.payway == "oceanpayment"
 						ro = ReconciliationOceanpayment.new(online_pay.paytype,online_pay.system)
 						flag, reconciliation_id = ro.verify_single_order(online_pay)
+					elsif online_pay.payway == "helipay"
+						rh = ReconciliationHelipay.new(online_pay.order_no, online_pay.paytype)
+						flag, reconciliation_id = rh.verify_single_order
 					end
 
 					if flag == true

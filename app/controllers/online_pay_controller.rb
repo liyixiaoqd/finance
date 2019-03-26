@@ -230,7 +230,8 @@ class OnlinePayController < ApplicationController
 		ret_hash={
 			'redirect_url'=>'',
 			'trade_no'=>'',
-			'post_params'=>{}
+			'post_params'=>{},
+			'is_png' => false
 		}
 
 		online_pay=nil
@@ -274,7 +275,10 @@ class OnlinePayController < ApplicationController
 
 			# logger.info("ONLINE PAY SUBMIT LOCK ONLINE_PAY START:#{online_pay.id} - #{online_pay.order_no}")
 			# online_pay.with_lock do 
-			if online_pay.payway=="oceanpayment" && online_pay.paytype[0,8]=="unionpay"
+			if online_pay.payway=="helipay"
+				pay_detail = OnlinePay.get_instance_pay_detail(online_pay)
+				ret_hash['is_png'] = true
+			elsif online_pay.payway=="oceanpayment" && online_pay.paytype[0,8]=="unionpay"
 				pay_detail = OceanpaymentUnionpayDetail.new(online_pay)
 			elsif online_pay.payway=="oceanpayment" && online_pay.paytype=="wechatpay"
 				pay_detail = OceanpaymentWechatpayDetail.new(online_pay)

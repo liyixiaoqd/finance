@@ -12,9 +12,9 @@ class HelipayWechatpayDetail
 		define_var("helipay_alipay",online_pay)
 	end
 
-	def submit()
+	def get_submit_info()
 		begin
-			url,trade_no, params = get_submit_info()
+			url,trade_no, params = get_submit_params()
 			response = method_url_response("post", url, true, params, nil, "helipay")
 
 			raise "call url failure [#{response.code}]" if response.code!="200"
@@ -27,16 +27,16 @@ class HelipayWechatpayDetail
 			raise "no qrCode info #{body}" if body['qrCode'].blank?
 			raise "no serialNumber info #{body}" if body['serialNumber'].blank?
 
-			["success",body['qrCode'],body['serialNumber'],"false",""]
+			[body['qrCode'],body['serialNumber'],{}]
 		rescue=>e
 			Rails.logger.info("HelipayWechatpay get_pay_pic rescue: #{e.message}")
-			["failure","","","false",e.message]
+			["","",{}]
 		end
 
 	end
 
 	# 组装参数
-	def get_submit_info()
+	def get_submit_params()
 		trade_no=@system+"_"+@order_no
 
 		# 先初始化必填项
