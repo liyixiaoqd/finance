@@ -28,8 +28,10 @@ class ReconciliationHelipay
 			elsif @paytype == "wechatpay"
 				post_params["content"] = encrypt_base64(post_params, Settings.helipay.wechatpay.aes_secret)			
 				post_params["sign"] = sha256_sort(Settings.helipay.wechatpay.sha_secret, post_params)
-			else
-				nil
+			elsif @paytype[0,8] == "unionpay"
+				post_params["content"] = encrypt_base64(post_params, Settings.helipay.unionpay.b2c.aes_secret)			
+				post_params["sign"] = sha256_sort(Settings.helipay.unionpay.b2c.sha_secret, post_params)
+				post_params["merchantNo"] = Settings.helipay.unionpay.merchant_no
 			end
 
 			response = method_url_response("post", Settings.helipay.public.query_url, true, post_params, nil, "helipay")
