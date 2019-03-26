@@ -422,6 +422,8 @@ class OnlinePay < ActiveRecord::Base
                 when 'oceanpayment_alipay' then trade_no=params["order_number"]
                 when 'helipay_alipay' then trade_no=params["serialNumber"]
                 when 'helipay_wechatpay' then trade_no=params["serialNumber"]
+                when 'helipay_unionpay_b2c' then trade_no=params["serialNumber"]
+                when 'helipay_unionpay_b2b' then trade_no=params["serialNumber"]
                 else
                     logger.warn("ONLINE_PAY CALLBACK:get_online_pay_instance:#{pay_combine}=#{payway}+#{paytype}!")
                 end
