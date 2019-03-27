@@ -182,12 +182,15 @@ class OnlinePayController < ApplicationController
 				raise "can not use alipay oversea"
 			end
 			if online_pay.paytype=="transaction"
-				flag,online_pay.redirect_url,online_pay.trade_no,online_pay.is_credit,message,url_type=pay_detail.submit_direct_new()
+				flag,redirect_url,online_pay.trade_no,online_pay.is_credit,message,url_type=pay_detail.submit_direct_new()
 			else
-			 	flag,online_pay.redirect_url,online_pay.trade_no,online_pay.is_credit,message,url_type=pay_detail.submit()
+			 	flag,redirect_url,online_pay.trade_no,online_pay.is_credit,message,url_type=pay_detail.submit()
 			end
 
-			logger.info("#{flag} - #{online_pay.redirect_url} - #{online_pay.trade_no} - #{message}")
+			# 字符串过长
+			online_pay.redirect_url = redirect_url unless url_type == "2"
+
+			logger.info("#{flag} - #{redirect_url} - #{online_pay.trade_no} - #{message}")
 
 			unless(flag=="success")
 				online_pay.set_status!("failure_submit",message)
@@ -206,7 +209,7 @@ class OnlinePayController < ApplicationController
 				trade_no: online_pay.trade_no
 			}) unless online_pay.trade_no.blank?
 
-			ret_hash['redirect_url']=CGI.escape(online_pay.redirect_url)
+			ret_hash['redirect_url']=CGI.escape(redirect_url)
 			ret_hash['trade_no']=online_pay.trade_no
 			ret_hash['is_credit']=online_pay.is_credit
 			ret_hash['url_type']=url_type.blank? ? 0 : url_type
