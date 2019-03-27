@@ -1,5 +1,37 @@
 class HelipayUnionpayDetail
 	include PayDetailable, Encrypt
+
+	BANKCODE_ENUM={
+		"ICBC"=>"中国工商银行",
+		"ABC"=>"中国农业银行",
+		"CMBCHINA"=>"招商银行",
+		"CCB"=>"中国建设银行",
+		"BOCO"=>"交通银行",
+		"BOC"=>"中国银行",
+		"CMBC"=>"中国民生银行",
+		"CGB"=>"广发银行",
+		"HXB"=>"华夏银行",
+		"POST"=>"中国邮政储蓄银行",
+		"ECITIC"=>"中信银行",
+		"CEB"=>"中国光大银行",
+		"PINGAN"=>"平安银行",
+		"CIB"=>"兴业银行",
+		"SPDB"=>"浦发银行",
+		"BCCB"=>"北京银行",
+		"BON"=>"南京银行",
+		"NBCB"=>"宁波银行",
+		"BEA"=>"东亚银行",
+		"SRCB"=>"上海农商银行",
+		"SHB"=>"上海银行",
+		"CZB"=>"浙商银行",
+		"TCCB"=>"天津银行",
+		"HSBANK"=>"徽商银行",
+		"HFBANK"=>"恒丰银行",
+		"CBHB"=>"渤海银行",
+		"JSB"=>"江苏银行",
+		"CITI"=>"花旗银行",
+		"THX"=>"贵阳银行"
+	}
 	# amount 
 	attr_accessor :order_no,:amount,:currency,:description,:credit_brand,:paytype
 
@@ -74,6 +106,10 @@ class HelipayUnionpayDetail
 
 			if online_pay.currency.blank? || !["CNY","RMB"].include?(online_pay.currency)
 				errmsg = "currency must be CNY for [#{online_pay.currency}]"
+			end
+
+			if BANKCODE_ENUM[online_pay.credit_brand].blank?
+				errmsg = "bankCode[#{online_pay.credit_brand}] not support"
 			end
 
 			if errmsg.blank?

@@ -439,6 +439,9 @@ class OnlinePayController < ApplicationController
 			online_pay.send_country=params.delete('send_country')
 
 			online_pay.set_order_type!(params.delete('order_type'))
+			if params['bankCode'].present?
+				online_pay.credit_brand = params.delete('bankCode')
+			end
 
 			online_pay.other_params=params.inspect
 
