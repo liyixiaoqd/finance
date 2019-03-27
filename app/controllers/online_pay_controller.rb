@@ -188,7 +188,7 @@ class OnlinePayController < ApplicationController
 			end
 
 			# 字符串过长
-			online_pay.redirect_url = redirect_url unless url_type == "2"
+			online_pay.redirect_url = redirect_url unless url_type == 2
 
 			logger.info("#{flag} - #{redirect_url} - #{online_pay.trade_no} - #{message}")
 
