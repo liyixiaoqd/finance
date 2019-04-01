@@ -1011,15 +1011,15 @@ class OnlinePayCallbackController < ApplicationController
 				end
 				if params['paytype'] == "alipay"
 					content_hash = JSON.parse pay_detail.decrypt_base64(params['content'], Settings.helipay.alipay.aes_secret)
-					content_hash['orderAmount'] = sprintf("%.2f", content_hash['orderAmount'])
+					content_hash['orderAmount'] = sprintf("%.2f", content_hash['orderAmount']) if content_hash['orderAmount'].present?
 					calc_sign = pay_detail.sha256_sort(Settings.helipay.alipay.sha_secret, content_hash)
 				elsif params['paytype'] == "wechatpay"
 					content_hash = JSON.parse pay_detail.decrypt_base64(params['content'], Settings.helipay.wechatpay.aes_secret)
-					content_hash['orderAmount'] = sprintf("%.2f", content_hash['orderAmount'])
+					content_hash['orderAmount'] = sprintf("%.2f", content_hash['orderAmount']) if content_hash['orderAmount'].present?
 					calc_sign = pay_detail.sha256_sort(Settings.helipay.wechatpay.sha_secret, content_hash)
 				elsif params['paytype'][0,8] == "unionpay"
 					content_hash = JSON.parse pay_detail.decrypt_base64(params['content'], Settings.helipay.unionpay.b2c.aes_secret)
-					content_hash['orderAmount'] = sprintf("%.2f", content_hash['orderAmount'])
+					content_hash['orderAmount'] = sprintf("%.2f", content_hash['orderAmount']) if content_hash['orderAmount'].present?
 					calc_sign = pay_detail.sha256_sort(Settings.helipay.unionpay.b2c.sha_secret, content_hash)
 				end
 
