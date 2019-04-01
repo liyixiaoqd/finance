@@ -1006,6 +1006,9 @@ class OnlinePayCallbackController < ApplicationController
 
 			begin
 				# decrypt
+				if params['content']['orderAmount'].present?
+					params['content']['orderAmount'] = sprintf("%.2f", params['content']['orderAmount'])
+				end
 				if params['paytype'] == "alipay"
 					content_hash = JSON.parse pay_detail.decrypt_base64(params['content'], Settings.helipay.alipay.aes_secret)
 					calc_sign = pay_detail.sha256_sort(Settings.helipay.alipay.sha_secret, content_hash)
@@ -1016,7 +1019,7 @@ class OnlinePayCallbackController < ApplicationController
 					content_hash = JSON.parse pay_detail.decrypt_base64(params['content'], Settings.helipay.unionpay.b2c.aes_secret)
 					calc_sign = pay_detail.sha256_sort(Settings.helipay.unionpay.b2c.sha_secret, content_hash)
 				end
-
+				
 				Rails.logger.info("helipay decrypt: [#{content_hash}]")
 
 				# sign compare
