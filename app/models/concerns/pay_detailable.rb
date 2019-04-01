@@ -51,7 +51,7 @@ module PayDetailable extend ActiveSupport::Concern
 			request = Net::HTTP::Get.new(uri.request_uri) 
 		else
 			request = Net::HTTP::Post.new(uri.request_uri) 
-			request.set_form_data(params) if spec.present?
+			request.set_form_data(params) #if spec.blank?
 		end
 
 		request.body = body_str if body_str.present?
