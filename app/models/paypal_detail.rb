@@ -82,9 +82,9 @@ class PaypalDetail
 		#return  flag   redirect_url    trade_no    is_credit    errmsg
 		unless(response.token.blank?)
 			redirect_url="#{Settings.paypal.paypal_api_uri}?cmd=_express-checkout&token=#{response.token}"
-			["success",redirect_url,response.token,"true",""]
+			["success",redirect_url,response.token,"true","",0]
 		else
-			["failure","","","",response.message]
+			["failure","","","",response.message,0]
 		end
 	end
 

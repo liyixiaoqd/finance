@@ -129,7 +129,8 @@ class OnlinePayController < ApplicationController
 		ret_hash={
 			'redirect_url'=>'',
 			'trade_no'=>'',
-			'is_credit'=>''
+			'is_credit'=>'',
+			'url_type' => 0
 		}
 
 		online_pay=nil
@@ -174,18 +175,22 @@ class OnlinePayController < ApplicationController
 
 			# logger.info("ONLINE PAY SUBMIT LOCK ONLINE_PAY START:#{online_pay.id} - #{online_pay.order_no}")
 			# online_pay.with_lock do 
+
 			pay_detail=OnlinePay.get_instance_pay_detail(online_pay)
 			#flag,online_pay.redirect_url,online_pay.trade_no,online_pay.is_credit,message=pay_detail.submit()
 			if online_pay.payway=="alipay" && online_pay.paytype=="oversea"
 				raise "can not use alipay oversea"
 			end
 			if online_pay.paytype=="transaction"
-				flag,online_pay.redirect_url,online_pay.trade_no,online_pay.is_credit,message=pay_detail.submit_direct_new()
+				flag,redirect_url,online_pay.trade_no,online_pay.is_credit,message,url_type=pay_detail.submit_direct_new()
 			else
-			 	flag,online_pay.redirect_url,online_pay.trade_no,online_pay.is_credit,message=pay_detail.submit()
+			 	flag,redirect_url,online_pay.trade_no,online_pay.is_credit,message,url_type=pay_detail.submit()
 			end
 
-			logger.info("#{flag} - #{online_pay.redirect_url} - #{online_pay.trade_no} - #{message}")
+			# 字符串过长
+			online_pay.redirect_url = redirect_url unless url_type == 2
+
+			logger.info("#{flag} - #{redirect_url} - #{online_pay.trade_no} - #{message}")
 
 			unless(flag=="success")
 				online_pay.set_status!("failure_submit",message)
@@ -204,9 +209,10 @@ class OnlinePayController < ApplicationController
 				trade_no: online_pay.trade_no
 			}) unless online_pay.trade_no.blank?
 
-			ret_hash['redirect_url']=CGI.escape(online_pay.redirect_url)
+			ret_hash['redirect_url']=CGI.escape(redirect_url)
 			ret_hash['trade_no']=online_pay.trade_no
 			ret_hash['is_credit']=online_pay.is_credit
+			ret_hash['url_type']=url_type.blank? ? 0 : url_type
 			# end
 			# logger.info("ONLINE PAY SUBMIT LOCK ONLINE_PAY END:#{online_pay.id} - #{online_pay.order_no}")
 		rescue => e
@@ -436,6 +442,9 @@ class OnlinePayController < ApplicationController
 			online_pay.send_country=params.delete('send_country')
 
 			online_pay.set_order_type!(params.delete('order_type'))
+			if params['bankCode'].present?
+				online_pay.credit_brand = params.delete('bankCode')
+			end
 
 			# other_params 长度限制不记录
 			tmp_cash = params.delete('cash_coupons')

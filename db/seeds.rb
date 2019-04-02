@@ -391,3 +391,10 @@ AccessAuthority.create!(:controller=>"CashCouponController",:action=>"use",
 			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>true,
 			:describe=>'现金券直接操作接口')
 
+AccessAuthority.create!(:controller=>"OnlinePayCallbackController",:action=>"helipay_notify",
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>false,
+			:describe=>'helipay支付异步回调接口')
+AccessAuthority.create!(:controller=>"OnlinePayCallbackController",:action=>"helipay_return",
+			:is_sign_in=>false,:is_interface=>true,:is_digest_auth=>false,
+			:describe=>'helipay支付同步回调接口')
+

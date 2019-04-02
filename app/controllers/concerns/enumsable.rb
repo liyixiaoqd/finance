@@ -21,7 +21,8 @@ module Enumsable extend ActiveSupport::Concern
 		"积分"=>"score",
 		"电子现金"=>"e_cash",
 		"钱海"=>"oceanpayment",
-		"微信"=>"wechat"
+		"微信"=>"wechat",
+		"合利宝" => "helipay"
 	}
 
 	PAYTYPE_MAPPING_TO_DISPLAY={

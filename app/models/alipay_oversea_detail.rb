@@ -29,10 +29,10 @@ class AlipayOverseaDetail
 
 		response_code=method_url_response_code("get",redirect_url,true)
 		if(response_code=="200" || response_code=="302")
-			["success",redirect_url,"","false",""]
+			["success",redirect_url,"","false","",0]
 		else
 			Rails.logger.info(redirect_url)
-			["failure","","","","get alipay url failure,code:#{response_code}"]
+			["failure","","","","get alipay url failure,code:#{response_code}",0]
 		end
 	end
 

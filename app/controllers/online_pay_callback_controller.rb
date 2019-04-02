@@ -753,6 +753,111 @@ class OnlinePayCallbackController < ApplicationController
 		end
 	end
 
+	def helipay_return
+		render_text="failure"
+		logger.info("into helipay_return and params: [#{params}]")
+		use_params = {}
+		
+		# 验证数据
+		begin
+			valid_flag, use_params = valid_helipay_notify(params)
+			if valid_flag == false
+				logger.info("into helipay_notify return ,valid failure")
+				render :text=>render_text and return 
+			end
+		rescue=>e
+			logger.info("into helipay_notify return ,rescue #{e.message}")
+			render :text=>render_text and return 
+		end
+
+		#order_notes == system
+		online_pay=OnlinePay.get_online_pay_instance("helipay",params['paytype'],use_params,"",false,true)
+		render text: "#{render_text}" and return if (online_pay.blank? || online_pay.success_url.blank?)
+
+		ret_hash=init_return_ret_hash(online_pay)
+		redirect_url=OnlinePay.redirect_url_replace("get",online_pay.success_url,ret_hash)
+		logger.info("oceanpayment_alipay_return:#{redirect_url}")
+
+		redirect_to redirect_url
+	end
+
+	def helipay_notify
+		logger.info("into helipay_notify and params: [#{params}]")
+		render_text="failure"
+
+		# 验证数据
+		begin
+			valid_flag, use_params = valid_helipay_notify(params)
+			if valid_flag == false
+				logger.info("into helipay_notify return ,valid failure")
+				render :text=>render_text and return 
+			end
+		rescue=>e
+			logger.info("into helipay_notify return ,rescue #{e.message}")
+			render :text=>render_text and return 
+		end
+
+		ActiveRecord::Base.transaction do
+			online_pay=OnlinePay.get_online_pay_instance("helipay",params['paytype'],use_params,"",false,true)
+			render :text=>"#{render_text}" and return if (online_pay.blank? || online_pay.notification_url.blank?)
+			cq=CallQueue.online_pay_is_succ_record(online_pay.id)
+
+			# pay_detail=OceanpaymentWechatpayDetail.new(online_pay)
+			
+			ret_hash=init_notify_ret_hash(online_pay)
+
+			rollback_callback_status = online_pay.callback_status
+
+			render :text=>'receive-ok' and return if online_pay.check_has_updated?(use_params['orderStatus'])
+
+			online_pay.callback_status=use_params['orderStatus']
+			online_pay.set_status_by_callback!()
+			online_pay.reason=use_params['remark']
+
+			# ????
+			online_pay.reconciliation_id=use_params['serialNumber']
+
+			ret_hash['status']=online_pay.status
+			ret_hash['status_reason']=online_pay.reason
+
+			redirect_url=OnlinePay.redirect_url_replace("post",online_pay.notification_url)
+			logger.info("oceanpayment_alipay_notify:#{redirect_url}")
+
+			begin
+				online_pay.save!()
+				if online_pay.is_success?() && online_pay.find_reconciliation().blank?
+					online_pay.set_reconciliation.save!()
+					fw=FinanceWater.save_by_online_pay(online_pay)
+					ret_hash['water_no']=fw.id unless fw.blank?
+					cq.online_pay_is_succ_set() unless cq.blank?
+				end
+
+				if online_pay.is_success?() && online_pay.cash_coupon == true
+					CashCouponDetail.proc_by_order_no!(online_pay.order_no, CashCouponDetail::USE)
+				end
+				
+				# response_code=online_pay.method_url_response_code("post",redirect_url,false,ret_hash)
+				# unless response_code=="200"
+				# 	raise "call #{redirect_url} failure : #{response_code}"
+				# end
+				logger.info("ret_hash[#{ret_hash}]") unless Rails.env.production?
+				if !online_pay.method_url_success?("post",redirect_url,false,ret_hash)
+					if online_pay.status=='success_notify'
+						online_pay.set_status!("failure_notify_third","call notify_url wrong")
+						online_pay.update_attributes!({})
+					end
+				end
+
+				render_text="SUCCESS"
+			rescue => e
+				online_pay.update_attributes(:status=>"failure_notify",:reason=>e.message,:callback_status=>rollback_callback_status)
+				logger.info("sofort_notify failure!! : #{e.message},[#{params}]")
+			end
+
+			render text: "#{render_text}"
+		end
+	end
+
 	private 
 		def init_return_ret_hash(online_pay)
 			{
@@ -887,5 +992,49 @@ class OnlinePayCallbackController < ApplicationController
 			end
 
 			valid_flag
+		end
+
+		def valid_helipay_notify(params)
+			valid_flag, content_hash = false, {}
+
+			raise "params wrong" if params['orderNo'].blank?
+
+			op = OnlinePay.find_by(order_no: params['orderNo'], payway: "helipay", paytype: params['paytype'])
+			raise "no OnlinePay record? [#{params['orderNo']}]" if op.blank?
+
+			pay_detail = OnlinePay.get_instance_pay_detail(op)
+
+			begin
+				# decrypt
+				if params['content']['orderAmount'].present?
+					params['content']['orderAmount'] = sprintf("%.2f", params['content']['orderAmount'])
+				end
+				if params['paytype'] == "alipay"
+					content_hash = JSON.parse pay_detail.decrypt_base64(params['content'], Settings.helipay.alipay.aes_secret)
+					content_hash['orderAmount'] = sprintf("%.2f", content_hash['orderAmount']) if content_hash['orderAmount'].present?
+					calc_sign = pay_detail.sha256_sort(Settings.helipay.alipay.sha_secret, content_hash)
+				elsif params['paytype'] == "wechatpay"
+					content_hash = JSON.parse pay_detail.decrypt_base64(params['content'], Settings.helipay.wechatpay.aes_secret)
+					content_hash['orderAmount'] = sprintf("%.2f", content_hash['orderAmount']) if content_hash['orderAmount'].present?
+					calc_sign = pay_detail.sha256_sort(Settings.helipay.wechatpay.sha_secret, content_hash)
+				elsif params['paytype'][0,8] == "unionpay"
+					content_hash = JSON.parse pay_detail.decrypt_base64(params['content'], Settings.helipay.unionpay.b2c.aes_secret)
+					content_hash['orderAmount'] = sprintf("%.2f", content_hash['orderAmount']) if content_hash['orderAmount'].present?
+					calc_sign = pay_detail.sha256_sort(Settings.helipay.unionpay.b2c.sha_secret, content_hash)
+				end
+
+				Rails.logger.info("helipay decrypt: [#{content_hash}]")
+
+				# sign compare
+				raise "orderNo not match [#{content_hash['orderNo']}] <-> [#{params['orderNo']}]" if content_hash['orderNo'] != params['orderNo']
+				raise "sign not match [#{calc_sign}] <-> [#{params['sign']}]" if calc_sign != params['sign']
+
+				valid_flag = true
+			rescue=>e
+				logger.info("valid_helipay_notify rescue: #{e.message}")
+				valid_flag=false
+			end
+			
+			[valid_flag, content_hash]
 		end
 end
