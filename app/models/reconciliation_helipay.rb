@@ -138,7 +138,7 @@ class ReconciliationHelipay
 			'feeamt'=>content[3].to_f,
 			'currencycode'=>"RMB",
 			'payway'=>'helipay',
-			'paytype'=> content[1],
+			'paytype'=> paytype,
 			'transaction_date'=>content[0][0...10],
 			'batch_id'=>batch_id,
 			'reconciliation_flag'=>ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['INIT']
