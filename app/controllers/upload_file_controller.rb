@@ -4,6 +4,7 @@ class UploadFileController < ApplicationController
 	# before_action :authenticate_admin!
 
 	SOFORT_TRANSACTION_FILE_SPLIT=";"
+	HELIPAY_TRANSACTION_FILE_SPLIT=","
 
 	def index
 	end
@@ -14,6 +15,12 @@ class UploadFileController < ApplicationController
 
 			if msg.present?
 				flash[:notice]=msg
+			elsif params['file_type']=="helipay_transaction"
+				filename=write_file(params['file'],"")
+
+				flash[:notice],flash[:error]=ReconciliationHelipay.valid_reconciliation_file(filename, HELIPAY_TRANSACTION_FILE_SPLIT)
+
+				File.delete(filename)
 			elsif params['file_type']=="sofort_transaction"
 				params['file'].original_filename
 				arr=CSV.parse(params['file'].read,{:col_sep => SOFORT_TRANSACTION_FILE_SPLIT})
@@ -96,7 +103,9 @@ class UploadFileController < ApplicationController
 				msg="选择上传业务类型"
 			else
 				file_ext=File.extname(param_file.original_filename)
-				if file_type=="sofort_transaction"
+				if file_type=="helipay_transaction"
+					msg='请上传 .csv 格式文件' unless file_ext==".csv"
+				elsif file_type=="sofort_transaction"
 					msg='请上传 .csv 格式文件' unless file_ext==".csv"
 				elsif file_type=="NL_ABN_Bank"
 					msg='请上传 .xlsx 或 .xls 格式文件' if file_ext!=".xlsx" && file_ext!=".xls"

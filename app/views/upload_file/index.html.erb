@@ -38,13 +38,14 @@
 			<%= form_tag upload_file_upload_path,multipart:true do %>
 				<%= label_tag(:l1, "上传业务类型:") %>
 				<%= select_tag "file_type", options_for_select([ 
+						["合利宝对账明细","helipay_transaction"],
 						["sofort对账明细","sofort_transaction"],
 						["荷兰银行事务历史记录","NL_ABN_Bank"],
 						["德国银行事务历史记录","DE_BOC_Bank"],
 						["奥地利银行事务历史记录","AT_STA_Bank"],
 						["电商-英国银行交易记录上传","MERCHANT_EN_CASH_IN_BANK"],
 						["电商-荷兰银行交易记录上传","MERCHANT_NL_CASH_IN_BANK"] 
-					], "NL_ABN_Bank") %>
+					], "helipay_transaction") %>
 				<%= label_tag(:l2, "选择文件:") %>
 				<%= file_field_tag :file %>
 				 <div class="btn-toolbar">

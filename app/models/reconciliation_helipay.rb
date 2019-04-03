@@ -61,4 +61,87 @@ class ReconciliationHelipay
 
 		[flag,reconciliation_id]
 	end
+
+
+	def self.valid_reconciliation_file(filename, split, batch_id=Time.now.to_i)
+		arr=[]
+		File.open(filename, "r:GBK") do |f|
+			f.each_line do |line|
+				arr << line.chomp.split(split)
+			end
+		end
+
+		valid_reconciliation(arr, batch_id, true)
+	end
+
+	def self.valid_reconciliation(content_arr, batch_id, has_title = true)
+		valid_succ_num=0
+		valid_fail_num=0
+		valid_nosys_num=0
+		valid_rescue_num=0
+		errmsg = ''
+		# 2019-04-02 15:57:03.004, xxxx, 399.00, 1.40, xxxx, 397.60, 5831.86, TM190402240347095642
+		i = 0
+		content_arr.each do |content|
+			i += 1
+			next if has_title == true && i ==1 
+
+			begin
+				rd = ReconciliationDetail.init( content_to_hash(content, batch_id) )
+				rd.valid_and_save!
+
+				if(rd.reconciliation_flag==ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['NON_SYSTEM'])
+					valid_nosys_num=valid_nosys_num+1
+				elsif(rd.reconciliation_flag==ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['FAIL'])
+					valid_fail_num=valid_fail_num+1
+				elsif(rd.reconciliation_flag==ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['SUCC'])
+					valid_succ_num=valid_succ_num+1
+				end
+			rescue => e
+				valid_fail_num +=1
+
+				Rails.logger.info("helipayt对账异常:"+e.message)
+
+				if e.message.blank? || e.message.length>50
+					tmpmsg="第#{i}行:处理出错!"
+				else
+					tmpmsg=e.message
+				end
+
+				if valid_rescue_num==0
+					errmsg=tmpmsg
+				elsif valid_rescue_num<5
+					errmsg+=";"+tmpmsg
+				elsif valid_rescue_num==5
+					errmsg+="..."
+				end
+			end
+		end
+
+		outmsg="对账成功比数:#{valid_succ_num},对账失败比数:#{valid_fail_num},非系统记录比数:#{valid_nosys_num},处理异常笔数:#{valid_rescue_num}"
+		
+		if errmsg.length>200
+			Rails.logger.info("full errmsg:#{errmsg}")
+			errmsg=errmsg[0,200]+"..."
+		end
+		[outmsg,errmsg]
+	end
+
+	def self.content_to_hash(content, batch_id)
+		paytype = {"微信扫码"=>"wechatpay", "支付宝扫码"=>"alipay"}[content[1]]
+
+		{
+			'timestamp'=>content[0],
+			'order_no'=>content[7],
+			'transaction_status'=>'SUCC',  # 默认都为成功状态
+			'amt'=>content[2].to_f,
+			'feeamt'=>content[3].to_f,
+			'currencycode'=>"RMB",
+			'payway'=>'helipay',
+			'paytype'=> content[1]=="微信扫码",
+			'transaction_date'=>content[0][0...10],
+			'batch_id'=>batch_id,
+			'reconciliation_flag'=>ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['INIT']
+		}
+	end
 end
