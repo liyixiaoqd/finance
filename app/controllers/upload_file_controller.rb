@@ -104,7 +104,7 @@ class UploadFileController < ApplicationController
 			else
 				file_ext=File.extname(param_file.original_filename)
 				if file_type=="helipay_transaction"
-					msg='请上传 .csv 格式文件' unless file_ext==".csv"
+					msg='请上传 .xlsx 格式文件' unless file_ext==".xlsx"
 				elsif file_type=="sofort_transaction"
 					msg='请上传 .csv 格式文件' unless file_ext==".csv"
 				elsif file_type=="NL_ABN_Bank"

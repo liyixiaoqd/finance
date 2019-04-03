@@ -65,9 +65,21 @@ class ReconciliationHelipay
 
 	def self.valid_reconciliation_file(filename, split, batch_id=Time.now.to_i)
 		arr=[]
-		File.open(filename, "r:GBK") do |f|
-			f.each_line do |line|
-				arr << line.chomp.split(split)
+
+		if filename.to_s.split(".").last.to_sym == ".csv"
+			File.open(filename, "r:GBK") do |f|
+				f.each_line do |line|
+					arr << line.chomp.split(split)
+				end
+			end
+		else
+			xlsx=Roo::Spreadsheet.open(filename,extension: filename.to_s.split(".").last.to_sym)
+			xlsx.sheet(0).each do |row|
+				tmp_arr=[]
+				row.each do |field|
+					tmp_arr << field.to_s
+				end
+				arr << tmp_arr
 			end
 		end
 
@@ -98,14 +110,14 @@ class ReconciliationHelipay
 					valid_succ_num=valid_succ_num+1
 				end
 			rescue => e
-				valid_fail_num +=1
+				valid_rescue_num +=1
 
 				Rails.logger.info("helipayt对账异常:"+e.message)
 
 				if e.message.blank? || e.message.length>50
 					tmpmsg="第#{i}行:处理出错!"
 				else
-					tmpmsg=e.message
+					tmpmsg="第#{i}行:#{e.message}"
 				end
 
 				if valid_rescue_num==0
