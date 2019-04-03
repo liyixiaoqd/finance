@@ -31,7 +31,9 @@ class ReconciliationDetail < ActiveRecord::Base
 		'ALIPAY_OVERSEA_W' => 'PEND',
 		'ALIPAY_OVERSEA_F' => 'FAIL',
 		'SOFORT_SUCC' => 'SUCC',
-		'WECHAT_MOBILE_PAY_PEND' => 'SUCC'
+		'WECHAT_MOBILE_PAY_PEND' => 'SUCC',
+		'HELIPAY_WECHATPAY_SUCC' => 'SUCC',
+		'HELIPAY_ALIPAY_SUCC' => 'SUCC',
 	}
 
 	CONFIRM_FLAG={

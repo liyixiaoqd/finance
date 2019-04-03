@@ -130,7 +130,7 @@ class ReconciliationHelipay
 	def self.content_to_hash(content, batch_id)
 		paytype = {"微信扫码"=>"wechatpay", "支付宝扫码"=>"alipay"}[content[1]]
 
-		{
+		p = {
 			'timestamp'=>content[0],
 			'order_no'=>content[7],
 			'transaction_status'=>'SUCC',  # 默认都为成功状态
@@ -143,5 +143,9 @@ class ReconciliationHelipay
 			'batch_id'=>batch_id,
 			'reconciliation_flag'=>ReconciliationDetail::RECONCILIATIONDETAIL_FLAG['INIT']
 		}
+
+		Rails.logger.info(p)
+
+		p
 	end
 end
