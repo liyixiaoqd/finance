@@ -114,7 +114,7 @@ class ReconciliationHelipay
 
 				Rails.logger.info("helipayt对账异常:"+e.message)
 
-				if e.message.blank? || e.message.length>50
+				if e.message.blank? || e.message.length>100
 					tmpmsg="第#{i}行:处理出错!"
 				else
 					tmpmsg="第#{i}行:#{e.message}"
