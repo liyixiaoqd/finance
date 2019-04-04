@@ -57,6 +57,13 @@ module OnlinePayHelper
 		"package_material"=>"包材"
 	}
 
+	TURE_FALSE_MAPPING={
+		true => "是",
+		false => "否",
+		nil => "否",
+		"" => "否"
+	}
+
 	ACTUAL_PAY=%w(score e_cash)
 
 	def status_mapping(status)
@@ -91,5 +98,9 @@ module OnlinePayHelper
 			type='' unless isAuthority('11')
 		end
 		type
+	end
+
+	def true_false_mapping(field)
+		TURE_FALSE_MAPPING[field]
 	end
 end
