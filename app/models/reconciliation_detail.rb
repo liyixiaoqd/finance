@@ -74,6 +74,14 @@ class ReconciliationDetail < ActiveRecord::Base
 			rd=ReconciliationDetail.new(find_params)
 		end
 
+		# 2019.06.21 接口存在部分数据 第二次获取为空, 因此判断如原数据存在, 则不更新
+		other_params.each do |k,v|
+			if v.blank? && rd[k].present?
+				Rails.logger.info("update nil?? #{k} - [#{v}] - [#{rd[k]}]")
+				other_params[k]=rd[k]
+			end
+		end
+
 		rd.assign_attributes(other_params)
 		#Rails.logger.info(rd.attributes)
 		rd
